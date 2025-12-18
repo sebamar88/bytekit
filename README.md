@@ -63,6 +63,20 @@ const slug = StringUtils.slugify("New Users – October 2024");
 **EN:** Import everything from the root entry, configure the ApiClient once, reuse helpers everywhere.  
 **ES:** Importá desde la raíz, configurá el ApiClient una sola vez y reutilizá los helpers en todos tus servicios.
 
+## API surface (pnpm info) / Métodos expuestos
+
+`pnpm info @sebamar88/utils readme` ahora lista todos los exports públicos:
+
+-   **ApiClient / createApiClient / ApiError**: `get`, `post`, `put`, `patch`, `delete`, `request`.
+-   **Logger / createLogger**: `setLevel`, `child`, `debug`, `info`, `warn`, `error`, `log`, `silent`; transports `consoleTransportNode`, `consoleTransportBrowser`.
+-   **Profiler**: `start`, `end`, `summary`.
+-   **Timing & debug**: `createStopwatch` (`stop`, `elapsed`, `log`), `withTiming`, `measureSync`, `measureAsync`, `captureDebug`.
+-   **DateUtils**: `parse`, `isValid`, `toISODate`, `startOfDay`, `endOfDay`, `add`, `diff`, `diffInDays`, `isSameDay`, `isBefore`, `isAfter`, `format`.
+-   **StringUtils**: `removeDiacritics`, `slugify`, `compactWhitespace`, `capitalize`, `capitalizeWords`, `truncate`, `mask`, `interpolate`, `initials`, `toQueryString`.
+-   **StorageManager**: `set`, `get`, `remove`, `clear`.
+-   **EnvManager**: `get`, `require`, `isProd`.
+-   **Validator**: `isEmail`, `isEmpty`, `minLength`, `maxLength`, `matches`, `isUrl`, `isInternationalPhone`, `isPhoneE164`, `isUUIDv4`, `isLocalPhone`, `isDni`, `isCuit`, `isCbu`, `isStrongPassword`, `isDateRange`, `isOneTimeCode`.
+
 ## ApiClient Details / Detalles del ApiClient
 
 -   `baseUrl`: **EN** required prefix for relative endpoints. **ES** prefijo requerido para endpoints relativos.
@@ -262,6 +276,29 @@ Validator.isLocalPhone("11 5555-7777", "es-AR");
 
 -   Node.js >= 18 (ESM, `fetch`, `AbortController`, `URL`).
 -   Modern browsers (ships optional `cross-fetch` polyfill).
+
+## CLI scaffolding / Generador CLI
+
+**EN:** Install the package globally or invoke it with `npx`. The `sutils` binary scaffolds resource folders with ApiClient-powered CRUD helpers and ready-to-use React Query hooks.
+**ES:** Instalá el paquete globalmente o usalo con `npx`. El binario `sutils` crea carpetas por recurso con helpers de ApiClient y hooks listos para React Query.
+
+```bash
+npx sutils create users
+```
+
+### What is generated / Qué se genera
+
+- `api/<resource>/index.ts`: typed CRUD helpers built on `@sebamar88/utils`' `ApiClient`, including shape placeholders, filter helpers, and `list/get/create/update/delete` functions.
+- `hooks/<resource>/use<ResourcePlural>.ts`: React Query hooks (`use<ResourcePlural>`, `use<Resource>`, `useCreate<Resource>`, `useUpdate<Resource>`, `useDelete<Resource>`) that invalidate the corresponding queries and wire mutations to `@tanstack/react-query`.
+- `hooks/<resource>/index.ts`: re-exports the generated hooks.
+
+The generator accepts `--apiDir`, `--hooksDir`, `--route`, and `--force`; directories default to `api`/`hooks`, the route defaults to the resource name, and `--force` overwrites existing files. It also respects nested resource paths like `admin/users`.
+
+React Query must be available in the consuming project (`npm install @tanstack/react-query`), and the hooks expect an `ApiClient` instance that you pass as the first argument.
+
+```bash
+npx sutils create payments --apiDir=services --hooksDir=app/hooks --route=/billing/payments --force
+```
 
 ## License / Licencia
 
