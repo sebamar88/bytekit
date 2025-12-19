@@ -2,7 +2,7 @@
   "name": "@sebamar88/utils",
   "version": "0.1.9",
   "type": "module",
-  "description": "Modern TypeScript utility toolkit for the Nubi Lab team (HTTP client, logging, helpers)",
+  "description": "Modern TypeScript utility toolkit (HTTP client, logging, helpers)",
   "imports": {
     "#core/*": "./dist/utils/core/*",
     "#utils/*": "./dist/utils/*",
@@ -31,21 +31,20 @@
     "bin"
   ],
   "keywords": [
-    "nubi",
+    "typescript",
     "http-client",
     "logger",
-    "typescript",
     "utilities"
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/sebamar88/nubi-lab-utils.git"
+    "url": "git+https://github.com/sebamar88/utils.git"
   },
   "bugs": {
-    "url": "https://github.com/sebamar88/nubi-lab-utils/issues"
+    "url": "https://github.com/sebamar88/utils/issues"
   },
-  "homepage": "https://github.com/sebamar88/nubi-lab-utils#readme",
-  "author": "Nubi Lab",
+  "homepage": "https://github.com/sebamar88/utils#readme",
+  "author": "Sebastián Martinez",
   "license": "MIT",
   "sideEffects": false,
   "publishConfig": {
