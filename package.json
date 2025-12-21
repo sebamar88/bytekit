@@ -1,7 +1,7 @@
 {
     "name": "@bolt/core",
     "description": "Lightning-fast TypeScript utilities for modern development",
-    "version": "0.1.10",
+    "version": "0.1.11",
     "type": "module",
     "imports": {
         "#core/*": "./dist/utils/core/*",
