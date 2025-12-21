@@ -1,4 +1,4 @@
-# @bolt/core
+# bytekit
 
 > **Previously known as:** `@sebamar88/utils` (v0.1.9 and earlier)
 
@@ -28,9 +28,9 @@
 **ES:** Instalá el paquete globalmente para usar la herramienta CLI (`sutils`) desde cualquier lugar.
 
 ```bash
-npm install -g @bolt/core
+npm install -g bytekit
 # or / o
-pnpm add -g @bolt/core
+pnpm add -g bytekit
 ```
 
 **EN:** After global installation, you can use the `sutils` command:  
@@ -47,11 +47,11 @@ sutils types https://api.example.com/users
 **ES:** Instalá como dependencia del proyecto para usar todos los utilities en tu aplicación.
 
 ```bash
-npm install @bolt/core
+npm install bytekit
 # or / o
-pnpm add @bolt/core
+pnpm add bytekit
 # or / o
-yarn add @bolt/core
+yarn add bytekit
 ```
 
 ### Modular Installation / Instalación Modular
@@ -63,101 +63,101 @@ yarn add @bolt/core
 
 ```ts
 // HTTP Client
-import { ApiClient, createApiClient } from "@bolt/core/api-client";
+import { ApiClient, createApiClient } from "bytekit/api-client";
 
 // Retry & Circuit Breaker
-import { RetryPolicy, CircuitBreaker } from "@bolt/core/retry-policy";
+import { RetryPolicy, CircuitBreaker } from "bytekit/retry-policy";
 
 // Response Validation
-import { ResponseValidator } from "@bolt/core/response-validator";
+import { ResponseValidator } from "bytekit/response-validator";
 
 // Logging
-import { Logger, createLogger } from "@bolt/core/logger";
+import { Logger, createLogger } from "bytekit/logger";
 
 // Profiling
-import { Profiler } from "@bolt/core/profiler";
+import { Profiler } from "bytekit/profiler";
 
 // Debug Utilities
-import { createStopwatch, withTiming, measureAsync } from "@bolt/core/debug";
+import { createStopwatch, withTiming, measureAsync } from "bytekit/debug";
 
 // Request Caching
-import { RequestCache } from "@bolt/core/request-cache";
+import { RequestCache } from "bytekit/request-cache";
 
 // Rate Limiting
-import { RateLimiter, SlidingWindowRateLimiter } from "@bolt/core/rate-limiter";
+import { RateLimiter, SlidingWindowRateLimiter } from "bytekit/rate-limiter";
 
 // Request Deduplication
-import { RequestDeduplicator } from "@bolt/core/request-deduplicator";
+import { RequestDeduplicator } from "bytekit/request-deduplicator";
 
 // Error Boundary
 import {
     ErrorBoundary,
     getGlobalErrorBoundary,
-} from "@bolt/core/error-boundary";
+} from "bytekit/error-boundary";
 ```
 
 #### Helper Modules / Módulos Helpers
 
 ```ts
 // Date Utilities
-import { DateUtils } from "@bolt/core/date-utils";
+import { DateUtils } from "bytekit/date-utils";
 
 // String Utilities
-import { StringUtils } from "@bolt/core/string-utils";
+import { StringUtils } from "bytekit/string-utils";
 
 // Validation
-import { Validator } from "@bolt/core/validator";
+import { Validator } from "bytekit/validator";
 
 // Environment Manager
-import { EnvManager } from "@bolt/core/env-manager";
+import { EnvManager } from "bytekit/env-manager";
 
 // Storage Utilities
-import { StorageUtils } from "@bolt/core/storage-utils";
+import { StorageUtils } from "bytekit/storage-utils";
 
 // File Upload
-import { FileUploadHelper } from "@bolt/core/file-upload";
+import { FileUploadHelper } from "bytekit/file-upload";
 
 // Streaming
-import { StreamingHelper } from "@bolt/core/streaming";
+import { StreamingHelper } from "bytekit/streaming";
 
 // WebSocket
-import { WebSocketHelper } from "@bolt/core/websocket";
+import { WebSocketHelper } from "bytekit/websocket";
 
 // Array Utilities
-import { ArrayUtils } from "@bolt/core/array-utils";
+import { ArrayUtils } from "bytekit/array-utils";
 
 // Object Utilities
-import { ObjectUtils } from "@bolt/core/object-utils";
+import { ObjectUtils } from "bytekit/object-utils";
 
 // Form Utilities
-import { FormUtils, createForm } from "@bolt/core/form-utils";
+import { FormUtils, createForm } from "bytekit/form-utils";
 
 // Time Utilities
-import { TimeUtils } from "@bolt/core/time-utils";
+import { TimeUtils } from "bytekit/time-utils";
 
 // Event Emitter
-import { EventEmitter, createEventEmitter } from "@bolt/core/event-emitter";
+import { EventEmitter, createEventEmitter } from "bytekit/event-emitter";
 
 // Diff Utilities
-import { DiffUtils } from "@bolt/core/diff-utils";
+import { DiffUtils } from "bytekit/diff-utils";
 
 // Polling Helper
-import { PollingHelper, createPoller } from "@bolt/core/polling-helper";
+import { PollingHelper, createPoller } from "bytekit/polling-helper";
 
 // Crypto Utilities
-import { CryptoUtils } from "@bolt/core/crypto-utils";
+import { CryptoUtils } from "bytekit/crypto-utils";
 
 // Pagination Helper
 import {
     PaginationHelper,
     createPaginator,
-} from "@bolt/core/pagination-helper";
+} from "bytekit/pagination-helper";
 
 // Cache Manager
-import { CacheManager, createCacheManager } from "@bolt/core/cache-manager";
+import { CacheManager, createCacheManager } from "bytekit/cache-manager";
 
 // Compression Utilities
-import { CompressionUtils } from "@bolt/core/compression-utils";
+import { CompressionUtils } from "bytekit/compression-utils";
 ```
 
 #### Import Everything / Importar Todo
@@ -207,13 +207,13 @@ import {
     createPoller,
     createPaginator,
     createCacheManager,
-} from "@bolt/core";
+} from "bytekit";
 ```
 
 ## Quick Start / Inicio rápido
 
 ```ts
-import { ApiClient, createLogger, DateUtils, StringUtils } from "@bolt/core";
+import { ApiClient, createLogger, DateUtils, StringUtils } from "bytekit";
 
 const http = new ApiClient({
     baseUrl: "https://api.my-service.com",
@@ -244,8 +244,8 @@ const slug = StringUtils.slugify("New Users – October 2024");
 
 ## API surface / Métodos expuestos
 
-**EN:** Complete reference of all exported methods and classes. Use `npm info @bolt/core` to see the full list.  
-**ES:** Referencia completa de todos los métodos y clases exportados. Usa `npm info @bolt/core` para ver la lista completa.
+**EN:** Complete reference of all exported methods and classes. Use `npm info bytekit` to see the full list.  
+**ES:** Referencia completa de todos los métodos y clases exportados. Usa `npm info bytekit` para ver la lista completa.
 
 ### Core Modules / Módulos Core
 
@@ -904,7 +904,7 @@ class CompressionUtils {
 
 ## API surface (pnpm info) / Métodos expuestos
 
-`pnpm info @bolt/core readme` ahora lista todos los exports públicos:
+`pnpm info bytekit readme` ahora lista todos los exports públicos:
 
 ## ApiClient Details / Detalles del ApiClient
 
@@ -923,7 +923,7 @@ Each `request` (and `get`, `post`, `put`, `patch`, `delete`) accepts / Cada requ
 -   Native `RequestInit` fields (`headers`, `signal`, etc.).
 
 ```ts
-import { HttpError } from "@bolt/core";
+import { HttpError } from "bytekit";
 
 try {
     await http.get("/users");
@@ -939,7 +939,7 @@ try {
 -   **getList**: **EN** fetch paginated data with built-in support for `pagination`, `sort`, and `filters`. Returns a typed `PaginatedResponse` with metadata. **ES** obtiene datos paginados con soporte para `pagination`, `sort` y `filters`. Devuelve `PaginatedResponse` con metadatos.
 
 ```ts
-import { ApiClient } from "@bolt/core";
+import { ApiClient } from "bytekit";
 
 const api = new ApiClient({ baseUrl: "https://api.example.com" });
 
@@ -977,7 +977,7 @@ const filtered = await api.getList<User>("/users", {
 -   **CircuitBreaker**: **EN** prevent cascading failures by stopping requests when service is down. **ES** evita fallos en cascada deteniendo requests cuando el servicio está caído.
 
 ```ts
-import { ApiClient } from "@bolt/core";
+import { ApiClient } from "bytekit";
 
 const api = new ApiClient({
     baseUrl: "https://api.example.com",
@@ -1002,7 +1002,7 @@ const data = await api.get("/users");
 -   **ResponseValidator**: **EN** validate API responses against schemas before using them. **ES** valida respuestas de API contra esquemas antes de usarlas.
 
 ```ts
-import { ApiClient, ValidationSchema } from "@bolt/core";
+import { ApiClient, ValidationSchema } from "bytekit";
 
 const userSchema: ValidationSchema = {
     type: "object",
@@ -1026,7 +1026,7 @@ const users = await api.get<User[]>("/users", {
 -   **FileUploadHelper**: **EN** upload files with progress tracking, chunking, and retry support. **ES** sube archivos con seguimiento de progreso, chunking y reintentos.
 
 ```ts
-import { FileUploadHelper } from "@bolt/core";
+import { FileUploadHelper } from "bytekit";
 
 const file = document.querySelector<HTMLInputElement>("#file")?.files?.[0];
 if (file) {
@@ -1055,7 +1055,7 @@ if (file) {
 -   **StreamingHelper**: **EN** stream JSON lines, Server-Sent Events, or download files with progress. **ES** transmite JSON lines, Server-Sent Events o descarga archivos con progreso.
 
 ```ts
-import { StreamingHelper } from "@bolt/core";
+import { StreamingHelper } from "bytekit";
 
 // Stream JSON lines (NDJSON)
 const { data, complete } = await StreamingHelper.streamJsonLines<User>(
@@ -1086,7 +1086,7 @@ const blob = await StreamingHelper.downloadStream("/api/export.csv", {
 -   **WebSocketHelper**: **EN** manage WebSocket connections with auto-reconnect, heartbeat, and typed messages. **ES** gestiona conexiones WebSocket con reconexión automática, heartbeat y mensajes tipados.
 
 ```ts
-import { WebSocketHelper } from "@bolt/core";
+import { WebSocketHelper } from "bytekit";
 
 const ws = new WebSocketHelper("wss://api.example.com/ws", {
     reconnect: true,
@@ -1122,7 +1122,7 @@ ws.close();
 -   **RequestCache**: **EN** cache HTTP responses with TTL and stale-while-revalidate support. **ES** cachea respuestas HTTP con TTL y soporte para stale-while-revalidate.
 
 ```ts
-import { RequestCache } from "@bolt/core";
+import { RequestCache } from "bytekit";
 
 const cache = new RequestCache({
     ttl: 5 * 60 * 1000, // 5 minutes
@@ -1157,7 +1157,7 @@ console.log(`Hit rate: ${stats.hitRate * 100}%`);
 -   **SlidingWindowRateLimiter**: **EN** sliding window rate limiter for precise rate control. **ES** limitador de ventana deslizante para control preciso de tasa.
 
 ```ts
-import { RateLimiter, SlidingWindowRateLimiter } from "@bolt/core";
+import { RateLimiter, SlidingWindowRateLimiter } from "bytekit";
 
 // Token bucket limiter (allows bursts)
 const limiter = new RateLimiter({
@@ -1192,7 +1192,7 @@ if (slidingLimiter.isAllowed("https://api.example.com/users")) {
 -   **RequestDeduplicator**: **EN** deduplicate in-flight requests to avoid redundant API calls. **ES** deduplica requests en vuelo para evitar llamadas redundantes.
 
 ```ts
-import { RequestDeduplicator } from "@bolt/core";
+import { RequestDeduplicator } from "bytekit";
 
 const dedup = new RequestDeduplicator();
 
@@ -1221,7 +1221,7 @@ console.log(`In-flight: ${dedup.getInFlightCount()}`);
 -   **ObjectUtils**: **EN** everyday object manipulation utilities (isEmpty, deepClone, merge, pick, omit, flatten, groupBy, etc.). **ES** utilidades cotidianas para manipular objetos.
 
 ```ts
-import { ObjectUtils } from "@bolt/core";
+import { ObjectUtils } from "bytekit";
 
 // Check if empty
 ObjectUtils.isEmpty(null); // true
@@ -1280,7 +1280,7 @@ ObjectUtils.deepEqual({ a: 1 }, { a: 1 }); // true
 -   **ArrayUtils**: **EN** everyday array manipulation utilities (chunk, flatten, unique, shuffle, zip, partition, etc.). **ES** utilidades cotidianas para manipular arrays.
 
 ```ts
-import { ArrayUtils } from "@bolt/core";
+import { ArrayUtils } from "bytekit";
 
 // Chunk array into smaller pieces
 ArrayUtils.chunk([1, 2, 3, 4, 5], 2); // [[1, 2], [3, 4], [5]]
@@ -1345,7 +1345,7 @@ import {
     NotFoundError,
     TimeoutError,
     RateLimitError,
-} from "@bolt/core";
+} from "bytekit";
 
 // Create error boundary with custom config
 const boundary = new ErrorBoundary({
@@ -1412,7 +1412,7 @@ console.log(report);
 // }
 
 // Use global error boundary
-import { getGlobalErrorBoundary } from "@bolt/core";
+import { getGlobalErrorBoundary } from "bytekit";
 
 const globalBoundary = getGlobalErrorBoundary({
     maxRetries: 2,
@@ -1452,7 +1452,7 @@ try {
 -   **FormUtils**: **EN** form validation and state management with built-in validators, async validation, and framework-agnostic design. **ES** validación de formularios y gestión de estado con validadores integrados, validación async y agnóstico del framework.
 
 ```ts
-import { FormUtils, createForm, Validators } from "@bolt/core";
+import { FormUtils, createForm, Validators } from "bytekit";
 
 // Create form with validation rules
 const form = new FormUtils({
@@ -1568,7 +1568,7 @@ withTiming,
 createStopwatch,
 StorageManager,
 EnvManager,
-} from "@bolt/core";
+} from "bytekit";
 
 const logger = createLogger({ namespace: "payments", level: "debug" });
 
@@ -1598,7 +1598,7 @@ const apiKey = env.require("API_KEY");
     **ES**: Cliente HTTP tipado con reintentos, errores localizados, interceptores y `fetch` personalizable para Node/navegadores.
 
 ```ts
-import { ApiClient } from "@bolt/core";
+import { ApiClient } from "bytekit";
 
 const api = new ApiClient({
     baseUrl: "https://api.example.com",
@@ -1616,7 +1616,7 @@ const user = await api.get("/users/1", {
     **ES**: Logger estructurado con niveles, namespaces, transports para Node/browser y loggers hijos.
 
 ```ts
-import { createLogger } from "@bolt/core";
+import { createLogger } from "bytekit";
 
 const logger = createLogger({ namespace: "payments", level: "info" });
 logger.warn("payment delayed", { id: "tx_1" });
@@ -1636,7 +1636,7 @@ import {
     withTiming,
     measureAsync,
     Profiler,
-} from "@bolt/core";
+} from "bytekit";
 
 const stopwatch = createStopwatch({ label: "sync-users" });
 // ... run task
@@ -1735,7 +1735,7 @@ Validator.isLocalPhone("11 5555-7777", "es-AR");
     **ES**: Sistema de eventos pub/sub con listeners síncronos/asíncronos, listeners únicos, manejo de errores y seguimiento.
 
 ```ts
-import { EventEmitter, createEventEmitter } from "@bolt/core";
+import { EventEmitter, createEventEmitter } from "bytekit";
 
 // Create event emitter with typed events
 const emitter = new EventEmitter<{
@@ -1783,7 +1783,7 @@ const events = createEventEmitter<{ message: string }>();
     **ES**: Comparación profunda de objetos, generación/aplicación de parches y estrategias de merge para rastrear cambios.
 
 ```ts
-import { DiffUtils } from "@bolt/core";
+import { DiffUtils } from "bytekit";
 
 // Detect changes
 const old = { name: "John", age: 30, email: "john@example.com" };
@@ -1822,7 +1822,7 @@ DiffUtils.deepEqual({ a: { b: 1 } }, { a: { b: 2 } }); // false
     **ES**: Polling inteligente con backoff exponencial, condiciones de parada e intentos máximos para operaciones async.
 
 ```ts
-import { PollingHelper, createPoller } from "@bolt/core";
+import { PollingHelper, createPoller } from "bytekit";
 
 // Poll until condition is met
 const poller = new PollingHelper(
@@ -1867,7 +1867,7 @@ const filePoller = createPoller(
     **ES**: Generación de tokens/UUIDs, codificación base64, hashing, HMAC y comparación en tiempo constante para seguridad.
 
 ```ts
-import { CryptoUtils } from "@bolt/core";
+import { CryptoUtils } from "bytekit";
 
 // Generate secure tokens
 const token = CryptoUtils.generateToken(32); // 64 hex chars
@@ -1898,7 +1898,7 @@ const signature = await CryptoUtils.hmac("message", "secret");
     **ES**: Paginación offset-limit y basada en cursores con seguimiento de estado y navegación.
 
 ```ts
-import { PaginationHelper, createPaginator } from "@bolt/core";
+import { PaginationHelper, createPaginator } from "bytekit";
 
 const items = Array.from({ length: 100 }, (_, i) => ({ id: i + 1 }));
 
@@ -1952,7 +1952,7 @@ const userPaginator = createPaginator(users, { pageSize: 20 });
     **ES**: Cache multi-nivel (memoria + localStorage) con TTL, evicción LRU y estadísticas para optimización de rendimiento.
 
 ```ts
-import { CacheManager, createCacheManager } from "@bolt/core";
+import { CacheManager, createCacheManager } from "bytekit";
 
 const cache = new CacheManager({
     maxSize: 100, // Max entries
@@ -2006,7 +2006,7 @@ const apiCache = createCacheManager({ maxSize: 50 });
     **ES**: Compresión de strings, codificación base64, minificación JSON y soporte gzip/deflate para optimización de datos.
 
 ```ts
-import { CompressionUtils } from "@bolt/core";
+import { CompressionUtils } from "bytekit";
 
 // Compress and decompress
 const original = "Hello World Hello World Hello World";
@@ -2065,7 +2065,7 @@ npx sutils create users
 
 **What is generated / Qué se genera:**
 
--   `api/<resource>/index.ts`: typed CRUD helpers built on `@bolt/core`' `ApiClient`, including shape placeholders, filter helpers, and `list/get/create/update/delete` functions.
+-   `api/<resource>/index.ts`: typed CRUD helpers built on `bytekit`' `ApiClient`, including shape placeholders, filter helpers, and `list/get/create/update/delete` functions.
 -   `hooks/<resource>/use<ResourcePlural>.ts`: React Query hooks (`use<ResourcePlural>`, `use<Resource>`, `useCreate<Resource>`, `useUpdate<Resource>`, `useDelete<Resource>`) that invalidate the corresponding queries and wire mutations to `@tanstack/react-query`.
 -   `hooks/<resource>/index.ts`: re-exports the generated hooks.
 
@@ -2201,9 +2201,9 @@ npm run test
 
 ## Migration from @sebamar88/utils / Migración desde @sebamar88/utils
 
-**EN:** If you were using `@sebamar88/utils`, simply update your package name to `@bolt/core`. No code changes are required—all APIs remain the same.
+**EN:** If you were using `@sebamar88/utils`, simply update your package name to `bytekit`. No code changes are required—all APIs remain the same.
 
-**ES:** Si estabas usando `@sebamar88/utils`, simplemente actualiza el nombre del paquete a `@bolt/core`. No se requieren cambios de código—todas las APIs permanecen igual.
+**ES:** Si estabas usando `@sebamar88/utils`, simplemente actualiza el nombre del paquete a `bytekit`. No se requieren cambios de código—todas las APIs permanecen igual.
 
 ### Before / Antes
 
@@ -2218,22 +2218,24 @@ import { ApiClient, DateUtils } from "@sebamar88/utils";
 ### After / Después
 
 ```bash
-npm install @bolt/core
+npm install bytekit
 ```
 
 ```typescript
-import { ApiClient, DateUtils } from "@bolt/core";
+import { ApiClient, DateUtils } from "bytekit";
 ```
 
 ### Version History / Historial de Versiones
 
--   **v0.1.10+** - `@bolt/core` (current)
+-   **v0.1.10+** - `bytekit` (current)
 -   **v0.1.9 and earlier** - `@sebamar88/utils` (deprecated)
 
-**EN:** The package was renamed from `@sebamar88/utils` to `@bolt/core` starting with v0.1.10. All functionality remains the same.
+**EN:** The package was renamed from `@sebamar88/utils` to `bytekit` starting with v0.1.10. All functionality remains the same.
 
-**ES:** El paquete fue renombrado de `@sebamar88/utils` a `@bolt/core` a partir de v0.1.10. Toda la funcionalidad permanece igual.
+**ES:** El paquete fue renombrado de `@sebamar88/utils` a `bytekit` a partir de v0.1.10. Toda la funcionalidad permanece igual.
 
 ## License / Licencia
 
 MIT © 2024 Sebastián Martinez
+
+

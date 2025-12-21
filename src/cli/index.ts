@@ -280,7 +280,7 @@ function buildApiTemplate(options: {
     route: string;
 }): string {
     const { pluralPascal, singularPascal, route } = options;
-    return `import type { ApiClient } from "@bolt/core";
+    return `import type { ApiClient } from "bytekit";
 
 const RESOURCE_PATH = "${route}";
 
@@ -333,7 +333,7 @@ function buildHooksTemplate(options: {
     type UseMutationOptions,
     type UseQueryOptions,
 } from "@tanstack/react-query";
-import type { ApiClient } from "@bolt/core";
+import type { ApiClient } from "bytekit";
 import {
     list${pascalPlural},
     get${pascalSingular},
@@ -516,3 +516,5 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
         process.exit(1);
     });
 }
+
+

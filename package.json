@@ -1,5 +1,5 @@
 {
-    "name": "@bolt/core",
+    "name": "bytekit",
     "description": "Lightning-fast TypeScript utilities for modern development",
     "version": "0.1.11",
     "type": "module",
