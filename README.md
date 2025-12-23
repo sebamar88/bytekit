@@ -2347,25 +2347,12 @@ npm run build
 
 ### Testing TypeScript Compatibility / Testeando Compatibilidad
 
-**EN:** Run the compatibility test script to verify your TypeScript version:  
-**ES:** Ejecutá el script de compatibilidad para verificar tu versión de TypeScript:
+**EN:** Run the test suite to verify TypeScript compatibility:  
+**ES:** Ejecutá la suite de tests para verificar compatibilidad con TypeScript:
 
 ```bash
-# Run compatibility tests
-node .kiro/test-ts-compat.js
-
-# Or run full test suite
 npm run test
 ```
-
-### Detailed Compatibility Guide / Guía Detallada de Compatibilidad
-
-**EN:** For detailed information about TypeScript compatibility, see:  
-**ES:** Para información detallada sobre compatibilidad con TypeScript, ver:
-
--   `.kiro/TYPESCRIPT_COMPATIBILITY.md` - Full compatibility matrix and migration paths
--   `.kiro/MULTI_VERSION_TEST_REPORT.md` - Detailed test results and performance metrics
--   `.kiro/TYPESCRIPT_TESTING_SUMMARY.md` - Summary of testing methodology
 
 ## Migration from @sebamar88/utils / Migración desde @sebamar88/utils
 
