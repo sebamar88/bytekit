@@ -305,10 +305,7 @@ export class ApiClient {
                         throw await this.toApiError(finalResponse, errorLocale);
                     }
 
-                    if (
-                        finalResponse.status === 204 ||
-                        !finalResponse.headers.get("content-length")
-                    ) {
+                    if (finalResponse.status === 204) {
                         return undefined as T;
                     }
 
