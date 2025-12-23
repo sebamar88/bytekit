@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.3] - 2024-12-22
+
+### Fixed
+
+-   **CRITICAL**: Fixed "Illegal invocation" error in browser environments by binding `globalThis.fetch` context in `ApiClient`
+-   All TypeScript examples now use `Parameters<typeof createApiClient>[0]` instead of importing `ApiClientConfig` type
+
 ## [0.2.0] - 2024-12-22
 
 ### Added
