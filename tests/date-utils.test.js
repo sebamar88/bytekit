@@ -46,8 +46,9 @@ test("DateUtils.diff respects unit, rounding and absolute options", () => {
 });
 
 test("DateUtils.isSameDay ignores time components", () => {
-    const morning = new Date("2024-05-05T08:00:00-03:00");
-    const evening = new Date("2024-05-05T22:00:00-03:00");
+    // Use UTC dates to avoid timezone issues in CI environments
+    const morning = new Date("2024-05-05T08:00:00Z");
+    const evening = new Date("2024-05-05T22:00:00Z");
     assert.ok(DateUtils.isSameDay(morning, evening));
     assert.ok(DateUtils.isBefore(morning, evening));
     assert.ok(DateUtils.isAfter(evening, morning));
