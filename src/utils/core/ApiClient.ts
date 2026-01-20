@@ -293,7 +293,8 @@ export class ApiClient {
                 try {
                     const response = await this.withTimeout(
                         this.fetchImpl(url, init),
-                        timeout
+                        timeout,
+                        controller
                     );
 
                     // Response interceptor
@@ -391,10 +392,15 @@ export class ApiClient {
         return JSON.stringify(body);
     }
 
-    private async withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
+    private async withTimeout<T>(
+        promise: Promise<T>,
+        ms: number,
+        controller: AbortController
+    ): Promise<T> {
         return new Promise((resolve, reject) => {
             const timer = setTimeout(
-                () =>
+                () => {
+                    controller.abort();
                     reject(
                         new ApiError(
                             408,
@@ -403,7 +409,8 @@ export class ApiClient {
                             null,
                             true
                         )
-                    ),
+                    );
+                },
                 ms
             );
             promise

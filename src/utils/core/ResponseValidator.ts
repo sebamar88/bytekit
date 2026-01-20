@@ -64,6 +64,8 @@ export class ResponseValidator {
             errors.push(...this.validateString(data, schema, path));
         } else if (schema.type === "number" && typeof data === "number") {
             errors.push(...this.validateNumber(data, schema, path));
+        } else if (schema.type === "boolean" && typeof data === "boolean") {
+            errors.push(...this.validateBoolean(data, schema, path));
         }
 
         // Custom validation
@@ -192,6 +194,24 @@ export class ResponseValidator {
                 path,
                 message: `Value must be one of: ${schema.enum.join(", ")}`,
                 value: num,
+            });
+        }
+
+        return errors;
+    }
+
+    private static validateBoolean(
+        value: boolean,
+        schema: ValidationSchema,
+        path: string
+    ): ValidationError[] {
+        const errors: ValidationError[] = [];
+
+        if (schema.enum && !schema.enum.includes(value)) {
+            errors.push({
+                path,
+                message: `Value must be one of: ${schema.enum.join(", ")}`,
+                value,
             });
         }
 

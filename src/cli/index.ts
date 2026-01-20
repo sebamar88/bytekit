@@ -571,6 +571,16 @@ function toSingular(value: string): string {
         return `${value.slice(0, -3)}y`;
     }
 
+    if (
+        lower.endsWith("ses") ||
+        lower.endsWith("xes") ||
+        lower.endsWith("zes") ||
+        lower.endsWith("ches") ||
+        lower.endsWith("shes")
+    ) {
+        return value.slice(0, -2);
+    }
+
     if (lower.endsWith("s")) {
         return value.slice(0, -1);
     }
