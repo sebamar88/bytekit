@@ -146,7 +146,12 @@ export class RetryPolicy {
     }
 
     private isRetryableError(error: Error): boolean {
-        // Retry on network errors, timeouts, and 5xx errors
+        const status = (error as { status?: number }).status;
+        if (typeof status === "number") {
+            return status === 408 || status === 429 || status >= 500;
+        }
+
+        // Retry on network errors and timeouts
         const message = error.message.toLowerCase();
         return (
             message.includes("timeout") ||
