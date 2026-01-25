@@ -69,8 +69,6 @@ function generateTypeFromData(data: unknown, typeName: string): string {
  * Infer TypeScript type from data
  */
 function inferType(data: unknown, name: string, depth = 0): string {
-
-
     if (data === null) {
         return `type ${name} = null;`;
     }
@@ -97,11 +95,7 @@ function inferType(data: unknown, name: string, depth = 0): string {
         if (data.length === 0) {
             return `type ${name} = unknown[];`;
         }
-
-        // Infer from first element
-        const firstElement = data[0];
-        const elementType = inferElementType(firstElement);
-
+        const elementType = inferArrayElementType(data, depth);
         return `type ${name} = ${elementType}[];`;
     }
 
@@ -125,7 +119,7 @@ function generateObjectType(
 
     const properties = Object.entries(obj)
         .map(([key, value]) => {
-            const fieldType = inferFieldType(value);
+            const fieldType = inferInlineType(value, depth + 1);
             const isOptional = value === null || value === undefined ? "?" : "";
             return `${innerIndent}${key}${isOptional}: ${fieldType};`;
         })
@@ -134,10 +128,7 @@ function generateObjectType(
     return `export interface ${name} {\n${properties}\n${indent}}`;
 }
 
-/**
- * Infer field type from value
- */
-function inferFieldType(value: unknown): string {
+function inferInlineType(value: unknown, depth: number): string {
     if (value === null) {
         return "null";
     }
@@ -164,48 +155,46 @@ function inferFieldType(value: unknown): string {
         if (value.length === 0) {
             return "unknown[]";
         }
-
-        const elementType = inferElementType(value[0]);
+        const elementType = inferArrayElementType(value, depth);
         return `${elementType}[]`;
     }
 
     if (type === "object") {
-        // For inline objects, use Record
-        return "Record<string, unknown>";
+        return buildInlineObjectType(value as Record<string, unknown>, depth);
     }
 
     return "unknown";
 }
 
-/**
- * Infer element type from array element
- */
-function inferElementType(element: unknown): string {
-    if (element === null || element === undefined) {
+function inferArrayElementType(values: unknown[], depth: number): string {
+    const types = values.map((value) => inferInlineType(value, depth));
+    const uniqueTypes = Array.from(new Set(types));
+    if (uniqueTypes.length === 0) {
         return "unknown";
     }
+    if (uniqueTypes.length === 1) {
+        return uniqueTypes[0];
+    }
+    return `(${uniqueTypes.join(" | ")})`;
+}
 
-    const type = typeof element;
+function buildInlineObjectType(
+    obj: Record<string, unknown>,
+    depth: number
+): string {
+    const indent = "  ".repeat(depth);
+    const innerIndent = "  ".repeat(depth + 1);
+    const properties = Object.entries(obj)
+        .map(([key, value]) => {
+            const fieldType = inferInlineType(value, depth + 1);
+            const isOptional = value === null || value === undefined ? "?" : "";
+            return `${innerIndent}${key}${isOptional}: ${fieldType};`;
+        })
+        .join("\n");
 
-    if (type === "boolean") {
-        return "boolean";
+    if (!properties) {
+        return "{}";
     }
 
-    if (type === "number") {
-        return "number";
-    }
-
-    if (type === "string") {
-        return "string";
-    }
-
-    if (Array.isArray(element)) {
-        return "unknown[]";
-    }
-
-    if (type === "object") {
-        return "Record<string, unknown>";
-    }
-
-    return "unknown";
+    return `{\n${properties}\n${indent}}`;
 }
