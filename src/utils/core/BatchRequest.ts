@@ -17,7 +17,7 @@ export interface BatchRequestOptions {
 }
 
 export class BatchRequest {
-    private requests: Array<() => Promise<any>> = [];
+    private requests: Array<() => Promise<unknown>> = [];
     private labels: Map<number, string> = new Map();
 
     constructor(private options: BatchRequestOptions = {}) {}
@@ -41,7 +41,7 @@ export class BatchRequest {
      * Execute all requests in parallel
      * @throws If any request fails and abortOnError is true
      */
-    async execute(): Promise<any[]> {
+    async execute(): Promise<unknown[]> {
         const promises = this.requests.map((fn, index) =>
             this.executeWithTimeout(fn, index)
         );
@@ -61,7 +61,7 @@ export class BatchRequest {
      * Execute all requests sequentially
      * @throws If any request fails and abortOnError is true
      */
-    async executeSequential(): Promise<any[]> {
+    async executeSequential(): Promise<unknown[]> {
         const results = [];
 
         for (let i = 0; i < this.requests.length; i++) {
@@ -85,7 +85,7 @@ export class BatchRequest {
     /**
      * Execute with fallback - returns null for failed requests
      */
-    async executeWithFallback(): Promise<(any | null)[]> {
+    async executeWithFallback(): Promise<(unknown | null)[]> {
         const promises = this.requests.map((fn, index) =>
             this.executeWithTimeout(fn, index).catch(() => null)
         );
@@ -101,9 +101,9 @@ export class BatchRequest {
      *   .add(() => client.get("/posts"), "posts")
      *   .executeAsObject();
      */
-    async executeAsObject(): Promise<Record<string, any>> {
+    async executeAsObject(): Promise<Record<string, unknown>> {
         const results = await this.execute();
-        const obj: Record<string, any> = {};
+        const obj: Record<string, unknown> = {};
 
         results.forEach((result, index) => {
             const label = this.labels.get(index) || `request_${index}`;
@@ -116,9 +116,9 @@ export class BatchRequest {
     /**
      * Execute sequentially and return results as object
      */
-    async executeSequentialAsObject(): Promise<Record<string, any>> {
+    async executeSequentialAsObject(): Promise<Record<string, unknown>> {
         const results = await this.executeSequential();
-        const obj: Record<string, any> = {};
+        const obj: Record<string, unknown> = {};
 
         results.forEach((result, index) => {
             const label = this.labels.get(index) || `request_${index}`;
@@ -155,9 +155,9 @@ export class BatchRequest {
     }
 
     private async executeWithTimeout(
-        fn: () => Promise<any>,
+        fn: () => Promise<unknown>,
         index: number
-    ): Promise<any> {
+    ): Promise<unknown> {
         if (!this.options.timeout) {
             return fn();
         }

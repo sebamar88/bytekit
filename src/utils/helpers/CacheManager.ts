@@ -259,9 +259,7 @@ export class CacheManager<T = unknown> {
     /**
      * Invalidate keys matching pattern
      */
-    invalidatePattern(pattern: string | RegExp): void {
-        const regex =
-            typeof pattern === "string" ? new RegExp(pattern) : pattern;
+    async clearPattern(_pattern: string): Promise<void> {
         // Note: This is a simple implementation
         // In production, you'd want to track all keys
         this.clear();

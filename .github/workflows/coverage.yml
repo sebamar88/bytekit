@@ -1,0 +1,76 @@
+name: Enhanced Coverage Report
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  coverage:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Install pnpm
+      uses: pnpm/action-setup@v4
+      with:
+        version: 9
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 22.x
+        cache: 'pnpm'
+        
+    - name: Install dependencies
+      run: pnpm install
+      
+    - name: Build
+      run: pnpm run build
+      
+    - name: Run tests with coverage
+      run: pnpm run test:coverage > coverage.txt 2>&1 || true
+      
+    - name: Extract coverage percentage
+      id: coverage
+      run: |
+        COVERAGE=$(grep -oP 'all files\s+\|\s+\K[\d.]+' coverage.txt | head -1 || echo "0")
+        echo "coverage=$COVERAGE" >> $GITHUB_OUTPUT
+        echo "📊 Coverage: $COVERAGE%"
+      
+    - name: Upload coverage artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: coverage-report
+        path: coverage.txt
+        retention-days: 30
+      
+    - name: Comment PR with coverage
+      if: github.event_name == 'pull_request'
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const fs = require('fs');
+          const coverage = '${{ steps.coverage.outputs.coverage }}';
+          const coverageNum = parseFloat(coverage);
+          
+          const emoji = coverageNum >= 80 ? '✅' : coverageNum >= 60 ? '⚠️' : '❌';
+          const status = coverageNum >= 80 ? 'Great coverage!' : coverageNum >= 60 ? 'Coverage could be improved' : 'Low coverage - please add more tests';
+          
+          const comment = `## 📊 Code Coverage Report
+          
+**Coverage:** ${coverage}% ${emoji}
+
+${status}
+
+[View full coverage report](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
+          `;
+          
+          github.rest.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: comment
+          });

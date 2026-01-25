@@ -1,0 +1,449 @@
+ÔûÂ ApiClient Coverage
+  Ô£ö should handle request timeout correctly (638.3228ms)
+  Ô£ö should merge default headers with request headers (1.2406ms)
+  Ô£ö should handle network errors (fetch throws) (322.6672ms)
+  Ô£ö should handle non-JSON responses gracefully (0.5726ms)
+Ô£ö ApiClient Coverage (963.7908ms)
+Ô£ö ApiClient builds URLs with search params and returns JSON bodies (28.4324ms)
+Ô£ö ApiClient serializes JSON bodies and merges headers (4.5328ms)
+Ô£ö ApiClient throws ApiError with localized message on HTTP errors (2.3218ms)
+Ô£ö ApiClient rejects with timeout errors when exceeding deadline (341.8783ms)
+Ô£ö ApiClient.getList returns paginated response with correct structure (5.74ms)
+Ô£ö ApiClient.getList merges pagination params with existing searchParams (0.3559ms)
+Ô£ö BatchRequest executes requests in parallel (13.3177ms)
+Ô£ö BatchRequest executes requests sequentially (48.187ms)
+Ô£ö BatchRequest handles errors with fallback (0.5669ms)
+Ô£ö BatchRequest aborts on error when configured (0.2856ms)
+Ô£ö BatchRequest executeAsObject returns labeled results (0.3827ms)
+Ô£ö BatchRequest executeSequentialAsObject returns labeled results (0.2033ms)
+Ô£ö BatchRequest size returns number of requests (0.0944ms)
+Ô£ö BatchRequest clear removes all requests (0.1001ms)
+Ô£ö BatchRequest clone creates independent copy (0.2586ms)
+Ô£ö BatchRequest timeout rejects on timeout (53.2749ms)
+Ô£ö BatchRequest handles mixed success and timeout (51.7567ms)
+Ô£ö createBatchRequest factory function works (1.0333ms)
+Ô£ö BatchRequest handles empty batch (0.134ms)
+Generated C:\Users\sebam\AppData\Local\Temp\sutils-BPeacn\api\users\index.ts
+Generated C:\Users\sebam\AppData\Local\Temp\sutils-BPeacn\hooks\users\useUsers.ts
+Generated C:\Users\sebam\AppData\Local\Temp\sutils-BPeacn\hooks\users\index.ts
+Scaffolded "users" under "api" and "hooks".
+Ô£ö scaffolds API and hooks for a resource (101.6616ms)
+ÔûÂ ColorUtils
+  ÔûÂ hexToRgb
+    Ô£ö should convert 6-digit hex to RGB (2.8432ms)
+    Ô£ö should convert 3-digit hex to RGB (0.1768ms)
+    Ô£ö should handle hex without # (0.0893ms)
+    Ô£ö should return null for invalid hex (0.1053ms)
+  Ô£ö hexToRgb (5.1771ms)
+  ÔûÂ rgbToHex
+    Ô£ö should convert RGB values to hex (0.1971ms)
+    Ô£ö should convert RGB object to hex (0.1046ms)
+    Ô£ö should clamp values outside 0-255 (1.0377ms)
+  Ô£ö rgbToHex (1.4836ms)
+  ÔûÂ rgbToHsl / hslToRgb
+    Ô£ö should convert RGB to HSL (1.4735ms)
+    Ô£ö should convert HSL to RGB (0.1654ms)
+    Ô£ö should handle grayscale (0.0585ms)
+  Ô£ö rgbToHsl / hslToRgb (1.8101ms)
+  ÔûÂ lighten / darken
+    Ô£ö should lighten a color (0.3084ms)
+    Ô£ö should darken a color (0.1836ms)
+  Ô£ö lighten / darken (0.7378ms)
+  ÔûÂ complement
+    Ô£ö should return complementary color (0.2858ms)
+  Ô£ö complement (0.3583ms)
+  ÔûÂ invert
+    Ô£ö should invert black to white (0.1287ms)
+    Ô£ö should invert white to black (0.4106ms)
+  Ô£ö invert (0.691ms)
+  ÔûÂ mix
+    Ô£ö should mix two colors equally (0.3246ms)
+    Ô£ö should return first color at 0 weight (0.1478ms)
+    Ô£ö should return second color at 100 weight (0.1203ms)
+  Ô£ö mix (0.73ms)
+  ÔûÂ luminance
+    Ô£ö should return 0 for black (0.1629ms)
+    Ô£ö should return 1 for white (0.0985ms)
+    Ô£ö should return value between 0 and 1 for other colors (0.1295ms)
+  Ô£ö luminance (0.5687ms)
+  ÔûÂ contrast
+    Ô£ö should return maximum contrast for black and white (0.1957ms)
+    Ô£ö should return 1 for same colors (1.6117ms)
+  Ô£ö contrast (2.8956ms)
+  ÔûÂ isLight / isDark
+    Ô£ö should identify white as light (0.1155ms)
+    Ô£ö should identify black as dark (0.1315ms)
+  Ô£ö isLight / isDark (0.5329ms)
+  ÔûÂ textColor
+    Ô£ö should return black text for light backgrounds (0.612ms)
+    Ô£ö should return white text for dark backgrounds (0.4003ms)
+  Ô£ö textColor (2.1863ms)
+  ÔûÂ WCAG compliance
+    Ô£ö should pass AA for black on white (0.12ms)
+    Ô£ö should pass AAA for black on white (0.1456ms)
+  Ô£ö WCAG compliance (0.3632ms)
+  ÔûÂ random
+    Ô£ö should generate valid hex color (0.1616ms)
+  Ô£ö random (0.2076ms)
+  ÔûÂ palette
+    Ô£ö should generate specified number of colors (0.1286ms)
+    Ô£ö should include base color (0.0519ms)
+  Ô£ö palette (0.2253ms)
+  ÔûÂ gradient
+    Ô£ö should generate gradient with correct number of steps (0.2337ms)
+    Ô£ö should start with first color (0.1105ms)
+    Ô£ö should end with second color (0.0537ms)
+  Ô£ö gradient (0.5375ms)
+  ÔûÂ parse
+    Ô£ö should parse hex color (0.2116ms)
+    Ô£ö should parse rgb format (0.1721ms)
+    Ô£ö should parse hsl format (0.1647ms)
+    Ô£ö should parse named colors (0.1338ms)
+    Ô£ö should return null for unknown colors (0.0853ms)
+  Ô£ö parse (0.9059ms)
+  ÔûÂ isValidHex
+    Ô£ö should validate 3-digit hex (0.2239ms)
+    Ô£ö should validate 6-digit hex (0.0733ms)
+    Ô£ö should validate 8-digit hex (with alpha) (0.0585ms)
+    Ô£ö should reject invalid hex (0.045ms)
+  Ô£ö isValidHex (0.4904ms)
+Ô£ö ColorUtils (21.6796ms)
+Ô£ö DateUtils.parse accepts ISO strings and timestamps (0.9058ms)
+Ô£ö DateUtils.add combines multiple duration units (0.8892ms)
+Ô£ö DateUtils.diff respects unit, rounding and absolute options (0.2032ms)
+Ô£ö DateUtils.isSameDay ignores time components (0.1289ms)
+Ô£ö EnvManager.get reads from process.env in Node (0.7744ms)
+Ô£ö EnvManager.require throws when missing (0.4184ms)
+Ô£ö EnvManager.isProd checks NODE_ENV and MODE flags (0.2012ms)
+Ô£ö ErrorBoundary catches and handles errors (1.0798ms)
+Ô£ö ErrorBoundary executes function with error handling (0.1764ms)
+Ô£ö ErrorBoundary retries on retryable errors (24.1312ms)
+Ô£ö ErrorBoundary does not retry on non-retryable errors (0.6525ms)
+Ô£ö ErrorBoundary wraps async functions (2.0216ms)
+Ô£ö ErrorBoundary wraps sync functions (0.329ms)
+Ô£ö ErrorBoundary maintains error history (0.4862ms)
+Ô£ö ErrorBoundary creates error report (4.334ms)
+Ô£ö AppError subclasses have correct status codes (0.2984ms)
+Ô£ö ErrorBoundary normalizes errors (0.2933ms)
+Ô£ö FormUtils initializes with correct state (1.7335ms)
+Ô£ö FormUtils.setValue updates value and marks dirty (0.1508ms)
+Ô£ö FormUtils.setValues updates multiple values (0.1351ms)
+Ô£ö FormUtils.touchField marks field as touched (0.103ms)
+Ô£ö FormUtils.reset clears all state (0.0998ms)
+Ô£ö FormUtils validates required field (0.3581ms)
+Ô£ö FormUtils validates email format (0.1862ms)
+Ô£ö FormUtils validates minLength (0.1441ms)
+Ô£ö FormUtils validates maxLength (0.1233ms)
+Ô£ö FormUtils validates number min/max (0.1579ms)
+Ô£ö FormUtils validates pattern (0.1847ms)
+Ô£ö FormUtils validates with custom validator (0.2918ms)
+Ô£ö FormUtils validates with async custom validator (0.1447ms)
+Ô£ö FormUtils.validate checks all fields (0.1581ms)
+Ô£ö FormUtils.validate passes with valid data (0.1595ms)
+Ô£ö FormUtils.submit calls onSubmit callback (0.1449ms)
+Ô£ö FormUtils.submit calls onError callback on validation failure (0.0945ms)
+Ô£ö FormUtils.getErrors returns all errors (0.0786ms)
+Ô£ö FormUtils.clearErrors removes all errors (0.0833ms)
+Ô£ö FormUtils.createBinding returns field binding (0.1179ms)
+Ô£ö FormUtils.createBindings returns all field bindings (0.1315ms)
+Ô£ö FormUtils.serialize returns form data (0.0902ms)
+Ô£ö FormUtils.deserialize loads form data (0.0842ms)
+Ô£ö FormUtils validates on change when enabled (0.0898ms)
+Ô£ö FormUtils validates on blur when enabled (0.0755ms)
+Ô£ö Validators.required validates required fields (0.1062ms)
+Ô£ö Validators.email validates email format (0.0636ms)
+Ô£ö Validators.url validates URL format (0.1584ms)
+Ô£ö Validators.pattern validates regex patterns (0.086ms)
+Ô£ö Validators.match validates field matching (0.0618ms)
+Ô£ö createForm factory creates FormUtils instance (0.0735ms)
+Ô£ö HTTP_STATUS constants are defined (0.9584ms)
+Ô£ö isSuccess identifies 2xx status codes (0.1216ms)
+Ô£ö isRedirect identifies 3xx status codes (0.1272ms)
+Ô£ö isClientError identifies 4xx status codes (0.1027ms)
+Ô£ö isServerError identifies 5xx status codes (0.0928ms)
+Ô£ö isError identifies 4xx and 5xx status codes (0.0931ms)
+Ô£ö getStatusMessage returns correct messages (0.1634ms)
+Ô£ö getStatusCategory returns correct categories (0.101ms)
+Ô£ö isRetryable identifies retryable status codes (0.0999ms)
+Ô£ö isCacheable identifies cacheable status codes (0.0858ms)
+Ô£ö EventEmitter registers and emits events (1.7077ms)
+Ô£ö EventEmitter supports once listeners (0.2276ms)
+Ô£ö EventEmitter removes listeners (0.0973ms)
+Ô£ö EventEmitter emits synchronously (0.1241ms)
+Ô£ö EventEmitter tracks listener count (0.0786ms)
+Ô£ö EventEmitter factory function works (0.1215ms)
+Ô£ö DiffUtils detects changed fields (0.2308ms)
+Ô£ö DiffUtils detects added fields (0.1196ms)
+Ô£ö DiffUtils detects removed fields (0.0832ms)
+Ô£ö DiffUtils creates patches (0.165ms)
+Ô£ö DiffUtils applies patches (0.1088ms)
+Ô£ö DiffUtils deep equals objects (0.0774ms)
+Ô£ö PollingHelper polls until condition is met (20.6999ms)
+Ô£ö PollingHelper respects max attempts (21.3373ms)
+Ô£ö PollingHelper applies backoff (12.5151ms)
+Ô£ö PollingHelper factory function works (0.1953ms)
+Ô£ö CryptoUtils generates tokens (1.4351ms)
+Ô£ö CryptoUtils generates UUIDs (0.5524ms)
+Ô£ö CryptoUtils base64 encodes and decodes (0.1292ms)
+Ô£ö CryptoUtils URL-safe base64 encodes (0.056ms)
+Ô£ö CryptoUtils hashes strings (2.4932ms)
+Ô£ö CryptoUtils verifies hashes (0.3846ms)
+Ô£ö CryptoUtils constant-time compares strings (0.1993ms)
+Ô£ö PaginationHelper paginates with offset mode (0.216ms)
+Ô£ö PaginationHelper navigates pages (0.2543ms)
+Ô£ö PaginationHelper tracks state (0.1651ms)
+Ô£ö PaginationHelper factory function works (0.1908ms)
+Ô£ö CacheManager stores and retrieves values (0.2592ms)
+Ô£ö CacheManager respects TTL (100.4157ms)
+Ô£ö CacheManager tracks statistics (0.1925ms)
+Ô£ö CacheManager get or compute pattern (0.0925ms)
+Ô£ö CacheManager factory function works (0.0396ms)
+Ô£ö CompressionUtils compresses and decompresses (0.1929ms)
+Ô£ö CompressionUtils base64 encodes and decodes (0.0404ms)
+Ô£ö CompressionUtils minifies JSON (0.076ms)
+Ô£ö CompressionUtils pretty prints JSON (0.0731ms)
+Ô£ö CompressionUtils calculates compression ratio (0.0588ms)
+Ô£ö CompressionUtils formats bytes (0.0676ms)
+ÔûÂ NumberUtils
+  ÔûÂ format
+    Ô£ö should format numbers with locale (19.897ms)
+    Ô£ö should handle zero (0.2554ms)
+  Ô£ö format (21.0015ms)
+  ÔûÂ currency
+    Ô£ö should format currency with USD (0.6299ms)
+    Ô£ö should format with different currencies (0.187ms)
+  Ô£ö currency (0.9307ms)
+  ÔûÂ percentage
+    Ô£ö should format decimal as percentage (0.1819ms)
+    Ô£ö should handle isPercentage option (0.1962ms)
+  Ô£ö percentage (0.4763ms)
+  ÔûÂ ordinal
+    Ô£ö should return correct ordinal for 1 (0.283ms)
+    Ô£ö should return correct ordinal for 2 (0.0708ms)
+    Ô£ö should return correct ordinal for 3 (0.133ms)
+    Ô£ö should return correct ordinal for 4 (0.0686ms)
+    Ô£ö should return correct ordinal for 11 (0.059ms)
+    Ô£ö should return correct ordinal for 21 (0.0722ms)
+    Ô£ö should return Spanish ordinal (0.0554ms)
+  Ô£ö ordinal (0.9546ms)
+  ÔûÂ clamp
+    Ô£ö should clamp high values (0.0971ms)
+    Ô£ö should clamp low values (0.2201ms)
+    Ô£ö should not clamp values in range (0.0729ms)
+  Ô£ö clamp (0.4883ms)
+  ÔûÂ round
+    Ô£ö should round to specified decimals (0.1926ms)
+    Ô£ö should round to integer by default (1.1481ms)
+    Ô£ö should handle negative decimals (0.1097ms)
+  Ô£ö round (1.5867ms)
+  ÔûÂ range
+    Ô£ö should generate ascending range (1.0697ms)
+    Ô£ö should generate range with step (0.071ms)
+    Ô£ö should generate descending range (0.0567ms)
+    Ô£ö should throw on zero step (0.2034ms)
+  Ô£ö range (1.5369ms)
+  ÔûÂ random
+    Ô£ö should generate number within range (0.2319ms)
+  Ô£ö random (0.3137ms)
+  ÔûÂ isEven/isOdd
+    Ô£ö should identify even numbers (0.0992ms)
+    Ô£ö should identify odd numbers (0.1402ms)
+  Ô£ö isEven/isOdd (0.3568ms)
+  ÔûÂ isBetween
+    Ô£ö should return true for values in range (0.1711ms)
+    Ô£ö should return true for boundary values (0.1954ms)
+    Ô£ö should return false for values outside range (0.1272ms)
+  Ô£ö isBetween (0.7072ms)
+  ÔûÂ toWords
+    Ô£ö should convert zero (0.7654ms)
+    Ô£ö should convert single digits (1.0246ms)
+    Ô£ö should convert two digits (0.0728ms)
+    Ô£ö should convert hundreds (0.1431ms)
+    Ô£ö should convert thousands (0.1144ms)
+    Ô£ö should handle Spanish locale (0.3418ms)
+  Ô£ö toWords (3.4241ms)
+  ÔûÂ formatBytes
+    Ô£ö should format bytes (1.5447ms)
+    Ô£ö should format KB (0.1081ms)
+    Ô£ö should format MB (0.0484ms)
+  Ô£ö formatBytes (1.9456ms)
+  ÔûÂ pad
+    Ô£ö should pad numbers with zeros (0.0761ms)
+  Ô£ö pad (0.1151ms)
+  ÔûÂ statistics
+    Ô£ö should calculate sum (0.1139ms)
+    Ô£ö should calculate average (0.0589ms)
+    Ô£ö should calculate median (0.0946ms)
+    Ô£ö should calculate median for even count (0.1046ms)
+    Ô£ö should calculate mode (0.1226ms)
+    Ô£ö should calculate min (0.0707ms)
+    Ô£ö should calculate max (0.0407ms)
+    Ô£ö should handle empty arrays (0.0378ms)
+  Ô£ö statistics (0.7995ms)
+  ÔûÂ percentile
+    Ô£ö should calculate 50th percentile (median) (0.2347ms)
+    Ô£ö should calculate 90th percentile (0.0965ms)
+  Ô£ö percentile (0.3919ms)
+Ô£ö NumberUtils (35.8303ms)
+Ô£ö ObjectUtils.isEmpty detects empty values (1.1241ms)
+Ô£ö ObjectUtils.deepClone creates independent copy (0.1887ms)
+Ô£ö ObjectUtils.merge combines objects (0.7755ms)
+Ô£ö ObjectUtils.deepMerge recursively merges objects (0.2521ms)
+Ô£ö ObjectUtils.pick selects specific keys (0.2107ms)
+Ô£ö ObjectUtils.omit removes specific keys (0.1278ms)
+Ô£ö ObjectUtils.get retrieves nested values (0.1782ms)
+Ô£ö ObjectUtils.set assigns nested values (0.2175ms)
+Ô£ö ObjectUtils.flatten converts nested to flat (0.2389ms)
+Ô£ö ObjectUtils.unflatten converts flat to nested (0.1707ms)
+Ô£ö ObjectUtils.filter selects entries by predicate (0.1065ms)
+Ô£ö ObjectUtils.mapValues transforms values (0.0827ms)
+Ô£ö ObjectUtils.hasKeys checks for all keys (0.0896ms)
+Ô£ö ObjectUtils.hasAnyKey checks for any key (0.141ms)
+Ô£ö ObjectUtils.invert swaps keys and values (0.1843ms)
+Ô£ö ObjectUtils.groupBy groups array by key (0.2754ms)
+Ô£ö ObjectUtils.indexBy indexes array by key (0.1273ms)
+Ô£ö ObjectUtils.deepEqual compares objects (0.1174ms)
+Ô£ö ObjectUtils.size returns number of keys (0.0543ms)
+Ô£ö ObjectUtils.entries converts to key-value pairs (0.0587ms)
+Ô£ö ObjectUtils.fromEntries converts from key-value pairs (0.0539ms)
+Ô£ö ObjectUtils.fromKeys creates object from keys (0.1352ms)
+Ô£ö RateLimiter allows requests within limit (0.8479ms)
+Ô£ö RateLimiter blocks requests exceeding limit (0.1166ms)
+Ô£ö RateLimiter refills tokens over time (119.6815ms)
+Ô£ö RateLimiter provides statistics (0.2271ms)
+Ô£ö RateLimiter separates limits by hostname (0.0603ms)
+Ô£ö RateLimiter can be reset (0.065ms)
+Ô£ö SlidingWindowRateLimiter allows requests within limit (0.1228ms)
+Ô£ö SlidingWindowRateLimiter blocks requests exceeding limit (0.0714ms)
+Ô£ö SlidingWindowRateLimiter resets after window expires (121.7987ms)
+Ô£ö RequestCache stores and retrieves data (1.4747ms)
+Ô£ö RequestCache returns null for expired entries (150.8453ms)
+Ô£ö RequestCache supports stale-while-revalidate (220.5023ms)
+Ô£ö RequestCache invalidates entries (0.4792ms)
+Ô£ö RequestCache invalidates by pattern (0.2008ms)
+Ô£ö RequestCache tracks statistics (0.1266ms)
+Ô£ö RequestCache prunes expired entries (121.6012ms)
+Ô£ö RequestCache generates keys with options (0.2813ms)
+Ô£ö RequestDeduplicator executes request once for multiple calls (1.5539ms)
+Ô£ö RequestDeduplicator executes different requests separately (0.1959ms)
+Ô£ö RequestDeduplicator shares errors (0.2586ms)
+Ô£ö RequestDeduplicator tracks statistics (0.1843ms)
+Ô£ö RequestDeduplicator clears in-flight requests (101.4322ms)
+Ô£ö RequestDeduplicator supports custom key generator (0.3214ms)
+Ô£ö RequestDeduplicator can reset statistics (0.167ms)
+Ô£ö ResponseValidator validates object structure (0.9756ms)
+Ô£ö ResponseValidator detects missing required fields (0.2249ms)
+Ô£ö ResponseValidator validates array items (0.169ms)
+Ô£ö ResponseValidator validates string patterns (0.2684ms)
+Ô£ö ResponseValidator validates number ranges (0.1462ms)
+Ô£ö ResponseValidator supports custom validation (0.1913ms)
+Ô£ö RetryPolicy retries on failure and succeeds (32.0564ms)
+Ô£ö RetryPolicy throws after max attempts (11.6446ms)
+Ô£ö CircuitBreaker opens after failure threshold (0.417ms)
+Ô£ö CircuitBreaker closes after successful recovery (100.3486ms)
+Ô£ö StorageManager persists and retrieves JSON payloads (1.3276ms)
+Ô£ö StorageManager respects TTL and cleans expired entries (15.0003ms)
+Ô£ö StringUtils.slugify removes diacritics and normalizes separators (0.851ms)
+Ô£ö StringUtils.truncate respects ellipsis and word boundaries (0.1123ms)
+Ô£ö StringUtils.mask hides the middle section (0.0758ms)
+Ô£ö StringUtils.interpolate replaces placeholders with nesting support (0.1676ms)
+Ô£ö StringUtils.toQueryString serializes arrays and nested objects (5.5244ms)
+ÔûÂ TimeUtils
+  Ô£ö sleep should wait for specified time (50.4988ms)
+  Ô£ö delay should execute function after delay (51.2336ms)
+  Ô£ö timeout should resolve if promise finishes in time (0.2546ms)
+  Ô£ö timeout should reject if promise takes too long (51.1006ms)
+  Ô£ö retryAsync should succeed if function succeeds (0.2085ms)
+  Ô£ö retryAsync should retry on failure and eventually succeed (30.4336ms)
+  Ô£ö retryAsync should throw after max attempts (3.0151ms)
+  Ô£ö measureAsync should return result and duration (50.9692ms)
+  Ô£ö measureSync should return result and duration (5.4412ms)
+  Ô£ö formatDuration should format correctly (0.1016ms)
+  Ô£ö parseDuration should parse correctly (0.3177ms)
+  Ô£ö parseDuration should throw on invalid format (0.1317ms)
+  Ô£ö createQueue should process tasks with concurrency (102.1026ms)
+  Ô£ö debounce should delay execution (101.0411ms)
+  Ô£ö throttle should limit execution frequency (101.1666ms)
+Ô£ö TimeUtils (549.3208ms)
+Ô£ö UrlBuilder builds basic URL (0.8835ms)
+Ô£ö UrlBuilder adds path segments (0.2616ms)
+Ô£ö UrlBuilder chains multiple path segments (0.1658ms)
+Ô£ö UrlBuilder handles path segments with slashes (0.1021ms)
+Ô£ö UrlBuilder adds query parameters (0.2754ms)
+Ô£ö UrlBuilder chains multiple query calls (0.123ms)
+Ô£ö UrlBuilder ignores undefined and null query values (0.0963ms)
+Ô£ö UrlBuilder adds array query parameters (0.1645ms)
+Ô£ö UrlBuilder adds hash/fragment (0.2466ms)
+Ô£ö UrlBuilder converts boolean and number query params (0.2004ms)
+Ô£ö UrlBuilder getPathname returns pathname only (0.2229ms)
+Ô£ö UrlBuilder getSearch returns query string (0.1494ms)
+Ô£ö UrlBuilder getHash returns fragment (0.0575ms)
+Ô£ö UrlBuilder clone creates independent copy (0.2436ms)
+Ô£ö UrlBuilder toURL returns URL object (0.1268ms)
+Ô£ö createUrlBuilder factory function works (0.1025ms)
+Ô£ö UrlBuilder handles complex URL building (0.1236ms)
+Ô£ö Validator.isEmail validates typical addresses (0.7366ms)
+Ô£ö Validator.isStrongPassword enforces custom requirements (0.187ms)
+Ô£ö Validator.isLocalPhone matches locale-aware patterns (0.2655ms)
+Ô£ö Validator.isCuit validates checksum correctly (0.1718ms)
+Ô£ö Validator.isDateRange and isOneTimeCode behave as expected (0.1512ms)
+Ôä╣ tests 313
+Ôä╣ suites 36
+Ôä╣ pass 313
+Ôä╣ fail 0
+Ôä╣ cancelled 0
+Ôä╣ skipped 0
+Ôä╣ todo 0
+Ôä╣ duration_ms 1117.0897
+Ôä╣ start of coverage report
+Ôä╣ ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Ôä╣ file                      | line % | branch % | funcs % | uncovered lines
+Ôä╣ ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Ôä╣ dist                      |        |          |         | 
+Ôä╣  cli                      |        |          |         | 
+Ôä╣   index.js                |  51.20 |    50.00 |   61.11 | 9-11 16-23 27-30 34-36 47-61 65-101 104-140 164-168 181-182 188-191 237-314 448-449 453 455-495 497-501
+Ôä╣   type-generator.js       |  14.57 |   100.00 |    0.00 | 7-36 40-43 47-77 81-92 96-125 129-150
+Ôä╣  index.js                 | 100.00 |   100.00 |  100.00 | 
+Ôä╣  utils                    |        |          |         | 
+Ôä╣   core                    |        |          |         | 
+Ôä╣    ApiClient.js           |  90.91 |    65.22 |   75.86 | 71-72 92-93 95-96 98-99 114-115 176-177 188-194 204-205 213-214 270-273
+Ôä╣    BatchRequest.js        |  96.38 |    91.18 |  100.00 | 49-53
+Ôä╣    debug.js               |  37.35 |   100.00 |    0.00 | 5 11-31 37-43 49-55 61-72 78-81
+Ôä╣    ErrorBoundary.js       |  74.84 |    72.22 |   64.71 | 35-37 41-43 47-55 89-94 97-107 123-124 129-136 143-145 170-181 208-209 225-229 234-235 246-247 264-267 270-271 311-315 320-321
+Ôä╣    index.js               | 100.00 |   100.00 |  100.00 | 
+Ôä╣    Logger.js              |  27.92 |    25.00 |    0.00 | 19-48 51-79 86 89-100 102-103 105-113 115-116 118-119 121-122 124-125 127-140 142-145 147-148
+Ôä╣    Profiler.js            |  44.44 |    50.00 |    0.00 | 5-6 8-13 15-16
+Ôä╣    RateLimiter.js         |  75.29 |    75.00 |   64.71 | 46-51 76-77 82-87 129-145 150-152 157-158 163-168
+Ôä╣    RequestCache.js        |  93.48 |    96.43 |   85.71 | 82-84 101-106
+Ôä╣    RequestDeduplicator.js |  90.36 |    88.24 |   81.82 | 63-65 76-80
+Ôä╣    ResponseValidator.js   |  72.14 |    74.47 |  100.00 | 14-15 22-28 80-85 87-92 106-111 117-122 131-136
+Ôä╣    RetryPolicy.js         |  95.80 |    91.89 |   94.12 | 65-69
+Ôä╣   helpers                 |        |          |         | 
+Ôä╣    ArrayUtils.js          |  44.52 |   100.00 |    0.00 | 9-16 21-34 39-50 55-56 61-62 67-68 73-74 79-80 85-89 94-100 105-108 113-119 124-125 130-137 142-150 155-165 170-172 177-179 184-185 190-191 196-197 202-203 208-211 216-217 222-223 228-240 245-248 253-254 259-267 272-273 278-283 288-299
+Ôä╣    CacheManager.js        |  61.54 |    77.78 |   46.15 | 18-21 43-44 46-47 49-50 67-68 70-83 85-101 103-104 106-109 111-121 143-144 156-162 169-170 175-179 184-188 210-213
+Ôä╣    ColorUtils.js          |  78.45 |    80.49 |   62.79 | 30-31 50-74 106-129 168-169 204-205 277-282 287-292 297-298 342-346 351-356 438-441 463-464 469-477 482-490 508-514 519-525 573-577 582-586
+Ôä╣    CompressionUtils.js    |  66.07 |    80.77 |   47.06 | 66-67 76-77 83-87 92-94 99-101 106-108 132-133 139-149 154-168 173-182 187-200 205-210
+Ôä╣    CryptoUtils.js         |  54.88 |    66.67 |   62.50 | 17-22 35-52 61-62 71-72 87-89 95-102 117-127 133-153 167-173 179-186 191-201
+Ôä╣    DateUtils.js           |  85.58 |    87.50 |   62.50 | 25 44 47-48 51-53 56-58 97-101
+Ôä╣    DiffUtils.js           |  52.61 |    79.31 |   40.00 | 69-74 105-106 118-136 141-149 154-164 169-210 215-234 239-247
+Ôä╣    EnvManager.js          |  80.95 |    75.00 |  100.00 | 5-7 14
+Ôä╣    EventEmitter.js        |  70.67 |    70.83 |   58.82 | 27-28 65-66 73-82 100-106 113-119 129-130 136-142 150-152 157-165 177-181 186-187 192-194 199-200
+Ôä╣    FileUploadHelper.js    |  14.96 |   100.00 |    0.00 | 6-62 67-87 92-93 98-125
+Ôä╣    FormUtils.js           |  92.59 |    74.49 |   83.78 | 14-15 32 40 43-48 127-130 198-201 221-226 289-290 328-329
+Ôä╣    HttpStatusHelper.js    | 100.00 |   100.00 |  100.00 | 
+Ôä╣    NumberUtils.js         |  84.91 |    77.00 |   70.00 | 117-119 126-128 168-170 187-188 193-194 199-200 205-206 286-294 351-378 407-417 445-446 496-502 507-512
+Ôä╣    ObjectUtils.js         |  97.98 |    93.48 |   93.75 | 20 26-27 48 285-286
+Ôä╣    PaginationHelper.js    |  58.30 |    60.00 |   41.67 | 25-26 35-44 50-51 61-73 79-80 90-102 107-116 121-128 136-137 148-149 163-164 169-170 188-204 209-212 217-221 226-227 232-238 243-244 249-251
+Ôä╣    PollingHelper.js       |  75.57 |    82.61 |   60.00 | 38-44 60-63 81-83 88-89 100-102 107-113 118-123
+Ôä╣    StorageUtils.js        |  81.82 |    83.33 |   66.67 | 23-24 27-28 30-31
+Ôä╣    StreamingHelper.js     |   9.47 |   100.00 |    0.00 | 7-75 80-121 126-167
+Ôä╣    StringUtils.js         |  82.08 |    55.77 |   65.38 | 9-10 32 46-49 54-61 96-101 104 136-139 147-151
+Ôä╣    TimeUtils.js           |  90.60 |    84.75 |   85.71 | 25-30 32-34 58-60 121 127-128 133-134 139-140 170-171 230
+Ôä╣    UrlBuilder.js          |  97.20 |    92.31 |   95.00 | 24-25 96-97
+Ôä╣    Validator.js           |  71.79 |    54.29 |   48.00 | 27-30 49-53 59-67 70-75 78-81 101-104 116-127
+Ôä╣    WebSocketHelper.js     |  21.50 |    50.00 |    0.00 | 3-8 11-19 24-51 56-65 70-81 86-88 93-112 117-123 128-129 134-135 137-156 158-168 170-174 176-188 190-198
+Ôä╣   index.js                | 100.00 |   100.00 |  100.00 | 
+Ôä╣ ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Ôä╣ all files                 |  69.39 |    77.95 |   61.69 | 
+Ôä╣ ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Ôä╣ end of coverage report

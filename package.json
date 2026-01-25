@@ -145,6 +145,30 @@
     "./url-builder": {
       "types": "./dist/utils/helpers/UrlBuilder.d.ts",
       "import": "./dist/utils/helpers/UrlBuilder.js"
+    },
+    "./color-utils": {
+      "types": "./dist/utils/helpers/ColorUtils.d.ts",
+      "import": "./dist/utils/helpers/ColorUtils.js"
+    },
+    "./number-utils": {
+      "types": "./dist/utils/helpers/NumberUtils.d.ts",
+      "import": "./dist/utils/helpers/NumberUtils.js"
+    },
+    "./query-client": {
+      "types": "./dist/utils/core/QueryClient.d.ts",
+      "import": "./dist/utils/core/QueryClient.js"
+    },
+    "./query-state": {
+      "types": "./dist/utils/core/QueryState.d.ts",
+      "import": "./dist/utils/core/QueryState.js"
+    },
+    "./signal": {
+      "types": "./dist/utils/helpers/Signal.d.ts",
+      "import": "./dist/utils/helpers/Signal.js"
+    },
+    "./use-signal": {
+      "types": "./dist/utils/helpers/useSignal.d.ts",
+      "import": "./dist/utils/helpers/useSignal.js"
     }
   },
   "scripts": {

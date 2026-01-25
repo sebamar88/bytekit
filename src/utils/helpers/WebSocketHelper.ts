@@ -54,7 +54,7 @@ export class WebSocketHelper {
                     this.handleMessage(event.data);
                 };
 
-                this.ws.onerror = (event) => {
+                this.ws.onerror = () => {
                     const error = new Error("WebSocket error");
                     this.notifyError(error);
                     reject(error);
@@ -205,7 +205,7 @@ export class WebSocketHelper {
             if (this.isConnected()) {
                 try {
                     this.send("ping", {});
-                } catch (error) {
+                } catch {
                     // Heartbeat failed, connection will be handled by onclose
                 }
             }
@@ -241,6 +241,7 @@ export class WebSocketHelper {
             try {
                 handler(error);
             } catch (e) {
+
                 console.error("Error in error handler:", e);
             }
         });

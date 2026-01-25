@@ -2,7 +2,6 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import {
     ErrorBoundary,
-    AppError,
     AppValidationError,
     NotFoundError,
     UnauthorizedError,
@@ -92,10 +91,8 @@ test("ErrorBoundary wraps async functions", async () => {
 
 test("ErrorBoundary wraps sync functions", () => {
     const boundary = new ErrorBoundary();
-    let errorHandled = false;
-
     boundary.addHandler(() => {
-        errorHandled = true;
+        // Error handled
     });
 
     const wrappedFn = boundary.wrapSync(() => {

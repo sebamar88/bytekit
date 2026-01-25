@@ -99,10 +99,7 @@ test("RequestDeduplicator clears in-flight requests", async () => {
 
 test("RequestDeduplicator supports custom key generator", async () => {
     const dedup = new RequestDeduplicator({
-        keyGenerator: (url, options) => {
-            // Only deduplicate by URL, ignore options
-            return url;
-        },
+        keyGenerator: (url, _options) => url,
     });
 
     let callCount = 0;

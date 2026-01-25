@@ -40,7 +40,7 @@ export interface ApiClientConfig {
     circuitBreaker?: CircuitBreakerConfig;
 }
 
-export interface RequestOptions<TBody = unknown>
+export interface RequestOptions
     extends Omit<RequestInit, "body"> {
     searchParams?: Record<string, QueryParam>;
     body?: FormData | string | Blob | ArrayBuffer | Record<string, unknown>;
@@ -170,7 +170,7 @@ export class ApiClient {
             fetchImpl ??
             (typeof globalThis.fetch === "function"
                 ? globalThis.fetch.bind(globalThis)
-                : (crossFetch as any));
+                : (crossFetch as unknown as typeof fetch));
         this.locale = locale;
         this.errorMessages = errorMessages ?? {};
         this.timeoutMs = timeoutMs;
@@ -240,7 +240,8 @@ export class ApiClient {
             Object.assign(searchParams, options.filters);
         }
 
-        const { pagination, sort, filters, ...requestOptions } = options ?? {};
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { pagination, sort, filters: _filters, ...requestOptions } = options ?? {};
 
         return this.request<PaginatedResponse<T>>(path, {
             ...requestOptions,
@@ -341,8 +342,8 @@ export class ApiClient {
                     });
 
                     return data;
-                } catch (err: any) {
-                    if (err.name === "AbortError") {
+                } catch (err: unknown) {
+                    if (err instanceof Error && err.name === "AbortError") {
                         throw new ApiError(
                             408,
                             "Timeout",
@@ -354,7 +355,7 @@ export class ApiClient {
                     this.logger?.error(
                         "Request failed",
                         { path, method: rest.method },
-                        err
+                        err instanceof Error ? err : new Error(String(err))
                     );
                     throw err;
                 }

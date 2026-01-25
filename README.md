@@ -5,6 +5,17 @@
 **EN:** Modern TypeScript utilities: an isomorphic **ApiClient**, structured logging/profiling helpers, and ready-to-use modules (`DateUtils`, `StringUtils`, `StorageManager`, etc.).  
 **ES:** Colección moderna de utilidades TypeScript: **ApiClient** isomórfico, logging/profiling estructurado y helpers listos (`DateUtils`, `StringUtils`, `StorageManager`, etc.).
 
+## 📊 Status / Estado
+
+[![CI](https://github.com/sebamar88/bytekit/workflows/CI/badge.svg)](https://github.com/sebamar88/bytekit/actions/workflows/ci.yml)
+[![Coverage](https://github.com/sebamar88/bytekit/workflows/Enhanced%20Coverage%20Report/badge.svg)](https://github.com/sebamar88/bytekit/actions/workflows/coverage.yml)
+[![CodeQL](https://github.com/sebamar88/bytekit/workflows/CodeQL%20Security%20Analysis/badge.svg)](https://github.com/sebamar88/bytekit/actions/workflows/codeql.yml)
+[![npm version](https://img.shields.io/npm/v/bytekit.svg)](https://www.npmjs.com/package/bytekit)
+[![npm downloads](https://img.shields.io/npm/dm/bytekit.svg)](https://www.npmjs.com/package/bytekit)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Node.js Version](https://img.shields.io/node/v/bytekit.svg)](https://nodejs.org)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-blue.svg)](https://www.typescriptlang.org/)
+
 ---
 
 ## ✨ Highlights / Características

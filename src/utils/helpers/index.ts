@@ -1,5 +1,6 @@
 export * from "#helpers/ArrayUtils.js";
 export * from "#helpers/CacheManager.js";
+export * from "#helpers/ColorUtils.js";
 export * from "#helpers/CompressionUtils.js";
 export * from "#helpers/CryptoUtils.js";
 export * from "#helpers/DateUtils.js";
@@ -9,6 +10,7 @@ export * from "#helpers/EventEmitter.js";
 export * from "#helpers/FileUploadHelper.js";
 export * from "#helpers/FormUtils.js";
 export * from "#helpers/HttpStatusHelper.js";
+export * from "#helpers/NumberUtils.js";
 export * from "#helpers/ObjectUtils.js";
 export * from "#helpers/PaginationHelper.js";
 export * from "#helpers/PollingHelper.js";

@@ -7,7 +7,7 @@ import {
 
 test("BatchRequest executes requests in parallel", async () => {
     const batch = new BatchRequest();
-    const results = [];
+    // erased _results
 
     batch.add(async () => {
         await new Promise((resolve) => setTimeout(resolve, 10));

@@ -2,7 +2,10 @@ export class EnvManager {
     private readonly isBrowser = typeof window !== "undefined";
 
     get(name: string): string | undefined {
-        if (this.isBrowser) return (import.meta as any)?.env?.[name];
+        if (this.isBrowser) {
+            const meta = import.meta as unknown as { env: Record<string, string> };
+            return meta.env?.[name];
+        }
         return process?.env?.[name];
     }
 

@@ -70,7 +70,7 @@ export class StreamingHelper {
                             const item = JSON.parse(buffer) as T;
                             data.push(item);
                             onChunk?.(buffer);
-                        } catch (e) {
+                        } catch {
                             console.warn("Failed to parse final buffer:", buffer);
                         }
                     }
@@ -89,7 +89,7 @@ export class StreamingHelper {
                             const item = JSON.parse(line) as T;
                             data.push(item);
                             onChunk?.(line);
-                        } catch (e) {
+                        } catch {
                             console.warn("Failed to parse line:", line);
                         }
                     }
@@ -119,8 +119,6 @@ export class StreamingHelper {
         close: () => void;
     } {
         const {
-            timeout = 30000,
-            headers = {},
             onError,
             onComplete,
             eventType = "message",
@@ -137,7 +135,7 @@ export class StreamingHelper {
                     try {
                         const data = JSON.parse(event.data) as T;
                         subscribers.forEach((callback) => callback(data));
-                    } catch (e) {
+                    } catch {
                         console.warn("Failed to parse SSE data:", event.data);
                     }
                 });
@@ -180,8 +178,8 @@ export class StreamingHelper {
         options: StreamOptions & { onProgress?: (progress: number) => void } = {}
     ): Promise<Blob> {
         const {
-            timeout = 30000,
-            headers = {},
+            timeout: _timeout = 30000, // Renamed to _timeout as it's not directly used after this destructuring
+            headers: _headers = {}, // Renamed to _headers as it's not directly used after this destructuring
             onProgress,
             onError,
             onComplete,
@@ -189,11 +187,11 @@ export class StreamingHelper {
 
         try {
             const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), timeout);
+            const timeoutId = setTimeout(() => controller.abort(), _timeout); // Use _timeout here
 
             const response = await fetch(endpoint, {
                 method: "GET",
-                headers,
+                headers: _headers, // Use _headers here
                 signal: controller.signal,
             });
 

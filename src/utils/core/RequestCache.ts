@@ -48,7 +48,6 @@ export class RequestCache {
 
         const now = Date.now();
         const age = now - entry.timestamp;
-        const isExpired = age > entry.ttl;
         const isBeyondStaleWindow = age > entry.ttl + this.staleWhileRevalidate;
 
         // If beyond stale window, remove and return null

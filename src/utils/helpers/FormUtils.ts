@@ -405,7 +405,7 @@ export class FormUtils<
             try {
                 await this.config.onSubmit(this.state.values);
                 return true;
-            } catch (error) {
+            } catch {
                 return false;
             }
         }

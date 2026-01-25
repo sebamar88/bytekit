@@ -69,7 +69,7 @@ function generateTypeFromData(data: unknown, typeName: string): string {
  * Infer TypeScript type from data
  */
 function inferType(data: unknown, name: string, depth = 0): string {
-    const indent = "  ".repeat(depth);
+
 
     if (data === null) {
         return `type ${name} = null;`;

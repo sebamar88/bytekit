@@ -25,7 +25,7 @@ declare global {
 
 // Custom matchers for wiki-specific assertions
 expect.extend({
-  toBeValidWikiStructure(received: any) {
+  toBeValidWikiStructure(received: unknown) {
     // Custom matcher implementation will be added when needed
     const pass = typeof received === "object" && received !== null;
     return {
@@ -34,12 +34,17 @@ expect.extend({
     };
   },
 
-  toPreserveBilingualContent(received: any) {
+  toPreserveBilingualContent(received: unknown) {
     // Custom matcher implementation will be added when needed
-    const pass = received && received.en && received.es;
+    const hasContent =
+      typeof received === "object" &&
+      received !== null &&
+      "en" in received &&
+      "es" in received;
+    
     return {
-      message: () => `expected ${received} to preserve bilingual content`,
-      pass,
+      message: () => `expected ${String(received)} to preserve bilingual content`,
+      pass: hasContent as boolean,
     };
   },
 });
