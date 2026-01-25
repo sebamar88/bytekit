@@ -13,6 +13,14 @@ export interface PollingOptions<T = unknown> {
     onAttempt?: (attempt: number, result?: T, error?: Error) => void;
     onSuccess?: (result: T, attempts: number) => void;
     onError?: (error: Error, attempts: number) => void;
+    /** Add random jitter to intervals (true = 10%, number = custom percentage 0-100) */
+    jitter?: boolean | number;
+    /** Timeout for each individual attempt in milliseconds */
+    attemptTimeout?: number;
+    /** Whether to retry on error (default: true) */
+    retryOnError?: boolean;
+    /** Base for exponential backoff (default: 2) */
+    exponentialBase?: number;
 }
 
 export interface PollingResult<T = unknown> {
@@ -21,6 +29,12 @@ export interface PollingResult<T = unknown> {
     error?: Error;
     attempts: number;
     duration: number;
+    /** Performance metrics for successful attempts */
+    metrics?: {
+        minResponseTime: number;
+        maxResponseTime: number;
+        avgResponseTime: number;
+    };
 }
 
 /**
@@ -28,7 +42,7 @@ export interface PollingResult<T = unknown> {
  */
 export class PollingHelper<T = unknown> {
     private fn: () => Promise<T>;
-    private options: Required<PollingOptions<T>>;
+    private options: Required<Omit<PollingOptions<T>, 'attemptTimeout'>> & { attemptTimeout?: number };
     private abortController: AbortController | null = null;
 
     constructor(fn: () => Promise<T>, options: PollingOptions<T> = {}) {
@@ -43,7 +57,12 @@ export class PollingHelper<T = unknown> {
             onAttempt: options.onAttempt ?? (() => {}),
             onSuccess: options.onSuccess ?? (() => {}),
             onError: options.onError ?? (() => {}),
+            jitter: options.jitter ?? false,
+            attemptTimeout: options.attemptTimeout,
+            retryOnError: options.retryOnError ?? true,
+            exponentialBase: options.exponentialBase ?? 2,
         };
+        this.validateOptions();
     }
 
     /**
@@ -55,8 +74,19 @@ export class PollingHelper<T = unknown> {
         let currentInterval = this.options.interval;
         let lastError: Error | undefined;
         let lastResult: T | undefined;
+        const responseTimes: number[] = [];
 
         while (attempt < this.options.maxAttempts) {
+            // Check if aborted
+            if (this.abortController?.signal.aborted) {
+                return {
+                    success: false,
+                    error: new Error("Polling aborted"),
+                    attempts: attempt,
+                    duration: Date.now() - startTime,
+                };
+            }
+
             const elapsed = Date.now() - startTime;
             if (elapsed > this.options.maxDuration) {
                 return {
@@ -70,7 +100,19 @@ export class PollingHelper<T = unknown> {
             attempt++;
 
             try {
-                lastResult = await this.fn();
+                const attemptStartTime = Date.now();
+                
+                // Execute with optional timeout
+                lastResult = this.options.attemptTimeout
+                    ? await this.executeWithTimeout(
+                          this.fn(),
+                          this.options.attemptTimeout
+                      )
+                    : await this.fn();
+                
+                const responseTime = Date.now() - attemptStartTime;
+                responseTimes.push(responseTime);
+                
                 this.options.onAttempt(attempt, lastResult);
 
                 if (this.options.stopCondition(lastResult)) {
@@ -80,16 +122,30 @@ export class PollingHelper<T = unknown> {
                         result: lastResult,
                         attempts: attempt,
                         duration: Date.now() - startTime,
+                        metrics: this.calculateMetrics(responseTimes),
                     };
                 }
             } catch (error) {
                 lastError =
                     error instanceof Error ? error : new Error(String(error));
                 this.options.onAttempt(attempt, undefined, lastError);
+                
+                // If retryOnError is false, stop immediately
+                if (!this.options.retryOnError) {
+                    this.options.onError(lastError, attempt);
+                    return {
+                        success: false,
+                        error: lastError,
+                        attempts: attempt,
+                        duration: Date.now() - startTime,
+                        metrics: this.calculateMetrics(responseTimes),
+                    };
+                }
             }
 
             if (attempt < this.options.maxAttempts) {
-                await this.delay(currentInterval);
+                const delayTime = this.applyJitter(currentInterval);
+                await this.delay(delayTime);
                 currentInterval = Math.min(
                     currentInterval * this.options.backoffMultiplier,
                     this.options.maxBackoffInterval
@@ -106,6 +162,7 @@ export class PollingHelper<T = unknown> {
             error: lastError || new Error("Max attempts exceeded"),
             attempts: attempt,
             duration: Date.now() - startTime,
+            metrics: this.calculateMetrics(responseTimes),
         };
     }
 
@@ -129,6 +186,95 @@ export class PollingHelper<T = unknown> {
      */
     private delay(ms: number): Promise<void> {
         return new Promise((resolve) => setTimeout(resolve, ms));
+    }
+
+    /**
+     * Validate polling options
+     */
+    private validateOptions(): void {
+        if (this.options.interval <= 0) {
+            throw new Error("interval must be greater than 0");
+        }
+        if (this.options.maxAttempts <= 0) {
+            throw new Error("maxAttempts must be greater than 0");
+        }
+        if (this.options.maxDuration <= 0) {
+            throw new Error("maxDuration must be greater than 0");
+        }
+        if (this.options.backoffMultiplier < 1) {
+            throw new Error("backoffMultiplier must be >= 1");
+        }
+        if (this.options.maxBackoffInterval < this.options.interval) {
+            throw new Error("maxBackoffInterval must be >= interval");
+        }
+        if (typeof this.options.jitter === "number") {
+            if (this.options.jitter < 0 || this.options.jitter > 100) {
+                throw new Error("jitter percentage must be between 0 and 100");
+            }
+        }
+        if (
+            this.options.attemptTimeout !== undefined &&
+            this.options.attemptTimeout <= 0
+        ) {
+            throw new Error("attemptTimeout must be greater than 0");
+        }
+        if (this.options.exponentialBase < 1) {
+            throw new Error("exponentialBase must be >= 1");
+        }
+    }
+
+    /**
+     * Apply jitter to interval
+     */
+    private applyJitter(interval: number): number {
+        if (!this.options.jitter) return interval;
+
+        const jitterPercent =
+            typeof this.options.jitter === "number" ? this.options.jitter : 10;
+        const jitterAmount = interval * (jitterPercent / 100);
+        // Add random jitter: -jitterAmount to +jitterAmount
+        return interval + (Math.random() * jitterAmount * 2 - jitterAmount);
+    }
+
+    /**
+     * Execute promise with timeout
+     */
+    private async executeWithTimeout<R>(
+        promise: Promise<R>,
+        timeout: number
+    ): Promise<R> {
+        return Promise.race([
+            promise,
+            new Promise<R>((_, reject) =>
+                setTimeout(
+                    () => reject(new Error("Attempt timeout exceeded")),
+                    timeout
+                )
+            ),
+        ]);
+    }
+
+    /**
+     * Calculate performance metrics
+     */
+    private calculateMetrics(
+        responseTimes: number[]
+    ):
+        | { minResponseTime: number; maxResponseTime: number; avgResponseTime: number }
+        | undefined {
+        if (responseTimes.length === 0) return undefined;
+
+        const min = Math.min(...responseTimes);
+        const max = Math.max(...responseTimes);
+        const avg =
+            responseTimes.reduce((sum, time) => sum + time, 0) /
+            responseTimes.length;
+
+        return {
+            minResponseTime: min,
+            maxResponseTime: max,
+            avgResponseTime: Math.round(avg * 100) / 100, // Round to 2 decimals
+        };
     }
 
     /**

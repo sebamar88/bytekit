@@ -66,22 +66,20 @@ export class EventEmitter<
             this.onceMap.set(event as string, new Set());
         }
 
-        const onceListener: EventListener = async (data: unknown) => {
+        const onceListener: any = async (data: unknown) => {
             await listener(data as Events[K]);
-            // Remove the wrapped listener from eventMap
-            const handlers = this.eventMap.get(event as string);
-            if (handlers) {
-                handlers.delete(onceListener);
-            }
-            // Remove from onceMap
-            const onceHandlers = this.onceMap.get(event as string);
-            if (onceHandlers) {
-                onceHandlers.delete(onceListener);
-            }
+            this.off(event, onceListener);
         };
 
-        this.onceMap.get(event as string)!.add(onceListener as EventListener);
-        return this.on(event, onceListener as EventListener<Events[K]>);
+        // Attach original listener to allow removal by off()
+        onceListener._originalListener = listener;
+
+        if (!this.onceMap.has(event as string)) {
+            this.onceMap.set(event as string, new Set());
+        }
+        this.onceMap.get(event as string)!.add(onceListener);
+
+        return this.on(event, onceListener);
     }
 
     /**
@@ -92,13 +90,30 @@ export class EventEmitter<
         listener: EventListener<Events[K]>
     ): this {
         const handlers = this.eventMap.get(event as string);
-        if (handlers) {
-            handlers.delete(listener as EventListener);
+        if (!handlers) return this;
+
+        // Find the listener (either direct or wrapped in once)
+        for (const handler of handlers) {
+            if (
+                handler === listener ||
+                (handler as any)._originalListener === listener
+            ) {
+                handlers.delete(handler);
+                break;
+            }
         }
 
         const onceHandlers = this.onceMap.get(event as string);
         if (onceHandlers) {
-            onceHandlers.delete(listener as EventListener);
+            for (const handler of onceHandlers) {
+                if (
+                    handler === listener ||
+                    (handler as any)._originalListener === listener
+                ) {
+                    onceHandlers.delete(handler);
+                    break;
+                }
+            }
         }
 
         return this;

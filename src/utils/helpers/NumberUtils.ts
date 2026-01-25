@@ -485,13 +485,19 @@ export class NumberUtils {
      */
     static parse(value: string, locale: string = "en"): number {
         // Determine decimal and thousand separators based on locale
-        const parts = new Intl.NumberFormat(locale).formatToParts(1234.5);
+        const parts = new Intl.NumberFormat(locale).formatToParts(1000000.1);
         const decimalSep = parts.find((p) => p.type === "decimal")?.value ?? ".";
         const groupSep = parts.find((p) => p.type === "group")?.value ?? ",";
 
-        // Remove thousand separators and replace decimal separator
-        let normalized = value.replace(new RegExp("\\" + groupSep, "g"), "");
-        normalized = normalized.replace(decimalSep, ".");
+        let normalized = value;
+        // Remove thousand separators
+        if (groupSep) {
+            normalized = normalized.split(groupSep).join("");
+        }
+        // Normalize decimal separator
+        if (decimalSep && decimalSep !== ".") {
+            normalized = normalized.split(decimalSep).join(".");
+        }
 
         // Remove currency symbols and other non-numeric characters (except - and .)
         normalized = normalized.replace(/[^\d.-]/g, "");

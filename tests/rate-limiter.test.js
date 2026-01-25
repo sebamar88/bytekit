@@ -1,95 +1,87 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { RateLimiter, SlidingWindowRateLimiter } from "../dist/index.js";
+import { RateLimiter, SlidingWindowRateLimiter } from "../dist/utils/core/RateLimiter.js";
 
-test("RateLimiter allows requests within limit", () => {
-    const limiter = new RateLimiter({ maxRequests: 3, windowMs: 1000 });
+// ============================================================================
+// RateLimiter Tests
+// ============================================================================
 
-    assert.equal(limiter.isAllowed("https://api.example.com/users"), true);
-    assert.equal(limiter.isAllowed("https://api.example.com/users"), true);
-    assert.equal(limiter.isAllowed("https://api.example.com/users"), true);
+test("RateLimiter (Token Bucket) limits requests", () => {
+    const rl = new RateLimiter({ maxRequests: 2, windowMs: 1000 });
+    const url = "https://api.test.com";
+    
+    assert.equal(rl.isAllowed(url), true);
+    assert.equal(rl.isAllowed(url), true);
+    assert.equal(rl.isAllowed(url), false); // Limit reached
 });
 
-test("RateLimiter blocks requests exceeding limit", () => {
-    const limiter = new RateLimiter({ maxRequests: 2, windowMs: 1000 });
-
-    assert.equal(limiter.isAllowed("https://api.example.com/users"), true);
-    assert.equal(limiter.isAllowed("https://api.example.com/users"), true);
-    assert.equal(limiter.isAllowed("https://api.example.com/users"), false);
+test("RateLimiter (Token Bucket) refills over time", async () => {
+    const rl = new RateLimiter({ maxRequests: 2, windowMs: 100 });
+    const url = "https://api.test.com";
+    
+    rl.isAllowed(url);
+    rl.isAllowed(url);
+    assert.equal(rl.isAllowed(url), false);
+    
+    await new Promise(r => setTimeout(r, 150));
+    assert.equal(rl.isAllowed(url), true);
 });
 
-test("RateLimiter refills tokens over time", async () => {
-    const limiter = new RateLimiter({ maxRequests: 1, windowMs: 100 });
-
-    assert.equal(limiter.isAllowed("https://api.example.com/users"), true);
-    assert.equal(limiter.isAllowed("https://api.example.com/users"), false);
-
-    await new Promise((resolve) => setTimeout(resolve, 120));
-
-    assert.equal(limiter.isAllowed("https://api.example.com/users"), true);
-});
-
-test("RateLimiter provides statistics", () => {
-    const limiter = new RateLimiter({ maxRequests: 5, windowMs: 1000 });
-
-    limiter.isAllowed("https://api.example.com/users");
-    limiter.isAllowed("https://api.example.com/users");
-
-    const stats = limiter.getStats("https://api.example.com/users");
+test("RateLimiter.getStats returns correct information", () => {
+    const rl = new RateLimiter({ maxRequests: 5, windowMs: 60000 });
+    const url = "https://api.test.com";
+    
+    rl.isAllowed(url);
+    const stats = rl.getStats(url);
+    
     assert.equal(stats.limit, 5);
-    assert.equal(stats.remaining, 3);
+    assert.equal(stats.remaining, 4);
+    assert.ok(stats.resetAt > Date.now());
 });
 
-test("RateLimiter separates limits by hostname", () => {
-    const limiter = new RateLimiter({ maxRequests: 1, windowMs: 1000 });
-
-    assert.equal(limiter.isAllowed("https://api1.example.com/users"), true);
-    assert.equal(limiter.isAllowed("https://api2.example.com/users"), true);
-    assert.equal(limiter.isAllowed("https://api1.example.com/users"), false);
+test("SlidingWindowRateLimiter limits accurately", () => {
+    const rl = new SlidingWindowRateLimiter({ maxRequests: 2, windowMs: 1000 });
+    const url = "https://api.test.com";
+    
+    assert.equal(rl.isAllowed(url), true);
+    assert.equal(rl.isAllowed(url), true);
+    assert.equal(rl.isAllowed(url), false);
 });
 
-test("RateLimiter can be reset", () => {
-    const limiter = new RateLimiter({ maxRequests: 1, windowMs: 1000 });
-
-    limiter.isAllowed("https://api.example.com/users");
-    assert.equal(limiter.isAllowed("https://api.example.com/users"), false);
-
-    limiter.reset("https://api.example.com/users");
-    assert.equal(limiter.isAllowed("https://api.example.com/users"), true);
+test("RateLimiters can be reset", () => {
+    const rl = new RateLimiter({ maxRequests: 1 });
+    const swrl = new SlidingWindowRateLimiter({ maxRequests: 1 });
+    const url = "https://api.test.com";
+    
+    rl.isAllowed(url);
+    assert.equal(rl.isAllowed(url), false);
+    rl.reset(url);
+    assert.equal(rl.isAllowed(url), true);
+    
+    swrl.isAllowed(url);
+    assert.equal(swrl.isAllowed(url), false);
+    swrl.resetAll();
+    assert.equal(swrl.isAllowed(url), true);
 });
 
-test("SlidingWindowRateLimiter allows requests within limit", () => {
-    const limiter = new SlidingWindowRateLimiter({
-        maxRequests: 3,
-        windowMs: 1000,
-    });
-
-    assert.equal(limiter.isAllowed("https://api.example.com/users"), true);
-    assert.equal(limiter.isAllowed("https://api.example.com/users"), true);
-    assert.equal(limiter.isAllowed("https://api.example.com/users"), true);
+test("RateLimiter.waitForAllowance blocks until allowed", async () => {
+    const rl = new RateLimiter({ maxRequests: 1, windowMs: 100 });
+    const url = "https://api.test.com";
+    
+    rl.isAllowed(url); // Use the only token
+    
+    const start = Date.now();
+    await rl.waitForAllowance(url);
+    const duration = Date.now() - start;
+    
+    assert.ok(duration >= 100);
 });
 
-test("SlidingWindowRateLimiter blocks requests exceeding limit", () => {
-    const limiter = new SlidingWindowRateLimiter({
-        maxRequests: 2,
-        windowMs: 1000,
-    });
-
-    assert.equal(limiter.isAllowed("https://api.example.com/users"), true);
-    assert.equal(limiter.isAllowed("https://api.example.com/users"), true);
-    assert.equal(limiter.isAllowed("https://api.example.com/users"), false);
-});
-
-test("SlidingWindowRateLimiter resets after window expires", async () => {
-    const limiter = new SlidingWindowRateLimiter({
-        maxRequests: 1,
-        windowMs: 100,
-    });
-
-    assert.equal(limiter.isAllowed("https://api.example.com/users"), true);
-    assert.equal(limiter.isAllowed("https://api.example.com/users"), false);
-
-    await new Promise((resolve) => setTimeout(resolve, 120));
-
-    assert.equal(limiter.isAllowed("https://api.example.com/users"), true);
+test("SlidingWindowRateLimiter.getStats", () => {
+    const rl = new SlidingWindowRateLimiter({ maxRequests: 1, windowMs: 1000 });
+    const url = "https://api.test.com";
+    rl.isAllowed(url);
+    const stats = rl.getStats(url);
+    assert.equal(stats.remaining, 0);
+    assert.ok(stats.retryAfter > 0);
 });

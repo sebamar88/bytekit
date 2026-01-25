@@ -37,29 +37,10 @@ export class FileUploadHelper {
         } = options;
 
         const totalSize = file.size;
-        let uploadedSize = 0;
+        const chunks = Math.ceil(totalSize / chunkSize);
+        const uploadId = this.generateUploadId();
 
         try {
-            // For small files, upload directly
-            if (totalSize <= chunkSize) {
-                await this.uploadChunk(
-                    file,
-                    endpoint,
-                    0,
-                    totalSize,
-                    headers,
-                    timeout
-                );
-                return {
-                    success: true,
-                    fileId: this.generateUploadId(),
-                };
-            }
-
-            // For large files, upload in chunks
-            const chunks = Math.ceil(totalSize / chunkSize);
-            const uploadId = this.generateUploadId();
-
             for (let i = 0; i < chunks; i++) {
                 const start = i * chunkSize;
                 const end = Math.min(start + chunkSize, totalSize);
@@ -75,19 +56,13 @@ export class FileUploadHelper {
                             endpoint,
                             i,
                             chunks,
-                            { ...headers, "X-Upload-ID": uploadId },
+                            { 
+                                ...headers, 
+                                ...(chunks > 1 ? { "X-Upload-ID": uploadId } : {}) 
+                            },
                             timeout
                         );
                         success = true;
-                        uploadedSize = end;
-
-                        if (onProgress) {
-                            onProgress({
-                                loaded: uploadedSize,
-                                total: totalSize,
-                                percentage: Math.round((uploadedSize / totalSize) * 100),
-                            });
-                        }
                     } catch (error) {
                         retries++;
                         if (retries >= maxRetries) {
@@ -99,11 +74,19 @@ export class FileUploadHelper {
                         );
                     }
                 }
+
+                if (onProgress) {
+                    onProgress({
+                        loaded: end,
+                        total: totalSize,
+                        percentage: Math.round((end / totalSize) * 100),
+                    });
+                }
             }
 
             return {
                 success: true,
-                fileId: this.generateUploadId(),
+                fileId: uploadId,
             };
         } catch (error) {
             return {

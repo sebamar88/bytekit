@@ -163,6 +163,13 @@ export class PaginationHelper<T = unknown> {
             throw new Error("Use goToPage() in offset mode");
         }
 
+        if (!this.cursorMap.has(cursor)) {
+            const index = this.decodeCursor(cursor);
+            if (index >= 0 && index < this.items.length) {
+                this.cursorMap.set(cursor, index);
+            }
+        }
+
         if (this.cursorMap.has(cursor)) {
             this.currentCursor = cursor;
         }
@@ -249,7 +256,7 @@ export class PaginationHelper<T = unknown> {
                     ? this.generateCursor(nextIndex)
                     : undefined,
             previousCursor:
-                previousIndex > 0
+                currentIndex > 0
                     ? this.generateCursor(previousIndex)
                     : undefined,
             hasNextPage: nextIndex < this.items.length,
