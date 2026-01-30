@@ -451,7 +451,7 @@ test("PollingHelper calls onError callback", async () => {
 test("PollingHelper handles non-Error exceptions", async () => {
     const poller = new PollingHelper(
         async () => {
-            throw "String error"; // eslint-disable-line no-throw-literal
+            throw "String error";  
         },
         {
             interval: 10,

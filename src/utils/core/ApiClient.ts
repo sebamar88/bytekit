@@ -310,13 +310,12 @@ export class ApiClient {
             Object.assign(searchParams, options.filters);
         }
 
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const {
-            pagination,
-            sort,
-            filters: _filters,
-            ...requestOptions
-        } = options ?? {};
+        // Extract only needed properties for request
+        const { pagination, sort, filters, ...requestOptions } = options ?? {};
+        // Avoid unused var warnings
+        void pagination;
+        void sort;
+        void filters;
 
         return this.request<PaginatedResponse<T>>(path, {
             ...requestOptions,
