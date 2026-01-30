@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.4] - 2025-01-30
+
+### Fixed
+
+- **Browser Compatibility**: Fixed Vite warnings about Node.js modules (`zlib`, `util`, `crypto`) being externalized for browser compatibility
+    - Added runtime environment checks before importing Node.js-specific modules
+    - `CompressionUtils`: gzip, gunzip, deflate, and inflate methods now check for Node.js environment before importing `zlib` and `util`
+    - `CryptoUtils`: hash and hmac methods now check for Node.js environment before importing `crypto`
+    - Browser environments will gracefully fall back to browser-compatible alternatives (Web Crypto API, simple compression, etc.)
+    - Eliminates console warnings when using bytekit in Vite/browser projects
+
 ### Fixed
 
 - **CRITICAL**: Fixed `ApiClient` header handling for better compatibility with all fetch implementations

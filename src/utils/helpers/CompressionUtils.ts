@@ -148,66 +148,92 @@ export class CompressionUtils {
      * Gzip compress (Node.js only)
      */
     static async gzip(str: string): Promise<Buffer | string> {
-        try {
-            const zlib = await import("zlib");
-            const util = await import("util");
-            const gzip = util.promisify(zlib.gzip);
-            return await gzip(str);
-        } catch {
-            // Fallback to simple compression
-            return this.compress(str);
+        // Only import Node.js modules in Node.js environment
+        if (typeof process !== "undefined" && process.versions?.node) {
+            try {
+                const zlib = await import("zlib");
+                const util = await import("util");
+                const gzip = util.promisify(zlib.gzip);
+                return await gzip(str);
+            } catch {
+                // Fallback to simple compression
+                return this.compress(str);
+            }
         }
+        // Browser fallback
+        return this.compress(str);
     }
 
     /**
      * Gzip decompress (Node.js only)
      */
     static async gunzip(data: Buffer | string): Promise<string> {
-        try {
-            const zlib = await import("zlib");
-            const util = await import("util");
-            const gunzip = util.promisify(zlib.gunzip);
-            const result = await gunzip(data);
-            return result.toString();
-        } catch {
-            // Fallback to simple decompression
-            if (typeof data === "string") {
-                return this.decompress(data);
+        // Only import Node.js modules in Node.js environment
+        if (typeof process !== "undefined" && process.versions?.node) {
+            try {
+                const zlib = await import("zlib");
+                const util = await import("util");
+                const gunzip = util.promisify(zlib.gunzip);
+                const result = await gunzip(data);
+                return result.toString();
+            } catch {
+                // Fallback to simple decompression
+                if (typeof data === "string") {
+                    return this.decompress(data);
+                }
+                return data.toString();
             }
-            return data.toString();
         }
+        // Browser fallback
+        if (typeof data === "string") {
+            return this.decompress(data);
+        }
+        return data.toString();
     }
 
     /**
      * Deflate compress (Node.js only)
      */
     static async deflate(str: string): Promise<Buffer | string> {
-        try {
-            const zlib = await import("zlib");
-            const util = await import("util");
-            const deflate = util.promisify(zlib.deflate);
-            return await deflate(str);
-        } catch {
-            return this.compress(str);
+        // Only import Node.js modules in Node.js environment
+        if (typeof process !== "undefined" && process.versions?.node) {
+            try {
+                const zlib = await import("zlib");
+                const util = await import("util");
+                const deflate = util.promisify(zlib.deflate);
+                return await deflate(str);
+            } catch {
+                return this.compress(str);
+            }
         }
+        // Browser fallback
+        return this.compress(str);
     }
 
     /**
      * Inflate decompress (Node.js only)
      */
     static async inflate(data: Buffer | string): Promise<string> {
-        try {
-            const zlib = await import("zlib");
-            const util = await import("util");
-            const inflate = util.promisify(zlib.inflate);
-            const result = await inflate(data);
-            return result.toString();
-        } catch {
-            if (typeof data === "string") {
-                return this.decompress(data);
+        // Only import Node.js modules in Node.js environment
+        if (typeof process !== "undefined" && process.versions?.node) {
+            try {
+                const zlib = await import("zlib");
+                const util = await import("util");
+                const inflate = util.promisify(zlib.inflate);
+                const result = await inflate(data);
+                return result.toString();
+            } catch {
+                if (typeof data === "string") {
+                    return this.decompress(data);
+                }
+                return data.toString();
             }
-            return data.toString();
         }
+        // Browser fallback
+        if (typeof data === "string") {
+            return this.decompress(data);
+        }
+        return data.toString();
     }
 
     /**

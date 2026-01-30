@@ -129,17 +129,21 @@ export class CryptoUtils {
         }
 
         // Node.js fallback
-        try {
-            const crypto = await import("crypto");
-            const hash = crypto.createHash(
-                algorithm.toLowerCase().replace("-", "")
-            );
-            hash.update(str);
-            return hash.digest("hex");
-        } catch {
-            // Fallback to simple hash
-            return this.simpleHash(str);
+        if (typeof process !== "undefined" && process.versions?.node) {
+            try {
+                const crypto = await import("crypto");
+                const hash = crypto.createHash(
+                    algorithm.toLowerCase().replace("-", "")
+                );
+                hash.update(str);
+                return hash.digest("hex");
+            } catch {
+                // Fallback to simple hash
+                return this.simpleHash(str);
+            }
         }
+        // Browser without SubtleCrypto fallback
+        return this.simpleHash(str);
     }
 
     /**
@@ -172,17 +176,21 @@ export class CryptoUtils {
         }
 
         // Node.js fallback
-        try {
-            const crypto = await import("crypto");
-            const hmac = crypto.createHmac(
-                algorithm.toLowerCase().replace("-", ""),
-                secret
-            );
-            hmac.update(message);
-            return hmac.digest("hex");
-        } catch {
-            return "";
+        if (typeof process !== "undefined" && process.versions?.node) {
+            try {
+                const crypto = await import("crypto");
+                const hmac = crypto.createHmac(
+                    algorithm.toLowerCase().replace("-", ""),
+                    secret
+                );
+                hmac.update(message);
+                return hmac.digest("hex");
+            } catch {
+                return "";
+            }
         }
+        // Browser without SubtleCrypto fallback
+        return "";
     }
 
     /**
