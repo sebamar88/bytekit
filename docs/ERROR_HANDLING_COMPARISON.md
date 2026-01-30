@@ -3,6 +3,7 @@
 ## Problema Original
 
 Con `fetch` nativo, obtienes acceso directo a `response.status` y `response.text()`, pero debes manejar manualmente:
+
 - Retries
 - Timeouts
 - Error parsing
@@ -26,7 +27,7 @@ try {
   });
 
   console.log("Status:", response.status);  // ✅ Acceso directo
-  
+
   if (!response.ok) {
     const text = await response.text();      // ✅ Puedes ver el error crudo
     console.log("Error:", text);
@@ -34,7 +35,7 @@ try {
   }
 
   const data = await response.json();
-  
+
 } catch (error) {
   console.error(error.message);  // ❌ Solo mensaje genérico
   // NO tienes: status, body estructurado, retries automáticos
@@ -42,6 +43,7 @@ try {
 ```
 
 **Problemas:**
+
 - Sin retries automáticos
 - Sin timeout configurado
 - Debes parsear errores manualmente
@@ -74,9 +76,9 @@ try {
     model: "llama-3.3-70b-versatile",
     ...
   });
-  
+
   // ✅ Data ya parseado, retries automáticos
-  
+
 } catch (error) {
   if (error instanceof ApiError) {
     // ✅ TODA la información disponible
@@ -84,11 +86,11 @@ try {
     console.log("Status Text:", error.statusText);  // "Bad Request"
     console.log("Message:", error.message);         // Localizado
     console.log("Body:", error.body);               // Response completo
-    
+
     // Para debugging detallado:
     console.log(error.toString());
     // ApiError: La solicitud es inválida
-    // Status: 400 Bad Request  
+    // Status: 400 Bad Request
     // Body: {
     //   "error": {
     //     "message": "Invalid model",
@@ -100,6 +102,7 @@ try {
 ```
 
 **Ventajas:**
+
 - ✅ Retries automáticos (configurable)
 - ✅ Timeout configurado
 - ✅ Errores ya parseados en `error.body`
@@ -144,12 +147,12 @@ catch (error) {
 
 ```typescript
 try {
-  await client.post("/endpoint", data);
+    await client.post("/endpoint", data);
 } catch (error) {
-  if (error instanceof ApiError) {
-    // Durante desarrollo, muestra TODO
-    console.error(error.toString());
-    /*
+    if (error instanceof ApiError) {
+        // Durante desarrollo, muestra TODO
+        console.error(error.toString());
+        /*
     ApiError: La solicitud es inválida
     Status: 400 Bad Request
     Body: {
@@ -157,7 +160,7 @@ try {
       "valid_models": ["llama-3.3-70b-versatile", ...]
     }
     */
-  }
+    }
 }
 ```
 
@@ -176,7 +179,7 @@ try {
         code?: string;
       }
     };
-    
+
     if (groqError?.error?.type === "rate_limit_exceeded") {
       console.log("Rate limited! Wait before retry");
       console.log("Details:", groqError.error.message);
@@ -189,21 +192,21 @@ try {
 
 ```typescript
 try {
-  await client.post("/endpoint", data);
+    await client.post("/endpoint", data);
 } catch (error) {
-  if (error instanceof ApiError) {
-    // Log estructurado para monitoring
-    logger.error("API request failed", {
-      status: error.status,
-      statusText: error.statusText,
-      endpoint: "/endpoint",
-      errorBody: error.body,
-      timestamp: new Date().toISOString(),
-    });
-    
-    // O serializa todo el error
-    logger.error("API request failed", JSON.parse(JSON.stringify(error)));
-  }
+    if (error instanceof ApiError) {
+        // Log estructurado para monitoring
+        logger.error("API request failed", {
+            status: error.status,
+            statusText: error.statusText,
+            endpoint: "/endpoint",
+            errorBody: error.body,
+            timestamp: new Date().toISOString(),
+        });
+
+        // O serializa todo el error
+        logger.error("API request failed", JSON.parse(JSON.stringify(error)));
+    }
 }
 ```
 
@@ -211,18 +214,18 @@ try {
 
 ```typescript
 try {
-  await client.post("/endpoint", data, {
-    skipRetry: true,  // No retry para este request específico
-  });
+    await client.post("/endpoint", data, {
+        skipRetry: true, // No retry para este request específico
+    });
 } catch (error) {
-  if (error instanceof ApiError) {
-    // Decide si hacer retry manual basado en el error
-    if (error.status === 429 || error.status >= 500) {
-      console.log("Retriable error, waiting...");
-      await sleep(5000);
-      // Manual retry
+    if (error instanceof ApiError) {
+        // Decide si hacer retry manual basado en el error
+        if (error.status === 429 || error.status >= 500) {
+            console.log("Retriable error, waiting...");
+            await sleep(5000);
+            // Manual retry
+        }
     }
-  }
 }
 ```
 
@@ -231,6 +234,7 @@ try {
 ## Recomendación Final
 
 **Usa ApiClient cuando:**
+
 - ✅ Necesitas retries automáticos
 - ✅ Quieres timeout configurado
 - ✅ Prefieres errores estructurados y localizados
@@ -238,6 +242,7 @@ try {
 - ✅ Trabajas con múltiples endpoints similares
 
 **Usa fetch nativo cuando:**
+
 - ⚠️ Necesitas control total del bajo nivel
 - ⚠️ Request muy específico one-off
 - ⚠️ Debugging de issues muy particulares de la librería fetch

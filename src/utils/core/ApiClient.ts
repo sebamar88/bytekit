@@ -40,8 +40,7 @@ export interface ApiClientConfig {
     circuitBreaker?: CircuitBreakerConfig;
 }
 
-export interface RequestOptions
-    extends Omit<RequestInit, "body"> {
+export interface RequestOptions extends Omit<RequestInit, "body"> {
     searchParams?: Record<string, QueryParam>;
     body?: FormData | string | Blob | ArrayBuffer | Record<string, unknown>;
     errorLocale?: Locale;
@@ -65,8 +64,9 @@ export interface FilterParams {
     [key: string]: QueryParam;
 }
 
-export interface ListOptions<TFilter extends FilterParams = FilterParams>
-    extends Omit<RequestOptions, "searchParams"> {
+export interface ListOptions<
+    TFilter extends FilterParams = FilterParams,
+> extends Omit<RequestOptions, "searchParams"> {
     pagination?: PaginationParams;
     sort?: SortParams;
     filters?: TFilter;
@@ -94,7 +94,7 @@ export class ApiError extends Error {
     ) {
         super(message);
         this.name = "ApiError";
-        
+
         // Mejorar el debugging incluyendo información detallada
         if (Error.captureStackTrace) {
             Error.captureStackTrace(this, ApiError);
@@ -122,19 +122,20 @@ export class ApiError extends Error {
             `${this.name}: ${this.message}`,
             `Status: ${this.status} ${this.statusText}`,
         ];
-        
+
         if (this.body) {
             try {
-                const bodyStr = typeof this.body === 'string' 
-                    ? this.body 
-                    : JSON.stringify(this.body, null, 2);
+                const bodyStr =
+                    typeof this.body === "string"
+                        ? this.body
+                        : JSON.stringify(this.body, null, 2);
                 parts.push(`Body: ${bodyStr}`);
             } catch {
                 parts.push(`Body: ${this.body}`);
             }
         }
-        
-        return parts.join('\n');
+
+        return parts.join("\n");
     }
 
     /**
@@ -240,9 +241,9 @@ export class ApiClient {
      * @example
      * // Forma simple (body directo)
      * await client.post("/api/users", { name: "John" })
-     * 
+     *
      * // Forma avanzada (con options)
-     * await client.post("/api/users", { 
+     * await client.post("/api/users", {
      *   body: { name: "John" },
      *   headers: { "X-Custom": "value" }
      * })
@@ -310,7 +311,12 @@ export class ApiClient {
         }
 
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const { pagination, sort, filters: _filters, ...requestOptions } = options ?? {};
+        const {
+            pagination,
+            sort,
+            filters: _filters,
+            ...requestOptions
+        } = options ?? {};
 
         return this.request<PaginatedResponse<T>>(path, {
             ...requestOptions,
@@ -422,7 +428,7 @@ export class ApiClient {
                             true
                         );
                     }
-                    
+
                     // Logging mejorado para ApiError
                     if (err instanceof ApiError) {
                         this.logger?.error(
@@ -459,13 +465,15 @@ export class ApiClient {
     // -------------------------
     // Helpers
     // -------------------------
-    
+
     /**
      * Normaliza el segundo parámetro de post/put/patch para soportar:
      * 1. Body directo: post("/path", { name: "John" })
      * 2. RequestOptions: post("/path", { body: {...}, headers: {...} })
      */
-    private normalizeBodyOrOptions(bodyOrOptions?: RequestOptions | unknown): RequestOptions {
+    private normalizeBodyOrOptions(
+        bodyOrOptions?: RequestOptions | unknown
+    ): RequestOptions {
         if (!bodyOrOptions) {
             return {};
         }
@@ -484,24 +492,36 @@ export class ApiClient {
      * RequestOptions tiene propiedades especiales como searchParams, headers, timeoutMs, etc.
      */
     private isRequestOptions(obj: unknown): obj is RequestOptions {
-        if (typeof obj !== 'object' || obj === null) {
+        if (typeof obj !== "object" || obj === null) {
             return false;
         }
 
         const knownKeys = [
-            'searchParams', 'errorLocale', 'timeoutMs', 
-            'validateResponse', 'skipRetry',
+            "searchParams",
+            "errorLocale",
+            "timeoutMs",
+            "validateResponse",
+            "skipRetry",
             // También incluir keys de RequestInit
-            'method', 'headers', 'mode', 'credentials', 'cache',
-            'redirect', 'referrer', 'referrerPolicy', 'integrity',
-            'keepalive', 'signal', 'window',
+            "method",
+            "headers",
+            "mode",
+            "credentials",
+            "cache",
+            "redirect",
+            "referrer",
+            "referrerPolicy",
+            "integrity",
+            "keepalive",
+            "signal",
+            "window",
         ];
 
         const objKeys = Object.keys(obj);
-        
+
         // Si tiene alguna de las keys de RequestOptions/RequestInit (excepto 'body'), es RequestOptions
-        const hasRequestOptionKey = objKeys.some(
-            key => knownKeys.includes(key)
+        const hasRequestOptionKey = objKeys.some((key) =>
+            knownKeys.includes(key)
         );
 
         return hasRequestOptionKey;
@@ -532,21 +552,12 @@ export class ApiClient {
         controller: AbortController
     ): Promise<T> {
         return new Promise((resolve, reject) => {
-            const timer = setTimeout(
-                () => {
-                    controller.abort();
-                    reject(
-                        new ApiError(
-                            408,
-                            "Timeout",
-                            "Request timeout",
-                            null,
-                            true
-                        )
-                    );
-                },
-                ms
-            );
+            const timer = setTimeout(() => {
+                controller.abort();
+                reject(
+                    new ApiError(408, "Timeout", "Request timeout", null, true)
+                );
+            }, ms);
             promise
                 .then((res) => {
                     clearTimeout(timer);

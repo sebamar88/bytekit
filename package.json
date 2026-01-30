@@ -1,236 +1,236 @@
 {
-  "name": "bytekit",
-  "description": "Lightning-fast TypeScript utilities for modern development",
-  "version": "1.0.0",
-  "type": "module",
-  "imports": {
-    "#core/*": "./dist/utils/core/*",
-    "#utils/*": "./dist/utils/*",
-    "#helpers/*": "./dist/utils/helpers/*"
-  },
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
-  "bin": {
-    "sutils": "./bin/sutils.js"
-  },
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
+    "name": "bytekit",
+    "description": "Lightning-fast TypeScript utilities for modern development",
+    "version": "1.0.0",
+    "type": "module",
+    "imports": {
+        "#core/*": "./dist/utils/core/*",
+        "#utils/*": "./dist/utils/*",
+        "#helpers/*": "./dist/utils/helpers/*"
     },
-    "./api-client": {
-      "types": "./dist/utils/core/ApiClient.d.ts",
-      "import": "./dist/utils/core/ApiClient.js"
+    "main": "./dist/index.js",
+    "types": "./dist/index.d.ts",
+    "bin": {
+        "sutils": "./bin/sutils.js"
     },
-    "./retry-policy": {
-      "types": "./dist/utils/core/RetryPolicy.d.ts",
-      "import": "./dist/utils/core/RetryPolicy.js"
+    "exports": {
+        ".": {
+            "types": "./dist/index.d.ts",
+            "import": "./dist/index.js"
+        },
+        "./api-client": {
+            "types": "./dist/utils/core/ApiClient.d.ts",
+            "import": "./dist/utils/core/ApiClient.js"
+        },
+        "./retry-policy": {
+            "types": "./dist/utils/core/RetryPolicy.d.ts",
+            "import": "./dist/utils/core/RetryPolicy.js"
+        },
+        "./response-validator": {
+            "types": "./dist/utils/core/ResponseValidator.d.ts",
+            "import": "./dist/utils/core/ResponseValidator.js"
+        },
+        "./logger": {
+            "types": "./dist/utils/core/Logger.d.ts",
+            "import": "./dist/utils/core/Logger.js"
+        },
+        "./profiler": {
+            "types": "./dist/utils/core/Profiler.d.ts",
+            "import": "./dist/utils/core/Profiler.js"
+        },
+        "./debug": {
+            "types": "./dist/utils/core/debug.d.ts",
+            "import": "./dist/utils/core/debug.js"
+        },
+        "./date-utils": {
+            "types": "./dist/utils/helpers/DateUtils.d.ts",
+            "import": "./dist/utils/helpers/DateUtils.js"
+        },
+        "./string-utils": {
+            "types": "./dist/utils/helpers/StringUtils.d.ts",
+            "import": "./dist/utils/helpers/StringUtils.js"
+        },
+        "./validator": {
+            "types": "./dist/utils/helpers/Validator.d.ts",
+            "import": "./dist/utils/helpers/Validator.js"
+        },
+        "./env-manager": {
+            "types": "./dist/utils/helpers/EnvManager.d.ts",
+            "import": "./dist/utils/helpers/EnvManager.js"
+        },
+        "./storage-utils": {
+            "types": "./dist/utils/helpers/StorageUtils.d.ts",
+            "import": "./dist/utils/helpers/StorageUtils.js"
+        },
+        "./file-upload": {
+            "types": "./dist/utils/helpers/FileUploadHelper.d.ts",
+            "import": "./dist/utils/helpers/FileUploadHelper.js"
+        },
+        "./streaming": {
+            "types": "./dist/utils/helpers/StreamingHelper.d.ts",
+            "import": "./dist/utils/helpers/StreamingHelper.js"
+        },
+        "./websocket": {
+            "types": "./dist/utils/helpers/WebSocketHelper.d.ts",
+            "import": "./dist/utils/helpers/WebSocketHelper.js"
+        },
+        "./array-utils": {
+            "types": "./dist/utils/helpers/ArrayUtils.d.ts",
+            "import": "./dist/utils/helpers/ArrayUtils.js"
+        },
+        "./cache-manager": {
+            "types": "./dist/utils/helpers/CacheManager.d.ts",
+            "import": "./dist/utils/helpers/CacheManager.js"
+        },
+        "./compression-utils": {
+            "types": "./dist/utils/helpers/CompressionUtils.d.ts",
+            "import": "./dist/utils/helpers/CompressionUtils.js"
+        },
+        "./crypto-utils": {
+            "types": "./dist/utils/helpers/CryptoUtils.d.ts",
+            "import": "./dist/utils/helpers/CryptoUtils.js"
+        },
+        "./diff-utils": {
+            "types": "./dist/utils/helpers/DiffUtils.d.ts",
+            "import": "./dist/utils/helpers/DiffUtils.js"
+        },
+        "./event-emitter": {
+            "types": "./dist/utils/helpers/EventEmitter.d.ts",
+            "import": "./dist/utils/helpers/EventEmitter.js"
+        },
+        "./form-utils": {
+            "types": "./dist/utils/helpers/FormUtils.d.ts",
+            "import": "./dist/utils/helpers/FormUtils.js"
+        },
+        "./object-utils": {
+            "types": "./dist/utils/helpers/ObjectUtils.d.ts",
+            "import": "./dist/utils/helpers/ObjectUtils.js"
+        },
+        "./pagination-helper": {
+            "types": "./dist/utils/helpers/PaginationHelper.d.ts",
+            "import": "./dist/utils/helpers/PaginationHelper.js"
+        },
+        "./polling-helper": {
+            "types": "./dist/utils/helpers/PollingHelper.d.ts",
+            "import": "./dist/utils/helpers/PollingHelper.js"
+        },
+        "./time-utils": {
+            "types": "./dist/utils/helpers/TimeUtils.d.ts",
+            "import": "./dist/utils/helpers/TimeUtils.js"
+        },
+        "./request-cache": {
+            "types": "./dist/utils/core/RequestCache.d.ts",
+            "import": "./dist/utils/core/RequestCache.js"
+        },
+        "./rate-limiter": {
+            "types": "./dist/utils/core/RateLimiter.d.ts",
+            "import": "./dist/utils/core/RateLimiter.js"
+        },
+        "./request-deduplicator": {
+            "types": "./dist/utils/core/RequestDeduplicator.d.ts",
+            "import": "./dist/utils/core/RequestDeduplicator.js"
+        },
+        "./error-boundary": {
+            "types": "./dist/utils/core/ErrorBoundary.d.ts",
+            "import": "./dist/utils/core/ErrorBoundary.js"
+        },
+        "./batch-request": {
+            "types": "./dist/utils/core/BatchRequest.d.ts",
+            "import": "./dist/utils/core/BatchRequest.js"
+        },
+        "./http-status": {
+            "types": "./dist/utils/helpers/HttpStatusHelper.d.ts",
+            "import": "./dist/utils/helpers/HttpStatusHelper.js"
+        },
+        "./url-builder": {
+            "types": "./dist/utils/helpers/UrlBuilder.d.ts",
+            "import": "./dist/utils/helpers/UrlBuilder.js"
+        },
+        "./color-utils": {
+            "types": "./dist/utils/helpers/ColorUtils.d.ts",
+            "import": "./dist/utils/helpers/ColorUtils.js"
+        },
+        "./number-utils": {
+            "types": "./dist/utils/helpers/NumberUtils.d.ts",
+            "import": "./dist/utils/helpers/NumberUtils.js"
+        },
+        "./query-client": {
+            "types": "./dist/utils/core/QueryClient.d.ts",
+            "import": "./dist/utils/core/QueryClient.js"
+        },
+        "./query-state": {
+            "types": "./dist/utils/core/QueryState.d.ts",
+            "import": "./dist/utils/core/QueryState.js"
+        },
+        "./signal": {
+            "types": "./dist/utils/helpers/Signal.d.ts",
+            "import": "./dist/utils/helpers/Signal.js"
+        },
+        "./use-signal": {
+            "types": "./dist/utils/helpers/useSignal.d.ts",
+            "import": "./dist/utils/helpers/useSignal.js"
+        }
     },
-    "./response-validator": {
-      "types": "./dist/utils/core/ResponseValidator.d.ts",
-      "import": "./dist/utils/core/ResponseValidator.js"
+    "scripts": {
+        "build": "tsc -p tsconfig.json",
+        "clean": "node -e \"require('fs').rmSync('dist', { recursive: true, force: true });\"",
+        "lint": "eslint src tests",
+        "lint:fix": "eslint src tests --fix",
+        "format": "prettier --write \"src/**/*.{ts,js,json}\" \"tests/**/*.{ts,js,json}\"",
+        "test": "npm run lint && npm run build && node --test tests/*.test.js",
+        "test:coverage": "npm run build && node --experimental-test-coverage --test tests/*.test.js",
+        "test:all": "pnpm run test",
+        "wiki:generate": "node scripts/generate-wiki.js",
+        "prepublishOnly": "pnpm run lint && pnpm run clean && pnpm run build"
     },
-    "./logger": {
-      "types": "./dist/utils/core/Logger.d.ts",
-      "import": "./dist/utils/core/Logger.js"
+    "files": [
+        "dist",
+        "bin"
+    ],
+    "keywords": [
+        "typescript",
+        "http-client",
+        "logger",
+        "utilities",
+        "formerly @sebamar88/utils"
+    ],
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/sebamar88/bytekit.git"
     },
-    "./profiler": {
-      "types": "./dist/utils/core/Profiler.d.ts",
-      "import": "./dist/utils/core/Profiler.js"
+    "bugs": {
+        "url": "https://github.com/sebamar88/bytekit/issues"
     },
-    "./debug": {
-      "types": "./dist/utils/core/debug.d.ts",
-      "import": "./dist/utils/core/debug.js"
+    "homepage": "https://github.com/sebamar88/bytekit#readme",
+    "author": "Sebastián Martinez",
+    "license": "MIT",
+    "sideEffects": false,
+    "publishConfig": {
+        "access": "public"
     },
-    "./date-utils": {
-      "types": "./dist/utils/helpers/DateUtils.d.ts",
-      "import": "./dist/utils/helpers/DateUtils.js"
+    "engines": {
+        "node": ">=18"
     },
-    "./string-utils": {
-      "types": "./dist/utils/helpers/StringUtils.d.ts",
-      "import": "./dist/utils/helpers/StringUtils.js"
+    "dependencies": {
+        "cross-fetch": "^4.1.0",
+        "tsx": "^4.21.0"
     },
-    "./validator": {
-      "types": "./dist/utils/helpers/Validator.d.ts",
-      "import": "./dist/utils/helpers/Validator.js"
+    "devDependencies": {
+        "@eslint/js": "^9.0.0",
+        "@types/node": "^25.0.3",
+        "eslint": "^9.0.0",
+        "fast-check": "^4.5.2",
+        "globals": "^15.0.0",
+        "prettier": "^3.0.0",
+        "typescript": "^5.9.3",
+        "typescript-eslint": "^8.0.0"
     },
-    "./env-manager": {
-      "types": "./dist/utils/helpers/EnvManager.d.ts",
-      "import": "./dist/utils/helpers/EnvManager.js"
+    "peerDependencies": {
+        "typescript": ">=4.5.0"
     },
-    "./storage-utils": {
-      "types": "./dist/utils/helpers/StorageUtils.d.ts",
-      "import": "./dist/utils/helpers/StorageUtils.js"
-    },
-    "./file-upload": {
-      "types": "./dist/utils/helpers/FileUploadHelper.d.ts",
-      "import": "./dist/utils/helpers/FileUploadHelper.js"
-    },
-    "./streaming": {
-      "types": "./dist/utils/helpers/StreamingHelper.d.ts",
-      "import": "./dist/utils/helpers/StreamingHelper.js"
-    },
-    "./websocket": {
-      "types": "./dist/utils/helpers/WebSocketHelper.d.ts",
-      "import": "./dist/utils/helpers/WebSocketHelper.js"
-    },
-    "./array-utils": {
-      "types": "./dist/utils/helpers/ArrayUtils.d.ts",
-      "import": "./dist/utils/helpers/ArrayUtils.js"
-    },
-    "./cache-manager": {
-      "types": "./dist/utils/helpers/CacheManager.d.ts",
-      "import": "./dist/utils/helpers/CacheManager.js"
-    },
-    "./compression-utils": {
-      "types": "./dist/utils/helpers/CompressionUtils.d.ts",
-      "import": "./dist/utils/helpers/CompressionUtils.js"
-    },
-    "./crypto-utils": {
-      "types": "./dist/utils/helpers/CryptoUtils.d.ts",
-      "import": "./dist/utils/helpers/CryptoUtils.js"
-    },
-    "./diff-utils": {
-      "types": "./dist/utils/helpers/DiffUtils.d.ts",
-      "import": "./dist/utils/helpers/DiffUtils.js"
-    },
-    "./event-emitter": {
-      "types": "./dist/utils/helpers/EventEmitter.d.ts",
-      "import": "./dist/utils/helpers/EventEmitter.js"
-    },
-    "./form-utils": {
-      "types": "./dist/utils/helpers/FormUtils.d.ts",
-      "import": "./dist/utils/helpers/FormUtils.js"
-    },
-    "./object-utils": {
-      "types": "./dist/utils/helpers/ObjectUtils.d.ts",
-      "import": "./dist/utils/helpers/ObjectUtils.js"
-    },
-    "./pagination-helper": {
-      "types": "./dist/utils/helpers/PaginationHelper.d.ts",
-      "import": "./dist/utils/helpers/PaginationHelper.js"
-    },
-    "./polling-helper": {
-      "types": "./dist/utils/helpers/PollingHelper.d.ts",
-      "import": "./dist/utils/helpers/PollingHelper.js"
-    },
-    "./time-utils": {
-      "types": "./dist/utils/helpers/TimeUtils.d.ts",
-      "import": "./dist/utils/helpers/TimeUtils.js"
-    },
-    "./request-cache": {
-      "types": "./dist/utils/core/RequestCache.d.ts",
-      "import": "./dist/utils/core/RequestCache.js"
-    },
-    "./rate-limiter": {
-      "types": "./dist/utils/core/RateLimiter.d.ts",
-      "import": "./dist/utils/core/RateLimiter.js"
-    },
-    "./request-deduplicator": {
-      "types": "./dist/utils/core/RequestDeduplicator.d.ts",
-      "import": "./dist/utils/core/RequestDeduplicator.js"
-    },
-    "./error-boundary": {
-      "types": "./dist/utils/core/ErrorBoundary.d.ts",
-      "import": "./dist/utils/core/ErrorBoundary.js"
-    },
-    "./batch-request": {
-      "types": "./dist/utils/core/BatchRequest.d.ts",
-      "import": "./dist/utils/core/BatchRequest.js"
-    },
-    "./http-status": {
-      "types": "./dist/utils/helpers/HttpStatusHelper.d.ts",
-      "import": "./dist/utils/helpers/HttpStatusHelper.js"
-    },
-    "./url-builder": {
-      "types": "./dist/utils/helpers/UrlBuilder.d.ts",
-      "import": "./dist/utils/helpers/UrlBuilder.js"
-    },
-    "./color-utils": {
-      "types": "./dist/utils/helpers/ColorUtils.d.ts",
-      "import": "./dist/utils/helpers/ColorUtils.js"
-    },
-    "./number-utils": {
-      "types": "./dist/utils/helpers/NumberUtils.d.ts",
-      "import": "./dist/utils/helpers/NumberUtils.js"
-    },
-    "./query-client": {
-      "types": "./dist/utils/core/QueryClient.d.ts",
-      "import": "./dist/utils/core/QueryClient.js"
-    },
-    "./query-state": {
-      "types": "./dist/utils/core/QueryState.d.ts",
-      "import": "./dist/utils/core/QueryState.js"
-    },
-    "./signal": {
-      "types": "./dist/utils/helpers/Signal.d.ts",
-      "import": "./dist/utils/helpers/Signal.js"
-    },
-    "./use-signal": {
-      "types": "./dist/utils/helpers/useSignal.d.ts",
-      "import": "./dist/utils/helpers/useSignal.js"
+    "peerDependenciesMeta": {
+        "typescript": {
+            "optional": true
+        }
     }
-  },
-  "scripts": {
-    "build": "tsc -p tsconfig.json",
-    "clean": "node -e \"require('fs').rmSync('dist', { recursive: true, force: true });\"",
-    "lint": "eslint src tests",
-    "lint:fix": "eslint src tests --fix",
-    "format": "prettier --write \"src/**/*.{ts,js,json}\" \"tests/**/*.{ts,js,json}\"",
-    "test": "npm run lint && npm run build && node --test tests/*.test.js",
-    "test:coverage": "npm run build && node --experimental-test-coverage --test tests/*.test.js",
-    "test:all": "pnpm run test",
-    "wiki:generate": "node scripts/generate-wiki.js",
-    "prepublishOnly": "pnpm run lint && pnpm run clean && pnpm run build"
-  },
-  "files": [
-    "dist",
-    "bin"
-  ],
-  "keywords": [
-    "typescript",
-    "http-client",
-    "logger",
-    "utilities",
-    "formerly @sebamar88/utils"
-  ],
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/sebamar88/bytekit.git"
-  },
-  "bugs": {
-    "url": "https://github.com/sebamar88/bytekit/issues"
-  },
-  "homepage": "https://github.com/sebamar88/bytekit#readme",
-  "author": "Sebastián Martinez",
-  "license": "MIT",
-  "sideEffects": false,
-  "publishConfig": {
-    "access": "public"
-  },
-  "engines": {
-    "node": ">=18"
-  },
-  "dependencies": {
-    "cross-fetch": "^4.1.0",
-    "tsx": "^4.21.0"
-  },
-  "devDependencies": {
-    "@eslint/js": "^9.0.0",
-    "@types/node": "^25.0.3",
-    "eslint": "^9.0.0",
-    "fast-check": "^4.5.2",
-    "globals": "^15.0.0",
-    "prettier": "^3.0.0",
-    "typescript": "^5.9.3",
-    "typescript-eslint": "^8.0.0"
-  },
-  "peerDependencies": {
-    "typescript": ">=4.5.0"
-  },
-  "peerDependenciesMeta": {
-    "typescript": {
-      "optional": true
-    }
-  }
 }

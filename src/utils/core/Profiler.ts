@@ -8,7 +8,10 @@ export class Profiler {
 
     end(label: string) {
         // Compatible con ES2020: usar slice().reverse() en lugar de findLast
-        const entry = this.stack.slice().reverse().find((e: { label: string; start: number }) => e.label === label);
+        const entry = this.stack
+            .slice()
+            .reverse()
+            .find((e: { label: string; start: number }) => e.label === label);
         if (!entry) return;
         const duration = performance.now() - entry.start;
         this.results[label] = duration;

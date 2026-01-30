@@ -7,7 +7,7 @@
 Cuando se usaba `ApiClient.post()` de forma intuitiva (como axios o fetch):
 
 ```typescript
-await client.post("/api/users", { name: "John" })
+await client.post("/api/users", { name: "John" });
 ```
 
 El objeto **NO** se enviaba como body, porque la firma esperaba `RequestOptions` donde el body va en `options.body`.
@@ -27,16 +27,16 @@ const client = new ApiClient({ baseUrl: "https://api.example.com" });
 
 // ✅ Ahora funciona intuitivamente
 await client.post("/users", {
-  name: "John Doe",
-  email: "john@example.com"
+    name: "John Doe",
+    email: "john@example.com",
 });
 
 await client.put("/users/123", {
-  name: "Jane Doe"
+    name: "Jane Doe",
 });
 
 await client.patch("/users/123", {
-  status: "active"
+    status: "active",
 });
 ```
 
@@ -45,10 +45,10 @@ await client.patch("/users/123", {
 ```typescript
 // ✅ Sigue funcionando para casos avanzados
 await client.post("/users", {
-  body: { name: "John" },
-  headers: { "X-Custom": "value" },
-  searchParams: { version: "v2" },
-  timeoutMs: 5000,
+    body: { name: "John" },
+    headers: { "X-Custom": "value" },
+    searchParams: { version: "v2" },
+    timeoutMs: 5000,
 });
 ```
 
@@ -57,6 +57,7 @@ await client.post("/users", {
 ## 🔍 Detección Automática
 
 El ApiClient detecta automáticamente si le pasaste:
+
 - **Body directo**: Cualquier objeto plano, array, primitivo
 - **RequestOptions**: Objeto con keys como `searchParams`, `headers`, `timeoutMs`, etc.
 
@@ -65,15 +66,15 @@ El ApiClient detecta automáticamente si le pasaste:
 await client.post("/post", { name: "John", age: 30 });
 
 // Detectado como RequestOptions (tiene 'searchParams')
-await client.post("/post", { 
-  body: { name: "John" }, 
-  searchParams: { v: "2" } 
+await client.post("/post", {
+    body: { name: "John" },
+    searchParams: { v: "2" },
 });
 
 // Edge case: objeto con campo 'body' como dato
 await client.post("/messages", {
-  body: "This is the message content",  // ✅ Tratado como dato
-  title: "Important"
+    body: "This is the message content", // ✅ Tratado como dato
+    title: "Important",
 });
 ```
 
@@ -82,11 +83,13 @@ await client.post("/messages", {
 ## 🧪 Tests de Compatibilidad
 
 Se crearon tests exhaustivos en:
+
 - `tests/api-client-body-detection.test.js`
 - `scripts/test-improved-post.ts`
 - `scripts/test-post-signature.ts`
 
 Cubre:
+
 - ✅ Body directo (objetos, arrays, primitivos)
 - ✅ RequestOptions con todas las combinaciones
 - ✅ Edge cases (objetos con campo 'body', etc.)
@@ -101,18 +104,18 @@ Cubre:
 ```typescript
 // NO funcionaba ❌
 await client.post("/chat/completions", {
-  model: "llama-3.3-70b-versatile",
-  messages: [{ role: "user", content: "hello" }]
+    model: "llama-3.3-70b-versatile",
+    messages: [{ role: "user", content: "hello" }],
 });
 // Body enviado: vacío o undefined
 // Error: 400 Bad Request
 
 // Tenías que hacer ✅ (poco intuitivo)
 await client.post("/chat/completions", {
-  body: {
-    model: "llama-3.3-70b-versatile",
-    messages: [{ role: "user", content: "hello" }]
-  }
+    body: {
+        model: "llama-3.3-70b-versatile",
+        messages: [{ role: "user", content: "hello" }],
+    },
 });
 ```
 
@@ -164,17 +167,17 @@ Lo mismo para `put()` y `patch()`.
 
 ```typescript
 const groqClient = new ApiClient({
-  baseUrl: "https://api.groq.com/openai/v1",
-  defaultHeaders: {
-    "Authorization": `Bearer ${API_KEY}`,
-  },
+    baseUrl: "https://api.groq.com/openai/v1",
+    defaultHeaders: {
+        Authorization: `Bearer ${API_KEY}`,
+    },
 });
 
 // ✅ Ahora funciona directamente
 const response = await groqClient.post("/chat/completions", {
-  model: "llama-3.3-70b-versatile",
-  messages: [{ role: "user", content: "Hello" }],
-  temperature: 0.7,
+    model: "llama-3.3-70b-versatile",
+    messages: [{ role: "user", content: "Hello" }],
+    temperature: 0.7,
 });
 ```
 
@@ -183,18 +186,18 @@ const response = await groqClient.post("/chat/completions", {
 ```typescript
 // Create user
 await client.post("/api/users", {
-  name: "John",
-  email: "john@example.com"
+    name: "John",
+    email: "john@example.com",
 });
 
 // Update user
 await client.put("/api/users/123", {
-  name: "Jane Doe"
+    name: "Jane Doe",
 });
 
 // Partial update
 await client.patch("/api/users/123", {
-  status: "active"
+    status: "active",
 });
 ```
 
