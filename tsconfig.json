@@ -26,12 +26,18 @@
         "moduleDetection": "force",
         "experimentalDecorators": true,
         "emitDecoratorMetadata": true,
-        "target": "ES2023",
+        "target": "ES2020",
         "lib": [
-            "ES2023",
+            "ES2020",
             "DOM"
         ],
-        "moduleResolution": "bundler"
+        "moduleResolution": "node",
+        "paths": {
+            "#core/*": ["./utils/core/*"],
+            "#helpers/*": ["./utils/helpers/*"],
+            "#utils/*": ["./utils/*"]
+        },
+        "baseUrl": "./src"
     },
     "include": [
         "src"

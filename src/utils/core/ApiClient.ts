@@ -94,6 +94,54 @@ export class ApiError extends Error {
     ) {
         super(message);
         this.name = "ApiError";
+        
+        // Mejorar el debugging incluyendo información detallada
+        if (Error.captureStackTrace) {
+            Error.captureStackTrace(this, ApiError);
+        }
+    }
+
+    /**
+     * Información completa del error para debugging
+     */
+    get details() {
+        return {
+            status: this.status,
+            statusText: this.statusText,
+            message: this.message,
+            body: this.body,
+            isTimeout: this.isTimeout,
+        };
+    }
+
+    /**
+     * toString mejorado para debugging
+     */
+    toString(): string {
+        const parts = [
+            `${this.name}: ${this.message}`,
+            `Status: ${this.status} ${this.statusText}`,
+        ];
+        
+        if (this.body) {
+            try {
+                const bodyStr = typeof this.body === 'string' 
+                    ? this.body 
+                    : JSON.stringify(this.body, null, 2);
+                parts.push(`Body: ${bodyStr}`);
+            } catch {
+                parts.push(`Body: ${this.body}`);
+            }
+        }
+        
+        return parts.join('\n');
+    }
+
+    /**
+     * Serialización para JSON.stringify()
+     */
+    toJSON() {
+        return this.details;
     }
 }
 
@@ -187,15 +235,36 @@ export class ApiClient {
         return this.request<T>(path, { ...options, method: "GET" });
     }
 
-    async post<T>(path: string, options?: RequestOptions) {
+    /**
+     * POST request - Acepta body directamente o RequestOptions
+     * @example
+     * // Forma simple (body directo)
+     * await client.post("/api/users", { name: "John" })
+     * 
+     * // Forma avanzada (con options)
+     * await client.post("/api/users", { 
+     *   body: { name: "John" },
+     *   headers: { "X-Custom": "value" }
+     * })
+     */
+    async post<T>(path: string, bodyOrOptions?: RequestOptions | unknown) {
+        const options = this.normalizeBodyOrOptions(bodyOrOptions);
         return this.request<T>(path, { ...options, method: "POST" });
     }
 
-    async put<T>(path: string, options?: RequestOptions) {
+    /**
+     * PUT request - Acepta body directamente o RequestOptions
+     */
+    async put<T>(path: string, bodyOrOptions?: RequestOptions | unknown) {
+        const options = this.normalizeBodyOrOptions(bodyOrOptions);
         return this.request<T>(path, { ...options, method: "PUT" });
     }
 
-    async patch<T>(path: string, options?: RequestOptions) {
+    /**
+     * PATCH request - Acepta body directamente o RequestOptions
+     */
+    async patch<T>(path: string, bodyOrOptions?: RequestOptions | unknown) {
+        const options = this.normalizeBodyOrOptions(bodyOrOptions);
         return this.request<T>(path, { ...options, method: "PATCH" });
     }
 
@@ -353,11 +422,27 @@ export class ApiClient {
                             true
                         );
                     }
-                    this.logger?.error(
-                        "Request failed",
-                        { path, method: rest.method },
-                        err instanceof Error ? err : new Error(String(err))
-                    );
+                    
+                    // Logging mejorado para ApiError
+                    if (err instanceof ApiError) {
+                        this.logger?.error(
+                            "API Request failed",
+                            {
+                                path,
+                                method: rest.method,
+                                status: err.status,
+                                statusText: err.statusText,
+                                body: err.body,
+                            },
+                            err
+                        );
+                    } else {
+                        this.logger?.error(
+                            "Request failed",
+                            { path, method: rest.method },
+                            err instanceof Error ? err : new Error(String(err))
+                        );
+                    }
                     throw err;
                 }
             });
@@ -374,6 +459,54 @@ export class ApiClient {
     // -------------------------
     // Helpers
     // -------------------------
+    
+    /**
+     * Normaliza el segundo parámetro de post/put/patch para soportar:
+     * 1. Body directo: post("/path", { name: "John" })
+     * 2. RequestOptions: post("/path", { body: {...}, headers: {...} })
+     */
+    private normalizeBodyOrOptions(bodyOrOptions?: RequestOptions | unknown): RequestOptions {
+        if (!bodyOrOptions) {
+            return {};
+        }
+
+        // Si tiene propiedades típicas de RequestOptions, tratarlo como options
+        if (this.isRequestOptions(bodyOrOptions)) {
+            return bodyOrOptions as RequestOptions;
+        }
+
+        // Caso contrario, tratarlo como body directo
+        return { body: bodyOrOptions as RequestOptions["body"] };
+    }
+
+    /**
+     * Detecta si un objeto es RequestOptions o un body plain
+     * RequestOptions tiene propiedades especiales como searchParams, headers, timeoutMs, etc.
+     */
+    private isRequestOptions(obj: unknown): obj is RequestOptions {
+        if (typeof obj !== 'object' || obj === null) {
+            return false;
+        }
+
+        const knownKeys = [
+            'searchParams', 'errorLocale', 'timeoutMs', 
+            'validateResponse', 'skipRetry',
+            // También incluir keys de RequestInit
+            'method', 'headers', 'mode', 'credentials', 'cache',
+            'redirect', 'referrer', 'referrerPolicy', 'integrity',
+            'keepalive', 'signal', 'window',
+        ];
+
+        const objKeys = Object.keys(obj);
+        
+        // Si tiene alguna de las keys de RequestOptions/RequestInit (excepto 'body'), es RequestOptions
+        const hasRequestOptionKey = objKeys.some(
+            key => knownKeys.includes(key)
+        );
+
+        return hasRequestOptionKey;
+    }
+
     private mergeHeaders(overrides?: HeadersInit) {
         const headers = new Headers(this.headers);
         if (overrides)

@@ -137,7 +137,8 @@ export const Validator = {
         if (typeof value !== "string") return false;
         const digits = sanitizeDigits(value);
         if (digits.length !== 11) return false;
-        const expected = Number(digits.at(-1));
+        // Compatible con ES2020: usar charAt() en lugar de at()
+        const expected = Number(digits.charAt(digits.length - 1));
         return expected === validateCuitChecksum(digits);
     },
 
