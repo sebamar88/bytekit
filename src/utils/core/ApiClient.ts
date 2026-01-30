@@ -36,6 +36,9 @@ export interface ApiClientConfig {
     errorMessages?: Partial<Record<Locale, Partial<Record<number, string>>>>;
     timeoutMs?: number;
     interceptors?: ApiClientInterceptors;
+    disableInterceptors?: boolean;
+    logHeaders?: boolean;
+    redactHeaderKeys?: string[];
     logger?: Logger;
     retryPolicy?: RetryConfig;
     circuitBreaker?: CircuitBreakerConfig;
@@ -48,6 +51,8 @@ export interface RequestOptions extends Omit<RequestInit, "body"> {
     timeoutMs?: number;
     validateResponse?: ValidationSchema;
     skipRetry?: boolean;
+    skipInterceptors?: boolean;
+    logHeaders?: boolean;
 }
 
 export interface SortParams {
@@ -195,6 +200,9 @@ export class ApiClient {
     private readonly locale: Locale;
     private readonly timeoutMs: number;
     private readonly interceptors?: ApiClientInterceptors;
+    private readonly disableInterceptors: boolean;
+    private readonly logHeaders: boolean;
+    private readonly redactHeaderKeys: Set<string>;
     private readonly logger?: Logger;
     private readonly errorMessages: Partial<
         Record<Locale, Partial<Record<number, string>>>
@@ -211,6 +219,9 @@ export class ApiClient {
         errorMessages,
         timeoutMs = 15000,
         interceptors,
+        disableInterceptors = false,
+        logHeaders = false,
+        redactHeaderKeys,
         logger,
         retryPolicy,
         circuitBreaker,
@@ -233,6 +244,19 @@ export class ApiClient {
         this.errorMessages = errorMessages ?? {};
         this.timeoutMs = timeoutMs;
         this.interceptors = interceptors;
+        this.disableInterceptors = disableInterceptors;
+        this.logHeaders = logHeaders;
+        this.redactHeaderKeys = new Set(
+            (
+                redactHeaderKeys ?? [
+                    "authorization",
+                    "cookie",
+                    "set-cookie",
+                    "x-api-key",
+                    "api-key",
+                ]
+            ).map((key) => key.toLowerCase())
+        );
         this.logger = logger;
         this.retryPolicy = new RetryPolicy(retryPolicy);
         this.circuitBreaker = new CircuitBreaker(circuitBreaker);
@@ -333,7 +357,13 @@ export class ApiClient {
         });
     }
     async request<T>(path: string, options: RequestOptions = {}): Promise<T> {
-        const { validateResponse, skipRetry, ...requestOptions } = options;
+        const {
+            validateResponse,
+            skipRetry,
+            skipInterceptors,
+            logHeaders,
+            ...requestOptions
+        } = options;
 
         const executeRequest = async (): Promise<T> => {
             return this.circuitBreaker.execute(async () => {
@@ -349,7 +379,12 @@ export class ApiClient {
                 const headers = this.mergeHeaders(overrideHeaders);
                 const preparedBody = this.prepareBody(body);
 
-                if (preparedBody && !(body instanceof FormData)) {
+                // Solo setear Content-Type si no existe ya y hay body
+                if (
+                    preparedBody &&
+                    !(body instanceof FormData) &&
+                    !headers.has("Content-Type")
+                ) {
                     headers.set("Content-Type", "application/json");
                 }
 
@@ -357,20 +392,36 @@ export class ApiClient {
                 const signal = controller.signal;
                 const timeout = timeoutMs ?? this.timeoutMs;
 
+                // Convertir Headers a objeto plano para compatibilidad con todas las implementaciones de fetch
+                const headersObject: Record<string, string> = {};
+                headers.forEach((value, key) => {
+                    headersObject[key] = value;
+                });
+
                 let init: RequestInit = {
                     ...rest,
-                    headers,
+                    headers: headersObject,
                     body: preparedBody,
                     signal,
                 };
 
                 // Request interceptor
-                if (this.interceptors?.request)
+                const interceptorsEnabled =
+                    !!this.interceptors &&
+                    !this.disableInterceptors &&
+                    !skipInterceptors;
+                if (interceptorsEnabled && this.interceptors?.request)
                     [url, init] = await this.interceptors.request(url, init);
+
+                const shouldLogHeaders = logHeaders ?? this.logHeaders;
+                const headersForLog = shouldLogHeaders
+                    ? this.redactHeaders(this.normalizeHeaders(init.headers))
+                    : undefined;
 
                 this.logger?.debug("HTTP Request", {
                     method: rest.method,
                     url,
+                    ...(shouldLogHeaders ? { headers: headersForLog } : {}),
                     body,
                 });
 
@@ -382,9 +433,10 @@ export class ApiClient {
                     );
 
                     // Response interceptor
-                    const finalResponse = this.interceptors?.response
-                        ? await this.interceptors.response(response)
-                        : response;
+                    const finalResponse =
+                        interceptorsEnabled && this.interceptors?.response
+                            ? await this.interceptors.response(response)
+                            : response;
 
                     if (!finalResponse.ok) {
                         throw await this.toApiError(finalResponse, errorLocale);
@@ -510,6 +562,8 @@ export class ApiClient {
             "timeoutMs",
             "validateResponse",
             "skipRetry",
+            "skipInterceptors",
+            "logHeaders",
             // También incluir keys de RequestInit
             "method",
             "headers",
@@ -540,6 +594,25 @@ export class ApiClient {
         if (overrides)
             new Headers(overrides).forEach((v, k) => headers.set(k, v));
         return headers;
+    }
+
+    private normalizeHeaders(headers?: HeadersInit) {
+        const normalized: Record<string, string> = {};
+        if (!headers) return normalized;
+        new Headers(headers).forEach((value, key) => {
+            normalized[key] = value;
+        });
+        return normalized;
+    }
+
+    private redactHeaders(headers: Record<string, string>) {
+        const redacted: Record<string, string> = {};
+        for (const [key, value] of Object.entries(headers)) {
+            redacted[key] = this.redactHeaderKeys.has(key.toLowerCase())
+                ? "[REDACTED]"
+                : value;
+        }
+        return redacted;
     }
 
     private prepareBody(body?: RequestOptions["body"]) {
