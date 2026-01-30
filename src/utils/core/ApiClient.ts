@@ -28,7 +28,8 @@ export interface ApiClientInterceptors {
 }
 
 export interface ApiClientConfig {
-    baseUrl: string;
+    baseUrl?: string;
+    baseURL?: string; // Alias for baseUrl (common convention)
     defaultHeaders?: HeadersInit;
     fetchImpl?: typeof fetch;
     locale?: Locale;
@@ -203,6 +204,7 @@ export class ApiClient {
 
     constructor({
         baseUrl,
+        baseURL,
         defaultHeaders,
         fetchImpl,
         locale = "es",
@@ -213,7 +215,14 @@ export class ApiClient {
         retryPolicy,
         circuitBreaker,
     }: ApiClientConfig) {
-        this.baseUrl = new URL(baseUrl.endsWith("/") ? baseUrl : `${baseUrl}/`);
+        // Support both baseUrl and baseURL (common convention)
+        const url = baseUrl ?? baseURL;
+        if (!url) {
+            throw new Error(
+                "ApiClient requires either 'baseUrl' or 'baseURL' in config"
+            );
+        }
+        this.baseUrl = new URL(url.endsWith("/") ? url : `${url}/`);
         this.headers = defaultHeaders ?? {};
         this.fetchImpl =
             fetchImpl ??
