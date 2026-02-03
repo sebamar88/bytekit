@@ -113,11 +113,6 @@ test("WebSocketHelper handles reconnection", async () => {
     });
     await wsh.connect();
 
-    let errorCalled = false;
-    wsh.onError(() => {
-        errorCalled = true;
-    });
-
     // Simulate unexpected close
     // @ts-expect-error - Test type override
     wsh.ws.close();

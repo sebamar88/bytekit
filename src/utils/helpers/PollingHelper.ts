@@ -42,7 +42,7 @@ export interface PollingResult<T = unknown> {
  */
 export class PollingHelper<T = unknown> {
     private fn: () => Promise<T>;
-    private options: Required<Omit<PollingOptions<T>, "attemptTimeout">> & {
+    private readonly options: Required<Omit<PollingOptions<T>, "attemptTimeout">> & {
         attemptTimeout?: number;
     };
     private abortController: AbortController | null = null;
@@ -182,8 +182,7 @@ export class PollingHelper<T = unknown> {
 
             attempt++;
 
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            const { result, error, responseTime } = await this.executeAttempt(
+            const { result, error, responseTime: _responseTime } = await this.executeAttempt(
                 attempt,
                 responseTimes
             );

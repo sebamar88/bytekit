@@ -118,7 +118,7 @@ export const Validators = {
         
         const atIndex = trimmed.indexOf('@');
         if (atIndex <= 0 || atIndex === trimmed.length - 1) return message;
-        if (trimmed.indexOf('@', atIndex + 1) !== -1) return message; // Multiple @
+        if (trimmed.slice(atIndex + 1).includes('@')) return message; // Multiple @
         
         const domain = trimmed.slice(atIndex + 1);
         const dotIndex = domain.indexOf('.');

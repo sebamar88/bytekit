@@ -175,7 +175,7 @@ async function testApiClientWithOptions() {
     });
 
     try {
-        const data = await client.post<any>("/chat/completions", {
+        await client.post<any>("/chat/completions", {
             body: REQUEST_BODY,
         });
         console.log("✅ Success!");

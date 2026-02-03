@@ -69,7 +69,7 @@ export const Validator = {
 
         const atIndex = trimmed.indexOf("@");
         if (atIndex <= 0 || atIndex === trimmed.length - 1) return false;
-        if (trimmed.indexOf("@", atIndex + 1) !== -1) return false; // Multiple @
+        if (trimmed.slice(atIndex + 1).includes("@")) return false; // Multiple @
 
         const domain = trimmed.slice(atIndex + 1);
         const dotIndex = domain.indexOf(".");
@@ -154,8 +154,7 @@ export const Validator = {
         if (typeof value !== "string") return false;
         const digits = sanitizeDigits(value);
         if (digits.length !== 11) return false;
-        // Compatible con ES2020: usar charAt() en lugar de at()
-        const expected = Number(digits.charAt(digits.length - 1));
+        const expected = Number(digits.at(-1));
         return expected === validateCuitChecksum(digits);
     },
 

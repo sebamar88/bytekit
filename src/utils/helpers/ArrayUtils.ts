@@ -82,7 +82,7 @@ export class ArrayUtils {
      * Get last element
      */
     static last<T>(arr: T[]): T | undefined {
-        return arr[arr.length - 1];
+        return arr.at(-1);
     }
 
     /**

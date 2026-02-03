@@ -118,7 +118,7 @@ export class StreamingHelper {
                 this.processLines(lines, data, onChunk);
 
                 // Keep incomplete line in buffer
-                buffer = lines[lines.length - 1];
+                buffer = lines.at(-1)!;
             }
 
             onComplete?.();

@@ -87,12 +87,12 @@ export interface MutationOptions<T = unknown> extends RequestOptions {
  * Provides React Query-like functionality with cache, state tracking, and lifecycle callbacks
  */
 export class QueryClient {
-    private apiClient: ApiClient;
-    private eventEmitter: EventEmitter<
+    private readonly apiClient: ApiClient;
+    private readonly eventEmitter: EventEmitter<
         QueryClientEvents & Record<string, unknown>
     >;
-    private cache: CacheManager<CachedQuery>;
-    private stateManager: Map<string, RequestState>;
+    private readonly cache: CacheManager<CachedQuery>;
+    private readonly stateManager: Map<string, RequestState>;
     private config: Required<QueryClientConfig>;
     private pendingRequests: Map<string, Promise<unknown>>;
 

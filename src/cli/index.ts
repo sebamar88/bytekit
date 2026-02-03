@@ -202,7 +202,7 @@ function parseTypesFlags(args: string[]): {
 
 async function createResourceFiles(config: ResourceConfig): Promise<void> {
     const { apiDir, hooksDir, force, resourceSegments, route } = config;
-    const lastSegment = resourceSegments[resourceSegments.length - 1];
+    const lastSegment = resourceSegments.at(-1)!;
     const pascalPlural = toPascalCase(lastSegment);
     const singularSegment = toSingular(lastSegment);
     const pascalSingular = toPascalCase(singularSegment);

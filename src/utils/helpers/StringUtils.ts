@@ -318,7 +318,7 @@ export const StringUtils = {
 
         return input
             .replace(/([a-z])([A-Z])/g, "$1-$2")
-            .replace(/([0-9])([A-Z])/g, "$1-$2")
+            .replace(/(\d)([A-Z])/g, "$1-$2")
             .replace(/[\s_]+/g, "-")
             .toLowerCase();
     },
@@ -329,7 +329,7 @@ export const StringUtils = {
 
         return input
             .replace(/([a-z])([A-Z])/g, "$1_$2")
-            .replace(/([0-9])([A-Z])/g, "$1_$2")
+            .replace(/(\d)([A-Z])/g, "$1_$2")
             .replace(/[\s-]+/g, "_")
             .toLowerCase();
     },
