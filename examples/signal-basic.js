@@ -3,7 +3,13 @@
  * Framework-agnostic signal demonstration
  */
 
-import { signal, computed, effect, batch, untracked } from "../dist/utils/helpers/Signal.js";
+import {
+    signal,
+    computed,
+    effect,
+    batch,
+    untracked,
+} from "../dist/utils/helpers/Signal.js";
 
 console.log("🎯 Signal System Examples\n");
 
@@ -76,7 +82,7 @@ console.log("Effect runs:", effectRuns); // Still 1
 // Example 6: Complex Dependencies
 console.log("\n=== Example 6: Complex Dependencies ===");
 const celsius = signal(0);
-const fahrenheit = computed(() => (celsius.value * 9/5) + 32);
+const fahrenheit = computed(() => (celsius.value * 9) / 5 + 32);
 const description = computed(() => {
     const temp = fahrenheit.value;
     if (temp < 32) return "Freezing";
@@ -85,12 +91,18 @@ const description = computed(() => {
     return "Hot";
 });
 
-console.log(`${celsius.value}°C = ${fahrenheit.value}°F (${description.value})`);
+console.log(
+    `${celsius.value}°C = ${fahrenheit.value}°F (${description.value})`
+);
 
 celsius.value = 25;
-console.log(`${celsius.value}°C = ${fahrenheit.value}°F (${description.value})`);
+console.log(
+    `${celsius.value}°C = ${fahrenheit.value}°F (${description.value})`
+);
 
 celsius.value = 100;
-console.log(`${celsius.value}°C = ${fahrenheit.value}°F (${description.value})`);
+console.log(
+    `${celsius.value}°C = ${fahrenheit.value}°F (${description.value})`
+);
 
 console.log("\n✅ All examples completed!");

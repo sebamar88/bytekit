@@ -111,22 +111,22 @@ export const Validators = {
         message = "Invalid email address"
     ): boolean | string => {
         if (typeof value !== "string" || !value) return true;
-        
+
         // Safe email validation without ReDoS vulnerability
         const trimmed = value.trim();
         if (trimmed !== value || trimmed.length === 0) return message;
-        
-        const atIndex = trimmed.indexOf('@');
+
+        const atIndex = trimmed.indexOf("@");
         if (atIndex <= 0 || atIndex === trimmed.length - 1) return message;
-        if (trimmed.slice(atIndex + 1).includes('@')) return message; // Multiple @
-        
+        if (trimmed.slice(atIndex + 1).includes("@")) return message; // Multiple @
+
         const domain = trimmed.slice(atIndex + 1);
-        const dotIndex = domain.indexOf('.');
+        const dotIndex = domain.indexOf(".");
         if (dotIndex <= 0 || dotIndex === domain.length - 1) return message;
-        
+
         // Check for whitespace
-        if (trimmed.includes(' ')) return message;
-        
+        if (trimmed.includes(" ")) return message;
+
         return true;
     },
 

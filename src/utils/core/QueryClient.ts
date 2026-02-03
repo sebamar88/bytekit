@@ -132,10 +132,7 @@ export class QueryClient {
         }
 
         // Setup reconnect refetch
-        if (
-            this.config.refetchOnReconnect &&
-            globalThis.window !== undefined
-        ) {
+        if (this.config.refetchOnReconnect && globalThis.window !== undefined) {
             globalThis.window.addEventListener("online", () =>
                 this.refetchStaleQueries()
             );

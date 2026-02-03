@@ -42,7 +42,9 @@ export interface PollingResult<T = unknown> {
  */
 export class PollingHelper<T = unknown> {
     private fn: () => Promise<T>;
-    private readonly options: Required<Omit<PollingOptions<T>, "attemptTimeout">> & {
+    private readonly options: Required<
+        Omit<PollingOptions<T>, "attemptTimeout">
+    > & {
         attemptTimeout?: number;
     };
     private abortController: AbortController | null = null;
@@ -182,10 +184,11 @@ export class PollingHelper<T = unknown> {
 
             attempt++;
 
-            const { result, error, responseTime: _responseTime } = await this.executeAttempt(
-                attempt,
-                responseTimes
-            );
+            const {
+                result,
+                error,
+                responseTime: _responseTime,
+            } = await this.executeAttempt(attempt, responseTimes);
 
             if (result !== undefined) {
                 if (this.options.stopCondition(result)) {
