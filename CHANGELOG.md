@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.14] - 2026-02-03
+
+### Fixed
+
+- **Code Quality**: Improved Reliability rating by addressing 59 SonarQube issues
+    - Added `readonly` modifiers to immutable class members in `QueryClient` and `PollingHelper`
+    - Removed useless variable assignments in tests and scripts
+    - Replaced `indexOf()` with `includes()` for clearer intent in `FormUtils` and `Validator`
+    - Updated array access to use `.at(-1)` instead of `[length - 1]` for better readability
+    - Simplified regex patterns: replaced `[0-9]` with `\d` in `StringUtils`
+    - Removed unused variables to eliminate dead code
+
 ## [1.0.13] - 2026-02-03
 
 ### Fixed
