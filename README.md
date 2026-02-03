@@ -8,23 +8,28 @@
 ## 📊 Status / Estado
 
 [![CI](https://github.com/sebamar88/bytekit/workflows/CI/badge.svg)](https://github.com/sebamar88/bytekit/actions/workflows/ci.yml)
-[![Coverage](https://github.com/sebamar88/bytekit/workflows/Enhanced%20Coverage%20Report/badge.svg)](https://github.com/sebamar88/bytekit/actions/workflows/coverage.yml)
+[![Coverage](https://codecov.io/gh/sebamar88/bytekit/branch/main/graph/badge.svg)](https://codecov.io/gh/sebamar88/bytekit)
 [![CodeQL](https://github.com/sebamar88/bytekit/workflows/CodeQL%20Security%20Analysis/badge.svg)](https://github.com/sebamar88/bytekit/actions/workflows/codeql.yml)
-[![npm version](https://img.shields.io/npm/v/bytekit.svg)](https://www.npmjs.com/package/bytekit)
-[![npm downloads](https://img.shields.io/npm/dm/bytekit.svg)](https://www.npmjs.com/package/bytekit)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Node.js Version](https://img.shields.io/node/v/bytekit.svg)](https://nodejs.org)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-blue.svg)](https://www.typescriptlang.org/)
+[![npm version](https://img.shields.io/npm/v/bytekit.svg?style=flat-square)](https://www.npmjs.com/package/bytekit)
+[![npm downloads](https://img.shields.io/npm/dm/bytekit.svg?style=flat-square)](https://www.npmjs.com/package/bytekit)
+[![Bundle Size](https://img.shields.io/bundlephobia/minzip/bytekit?style=flat-square&label=gzip%20size)](https://bundlephobia.com/package/bytekit)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](https://opensource.org/licenses/MIT)
+[![Node.js Version](https://img.shields.io/node/v/bytekit.svg?style=flat-square)](https://nodejs.org)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-blue.svg?style=flat-square)](https://www.typescriptlang.org/)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](https://github.com/sebamar88/bytekit/blob/main/CONTRIBUTING.md)
 
 ---
 
 ## ✨ Highlights / Características
 
-- ✅ **EN:** Fully ESM with `.d.ts` definitions. **ES:** Build 100% ESM con tipos listos.
+- ✅ **EN:** Fully ESM with `.d.ts` definitions and tree-shakeable exports. **ES:** Build 100% ESM con tipos listos y exports tree-shakeable.
 - 🌐 **EN:** Works on Node.js 18+ and modern browsers (via `cross-fetch`). **ES:** Compatible con Node.js 18+ y navegadores modernos (usa `cross-fetch`).
-- 🔁 **EN:** ApiClient with retries, localized errors, flexible options. **ES:** ApiClient con reintentos, errores localizados y configuración flexible.
-- 🧩 **EN:** Helper modules (strings, dates, validators, env, storage). **ES:** Helpers para strings, fechas, validadores, env y storage.
+- 🔁 **EN:** ApiClient with retries, circuit breaker, localized errors, and flexible options. **ES:** ApiClient con reintentos, circuit breaker, errores localizados y configuración flexible.
+- 🧩 **EN:** 28 helper modules (strings, dates, validators, env, storage, crypto, cache). **ES:** 28 módulos helpers (strings, fechas, validadores, env, storage, crypto, cache).
 - 🪵 **EN:** Structured logging/profiling: `createLogger`, `Profiler`, `withTiming`. **ES:** Logging/profiling estructurado: `createLogger`, `Profiler`, `withTiming`.
+- 🎯 **EN:** 95%+ test coverage with comprehensive test suite. **ES:** >95% de cobertura de tests con suite completa.
+- 📦 **EN:** Zero dependencies (except `cross-fetch` for isomorphic support). **ES:** Cero dependencias (excepto `cross-fetch` para soporte isomórfico).
+- ⚡ **EN:** Optimized for performance and small bundle size. **ES:** Optimizado para rendimiento y tamaño mínimo.
 
 ## 🚀 Quick Start / Inicio Rápido
 
@@ -125,6 +130,7 @@ function Users() {
 ### 🔗 Quick Links by Category / Enlaces Rápidos por Categoría
 
 #### 🔧 Core Modules (9) - Essential functionality / Funcionalidad esencial
+
 - **[ApiClient](https://github.com/sebamar88/bytekit/wiki/ApiClient)** - Typed HTTP client with retries, localized errors, and custom fetch support
 - **[Logger](https://github.com/sebamar88/bytekit/wiki/Logger)** - Structured logger with levels, namespaces, and transports for Node/browser
 - **[Profiler](https://github.com/sebamar88/bytekit/wiki/Profiler)** - Profiler utilities and helpers
@@ -136,6 +142,7 @@ function Users() {
 - **[ErrorBoundary](https://github.com/sebamar88/bytekit/wiki/ErrorBoundary)** - ErrorBoundary utilities and helpers
 
 #### 🛠️ Helper Modules (12) - Common utilities / Utilidades comunes
+
 - **[DateUtils](https://github.com/sebamar88/bytekit/wiki/DateUtils)** - Safe date parsing, manipulation, and formatting utilities
 - **[StringUtils](https://github.com/sebamar88/bytekit/wiki/StringUtils)** - Text processing utilities: slugify, capitalize, mask, interpolate
 - **[Validator](https://github.com/sebamar88/bytekit/wiki/Validator)** - Validation utilities for emails, phones, passwords, and more
@@ -150,6 +157,7 @@ function Users() {
 - **[TimeUtils](https://github.com/sebamar88/bytekit/wiki/TimeUtils)** - TimeUtils utilities and helpers
 
 #### ⚡ Utility Modules (7) - Advanced features / Características avanzadas
+
 - **[EventEmitter](https://github.com/sebamar88/bytekit/wiki/EventEmitter)** - EventEmitter utilities and helpers
 - **[DiffUtils](https://github.com/sebamar88/bytekit/wiki/DiffUtils)** - DiffUtils utilities and helpers
 - **[PollingHelper](https://github.com/sebamar88/bytekit/wiki/PollingHelper)** - PollingHelper utilities and helpers
@@ -163,23 +171,26 @@ function Users() {
 ## 🌟 Popular Use Cases / Casos de Uso Populares
 
 ### HTTP Client with Retries / Cliente HTTP con Reintentos
+
 ```ts
 const api = new ApiClient({
     baseUrl: "https://api.example.com",
     retryPolicy: { maxAttempts: 3, initialDelayMs: 100 },
-    circuitBreaker: { failureThreshold: 5 }
+    circuitBreaker: { failureThreshold: 5 },
 });
 
 const users = await api.get("/users");
 ```
 
 ### Structured Logging / Logging Estructurado
+
 ```ts
 const logger = createLogger({ namespace: "app", level: "info" });
 logger.info("User created", { userId: 123, email: "user@example.com" });
 ```
 
 ### Date & String Utilities / Utilidades de Fecha y String
+
 ```ts
 const formatted = DateUtils.format(new Date(), "es-AR");
 const slug = StringUtils.slugify("Hello World! 🌍");
@@ -187,6 +198,7 @@ const masked = StringUtils.mask("1234567890", { start: 4, end: 2 });
 ```
 
 ### Array & Object Manipulation / Manipulación de Arrays y Objetos
+
 ```ts
 const chunks = ArrayUtils.chunk([1, 2, 3, 4, 5], 2); // [[1,2], [3,4], [5]]
 const picked = ObjectUtils.pick(user, ["id", "name", "email"]);
@@ -204,7 +216,23 @@ const grouped = ObjectUtils.groupBy(users, "department");
 
 **[📁 View Local Examples →](https://github.com/sebamar88/bytekit/tree/main/examples)**
 
-## 🔗 Links / Enlaces
+## � Documentation / Documentación
+
+**EN:** Comprehensive guides to help you get the most out of bytekit:  
+**ES:** Guías completas para aprovechar al máximo bytekit:
+
+- **[🚀 Getting Started](./docs/guides/GETTING_STARTED.md)** - Installation, basic usage, and core concepts / Instalación, uso básico y conceptos core
+- **[🔬 Advanced Usage](./docs/guides/ADVANCED_USAGE.md)** - Complex patterns and techniques / Patrones y técnicas complejas
+- **[✨ Best Practices](./docs/guides/BEST_PRACTICES.md)** - Production-ready patterns / Patrones para producción
+- **[📖 Examples & Snippets](./docs/examples/README.md)** - Code samples and interactive demos / Ejemplos de código y demos interactivos
+
+### 🎮 Interactive CodeSandbox Examples
+
+- **[React Basic](./docs/examples/codesandbox/react-basic)** - ApiClient with React hooks / ApiClient con hooks de React
+- **[Vue Basic](./docs/examples/codesandbox/vue-basic)** - Composition API integration / Integración con Composition API
+- **[Svelte Basic](./docs/examples/codesandbox/svelte-basic)** - Svelte stores integration / Integración con stores de Svelte
+
+## �🔗 Links / Enlaces
 
 - **[📦 NPM Package](https://www.npmjs.com/package/bytekit)** - Install and version info
 - **[📚 Full Documentation Wiki](https://github.com/sebamar88/bytekit/wiki)** - Complete API reference

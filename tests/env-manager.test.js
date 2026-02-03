@@ -11,7 +11,10 @@ test("EnvManager.get reads from process.env in Node", () => {
 
 test("EnvManager.require throws when missing", () => {
     const env = new EnvManager();
-    assert.throws(() => env.require("MISSING_KEY"), /Missing environment variable/);
+    assert.throws(
+        () => env.require("MISSING_KEY"),
+        /Missing environment variable/
+    );
 });
 
 test("EnvManager.isProd checks NODE_ENV and MODE flags", () => {
@@ -23,4 +26,19 @@ test("EnvManager.isProd checks NODE_ENV and MODE flags", () => {
     process.env.MODE = "production";
     assert.ok(env.isProd());
     delete process.env.MODE;
+});
+
+test("EnvManager.get uses import.meta.env in browser mode", () => {
+    // Simulate browser environment
+    globalThis.window = {};
+    // @ts-ignore
+    globalThis.document = {};
+
+    const env = new EnvManager();
+    const value = env.get("BROWSER_ONLY");
+    assert.equal(value, undefined);
+
+    delete globalThis.window;
+    // @ts-ignore
+    delete globalThis.document;
 });

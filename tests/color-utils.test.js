@@ -22,6 +22,11 @@ describe("ColorUtils", () => {
         it("should return null for invalid hex", () => {
             assert.strictEqual(ColorUtils.hexToRgb("invalid"), null);
         });
+
+        it("should handle 8-digit hex by ignoring alpha", () => {
+            const result = ColorUtils.hexToRgb("#ff000080");
+            assert.deepStrictEqual(result, { r: 255, g: 0, b: 0 });
+        });
     });
 
     describe("rgbToHex", () => {
@@ -168,11 +173,17 @@ describe("ColorUtils", () => {
 
     describe("WCAG compliance", () => {
         it("should pass AA for black on white", () => {
-            assert.strictEqual(ColorUtils.meetsContrastAA("#000000", "#ffffff"), true);
+            assert.strictEqual(
+                ColorUtils.meetsContrastAA("#000000", "#ffffff"),
+                true
+            );
         });
 
         it("should pass AAA for black on white", () => {
-            assert.strictEqual(ColorUtils.meetsContrastAAA("#000000", "#ffffff"), true);
+            assert.strictEqual(
+                ColorUtils.meetsContrastAAA("#000000", "#ffffff"),
+                true
+            );
         });
     });
 
@@ -255,6 +266,139 @@ describe("ColorUtils", () => {
         it("should reject invalid hex", () => {
             assert.strictEqual(ColorUtils.isValidHex("ff5733"), false);
             assert.strictEqual(ColorUtils.isValidHex("#gggggg"), false);
+        });
+    });
+
+    describe("hexToRgba / rgbaToHex", () => {
+        it("should parse 8-digit hex with alpha", () => {
+            const rgba = ColorUtils.hexToRgba("#ff000080");
+            assert.equal(rgba.r, 255);
+            assert.equal(rgba.g, 0);
+            assert.equal(rgba.b, 0);
+            assert.ok(Math.abs(rgba.a - 0.5) < 0.01);
+        });
+
+        it("should handle 4-digit shorthand", () => {
+            const rgba = ColorUtils.hexToRgba("#f008");
+            assert.equal(rgba?.r, 255);
+            assert.equal(rgba?.g, 0);
+            assert.equal(rgba?.b, 0);
+        });
+
+        it("should return null for invalid hex length", () => {
+            const rgba = ColorUtils.hexToRgba("#ff0");
+            assert.strictEqual(rgba, null);
+        });
+
+        it("should convert RGBA to hex", () => {
+            const hex = ColorUtils.rgbaToHex(255, 0, 0, 0.5);
+            assert.strictEqual(hex.toLowerCase(), "#ff000080");
+        });
+    });
+
+    describe("hslToHex / hexToHsl", () => {
+        it("should convert HSL object to hex", () => {
+            const hex = ColorUtils.hslToHex({ h: 120, s: 100, l: 50 });
+            assert.strictEqual(hex.toLowerCase(), "#00ff00");
+        });
+
+        it("should return null for invalid hex in hexToHsl", () => {
+            const hsl = ColorUtils.hexToHsl("not-a-hex");
+            assert.strictEqual(hsl, null);
+        });
+    });
+
+    describe("saturate / desaturate / grayscale", () => {
+        it("should increase and decrease saturation", () => {
+            const saturated = ColorUtils.saturate("#808080", 20);
+            const desaturated = ColorUtils.desaturate("#ff0000", 50);
+            assert.ok(ColorUtils.isValidHex(saturated));
+            assert.ok(ColorUtils.isValidHex(desaturated));
+        });
+
+        it("should convert to grayscale", () => {
+            const gray = ColorUtils.grayscale("#ff0000");
+            const hsl = ColorUtils.hexToHsl(gray);
+            assert.strictEqual(hsl?.s, 0);
+        });
+    });
+
+    describe("alpha / adjustHue", () => {
+        it("should set alpha channel", () => {
+            const hex = ColorUtils.alpha("#ff0000", 0.25);
+            assert.strictEqual(hex.toLowerCase(), "#ff000040");
+        });
+
+        it("should adjust hue", () => {
+            const shifted = ColorUtils.adjustHue("#ff0000", 120);
+            const hsl = ColorUtils.hexToHsl(shifted);
+            assert.ok(hsl?.h >= 100 && hsl?.h <= 140);
+        });
+    });
+
+    describe("randomWithLightness", () => {
+        it("should generate color with specified lightness", () => {
+            const color = ColorUtils.randomWithLightness(70);
+            const hsl = ColorUtils.hexToHsl(color);
+            assert.strictEqual(hsl?.l, 70);
+        });
+    });
+
+    describe("additional palettes", () => {
+        it("should create complementary palette", () => {
+            const result = ColorUtils.complementaryPalette("#ff0000");
+            assert.strictEqual(result.length, 2);
+        });
+
+        it("should create triadic palette", () => {
+            const result = ColorUtils.triadicPalette("#ff0000");
+            assert.strictEqual(result.length, 3);
+        });
+
+        it("should create analogous palette", () => {
+            const result = ColorUtils.analogousPalette("#ff0000", 20);
+            assert.strictEqual(result.length, 3);
+        });
+    });
+
+    describe("shades and tints", () => {
+        it("should generate shades", () => {
+            const result = ColorUtils.shades("#ff0000", 3);
+            assert.strictEqual(result.length, 3);
+        });
+
+        it("should generate tints", () => {
+            const result = ColorUtils.tints("#ff0000", 3);
+            assert.strictEqual(result.length, 3);
+        });
+    });
+
+    describe("toCssRgb / toCssHsl", () => {
+        it("should format css rgb", () => {
+            const css = ColorUtils.toCssRgb("#ff0000");
+            assert.strictEqual(css, "rgb(255, 0, 0)");
+        });
+
+        it("should format css hsl", () => {
+            const css = ColorUtils.toCssHsl("#ff0000");
+            assert.match(css || "", /hsl\(\d+, \d+%, \d+%\)/);
+        });
+
+        it("should return null for invalid color", () => {
+            assert.strictEqual(ColorUtils.toCssRgb("zzzzzz"), null);
+            assert.strictEqual(ColorUtils.toCssHsl("zzzzzz"), null);
+        });
+    });
+
+    describe("parse rgba/hsla", () => {
+        it("should parse rgba format", () => {
+            const result = ColorUtils.parse("rgba(255, 0, 0, 0.5)");
+            assert.strictEqual(result?.toLowerCase(), "#ff0000");
+        });
+
+        it("should parse hsla format", () => {
+            const result = ColorUtils.parse("hsla(240, 100%, 50%, 0.5)");
+            assert.strictEqual(result?.toLowerCase(), "#0000ff");
         });
     });
 });

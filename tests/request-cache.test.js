@@ -100,3 +100,40 @@ test("RequestCache generates keys with options", () => {
     assert.deepEqual(data1, { page: 1 });
     assert.deepEqual(data2, { page: 2 });
 });
+
+test("RequestCache get increments misses for absent keys", () => {
+    const cache = new RequestCache();
+
+    assert.equal(cache.get("/missing"), null);
+    assert.equal(cache.getStats().misses, 1);
+    assert.equal(cache.getStats().hits, 0);
+});
+
+test("RequestCache clear resets stats and size", () => {
+    const cache = new RequestCache();
+    cache.set("/users/1", { id: 1 });
+    cache.get("/users/1");
+    cache.get("/users/2");
+
+    cache.clear();
+
+    const stats = cache.getStats();
+    assert.equal(stats.hits, 0);
+    assert.equal(stats.misses, 0);
+    assert.equal(stats.size, 0);
+});
+
+test("RequestCache getSize returns approximate bytes", () => {
+    const cache = new RequestCache();
+    cache.set("/users/1", { id: 1, name: "John" });
+
+    const size = cache.getSize();
+    assert.ok(size > 0);
+});
+
+test("RequestCache isStale returns false before expiration", () => {
+    const cache = new RequestCache({ ttl: 100, staleWhileRevalidate: 100 });
+    cache.set("/users/1", { id: 1 });
+
+    assert.equal(cache.isStale("/users/1"), false);
+});

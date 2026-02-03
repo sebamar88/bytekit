@@ -136,3 +136,40 @@ test("RequestDeduplicator can reset statistics", async () => {
     assert.equal(stats.deduplicated, 0);
     assert.equal(stats.total, 0);
 });
+
+test("RequestDeduplicator clear resets in-flight and stats", async () => {
+    const dedup = new RequestDeduplicator();
+
+    const fn = async () => {
+        await new Promise((resolve) => setTimeout(resolve, 20));
+        return { id: 1 };
+    };
+
+    const promise = dedup.execute("/users/1", fn);
+    assert.equal(dedup.getInFlightCount(), 1);
+
+    dedup.clear();
+    assert.equal(dedup.getInFlightCount(), 0);
+    assert.equal(dedup.getStats().total, 0);
+
+    await promise;
+});
+
+test("RequestDeduplicator default key generator sorts options", async () => {
+    const dedup = new RequestDeduplicator();
+    let callCount = 0;
+
+    const fn = async () => {
+        callCount++;
+        return { ok: true };
+    };
+
+    const [result1, result2] = await Promise.all([
+        dedup.execute("/users", fn, { b: 2, a: 1 }),
+        dedup.execute("/users", fn, { a: 1, b: 2 }),
+    ]);
+
+    assert.equal(callCount, 1);
+    assert.deepEqual(result1, { ok: true });
+    assert.deepEqual(result2, { ok: true });
+});

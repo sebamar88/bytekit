@@ -1,0 +1,142 @@
+import test from "node:test";
+import assert from "node:assert/strict";
+import { CompressionUtils } from "../dist/utils/helpers/CompressionUtils.js";
+
+test("CompressionUtils compress/decompress roundtrip", () => {
+    const original = "aaabbbccccccdddd";
+    const compressed = CompressionUtils.compress(original);
+    const decompressed = CompressionUtils.decompress(compressed);
+
+    assert.equal(decompressed, original);
+});
+
+test("CompressionUtils base64 encode/decode roundtrip", () => {
+    const original = "hello world";
+    const encoded = CompressionUtils.base64Encode(original);
+    const decoded = CompressionUtils.base64Decode(encoded);
+
+    assert.equal(decoded, original);
+});
+
+test("CompressionUtils base64 url encode/decode roundtrip", () => {
+    const original = "url-safe+data/with=padding";
+    const encoded = CompressionUtils.base64UrlEncode(original);
+    const decoded = CompressionUtils.base64UrlDecode(encoded);
+
+    assert.equal(decoded, original);
+});
+
+test("CompressionUtils serialize/deserialize compressed JSON", () => {
+    const obj = { name: "test", tag: "alpha" };
+    const serialized = CompressionUtils.serializeCompressed(obj);
+    const restored = CompressionUtils.deserializeCompressed(serialized);
+
+    assert.deepEqual(restored, obj);
+});
+
+test("CompressionUtils getCompressionRatio returns non-negative", () => {
+    const original = "aaaaaaaaaa";
+    const compressed = CompressionUtils.compress(original);
+    const ratio = CompressionUtils.getCompressionRatio(original, compressed);
+
+    assert.ok(ratio >= 0);
+});
+
+test("CompressionUtils minifyJSON trims whitespace", () => {
+    const input = '{\n  "a": 1,\n  "b": 2\n}';
+    const minified = CompressionUtils.minifyJSON(input);
+
+    assert.equal(minified, '{ "a": 1, "b": 2 }');
+});
+
+test("CompressionUtils prettyJSON formats valid JSON and returns input on error", () => {
+    const input = '{"a":1}';
+    const pretty = CompressionUtils.prettyJSON(input, 4);
+
+    assert.match(pretty, /\n/);
+
+    const invalid = "{broken";
+    const result = CompressionUtils.prettyJSON(invalid, 2);
+    assert.equal(result, invalid);
+});
+
+test("CompressionUtils gzip/gunzip roundtrip", async () => {
+    const original = "hello gzip";
+    const gzipped = await CompressionUtils.gzip(original);
+    const restored = await CompressionUtils.gunzip(gzipped);
+
+    assert.equal(restored, original);
+});
+
+test("CompressionUtils deflate/inflate roundtrip", async () => {
+    const original = "hello deflate";
+    const deflated = await CompressionUtils.deflate(original);
+    const restored = await CompressionUtils.inflate(deflated);
+
+    assert.equal(restored, original);
+});
+
+test("CompressionUtils getSize and formatBytes", () => {
+    const size = CompressionUtils.getSize("hello");
+    assert.ok(size > 0);
+
+    assert.equal(CompressionUtils.formatBytes(0), "0 Bytes");
+    assert.equal(CompressionUtils.formatBytes(1024), "1 KB");
+});
+
+test("CompressionUtils base64 uses browser btoa/atob when available", () => {
+    const originalBtoa = globalThis.btoa;
+    const originalAtob = globalThis.atob;
+
+    // @ts-ignore
+    globalThis.btoa = (value) => Buffer.from(value, "utf-8").toString("base64");
+    // @ts-ignore
+    globalThis.atob = (value) => Buffer.from(value, "base64").toString("utf-8");
+
+    const original = "browser-base64";
+    const encoded = CompressionUtils.base64Encode(original);
+    const decoded = CompressionUtils.base64Decode(encoded);
+
+    assert.equal(decoded, original);
+
+    globalThis.btoa = originalBtoa;
+    globalThis.atob = originalAtob;
+});
+
+test("CompressionUtils prettyJSON handles object input", () => {
+    const pretty = CompressionUtils.prettyJSON({ a: 1 }, 2);
+    assert.match(pretty, /\n/);
+});
+
+test("CompressionUtils gzip/deflate fallback without node", async () => {
+    const originalVersions = process.versions;
+    let overridden = false;
+
+    try {
+        Object.defineProperty(process, "versions", {
+            value: {},
+            configurable: true,
+            writable: true,
+        });
+        overridden = true;
+    } catch {
+        return;
+    }
+
+    const gzipped = await CompressionUtils.gzip("hello");
+    assert.equal(typeof gzipped, "string");
+
+    const deflated = await CompressionUtils.deflate("hello");
+    assert.equal(typeof deflated, "string");
+
+    const inflated = await CompressionUtils.inflate(deflated);
+    assert.equal(inflated, "hello");
+
+    if (overridden) {
+        Object.defineProperty(process, "versions", {
+            value: originalVersions,
+            configurable: true,
+            writable: true,
+        });
+    }
+});

@@ -2,6 +2,7 @@ node_modules
 examples/*/node_modules
 dist
 examples/*/dist
+docs/api
 .DS_Store
 *.log
 .npmrc

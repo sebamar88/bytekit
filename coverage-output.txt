@@ -1,0 +1,200 @@
+✔ StorageManager respects TTL and cleans expired entries (15.54018ms)
+✔ StorageManager remove deletes a key (0.148269ms)
+✔ StorageManager clear removes all keys (0.078678ms)
+✔ StorageManager returns null for invalid JSON (0.056276ms)
+✔ StreamingHelper.streamJsonLines processes JSON chunks correctly (32.43037ms)
+✔ StreamingHelper.streamJsonLines handles fetch errors (0.380215ms)
+✔ StreamingHelper.downloadStream tracks progress (34.350794ms)
+✔ StreamingHelper.streamSSE sets up connection (50.824421ms)
+✔ StreamingHelper.streamJsonLines handles empty body (0.230765ms)
+✔ StreamingHelper.streamJsonLines calls onComplete and parses final buffer (10.650556ms)
+✔ StreamingHelper.streamJsonLines logs warning on invalid line (10.469546ms)
+✔ StreamingHelper.downloadStream throws on non-ok response (0.425621ms)
+✔ StreamingHelper.downloadStream calls onComplete (10.570666ms)
+✔ StreamingHelper.downloadStream handles empty body (0.19623ms)
+✔ StreamingHelper.streamSSE warns on parse error (29.604802ms)
+✔ StreamingHelper.streamSSE calls onError and onComplete on error (30.659316ms)
+✔ StringUtils.removeDiacritics (0.564653ms)
+✔ StringUtils.slugify with various options (0.257385ms)
+✔ StringUtils.compactWhitespace (0.074851ms)
+✔ StringUtils.capitalize and capitalizeWords (0.134834ms)
+✔ StringUtils.truncate with options (0.119625ms)
+✔ StringUtils.mask (0.087504ms)
+✔ StringUtils.interpolate with nested paths (0.156785ms)
+✔ StringUtils.interpolate edge cases (0.326776ms)
+✔ StringUtils.initials (0.117792ms)
+✔ StringUtils.toQueryString complex scenarios (4.256441ms)
+✔ StringUtils.toQueryString with no params (0.098545ms)
+✔ StringUtils.slugify removes diacritics and normalizes separators (0.702122ms)
+✔ StringUtils.truncate respects ellipsis and word boundaries (0.093406ms)
+✔ StringUtils.mask hides the middle section (0.074801ms)
+✔ StringUtils.interpolate replaces placeholders with nesting support (0.158338ms)
+✔ StringUtils.toQueryString serializes arrays and nested objects (4.777122ms)
+✔ TimeUtils.debounce logic (60.925062ms)
+✔ TimeUtils.debounce with maxWait (160.000892ms)
+(node:324663) TimeoutNegativeWarning: -1770133852708 is a negative number.
+Timeout duration was set to 1.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ TimeUtils.throttle logic (59.600499ms)
+✔ TimeUtils.debounce leading only (60.697054ms)
+✔ TimeUtils.throttle with leading false (60.828992ms)
+✔ TimeUtils.throttle with trailing false (60.667357ms)
+✔ TimeUtils race/all/allSettled helpers (0.8448ms)
+✔ TimeUtils.sleep and delay (59.699576ms)
+✔ TimeUtils.timeout (40.876056ms)
+✔ TimeUtils.retryAsync backoff logic (30.685937ms)
+✔ TimeUtils.createQueue concurrency (40.700065ms)
+✔ TimeUtils measure helpers (10.855292ms)
+✔ TimeUtils duration format and parse (0.319491ms)
+▶ TimeUtils
+  ✔ sleep should wait for specified time (51.212582ms)
+  ✔ delay should execute function after delay (50.631819ms)
+  ✔ timeout should resolve if promise finishes in time (0.19155ms)
+  ✔ timeout should reject if promise takes too long (50.94058ms)
+  ✔ retryAsync should succeed if function succeeds (0.159039ms)
+  ✔ retryAsync should retry on failure and eventually succeed (30.190995ms)
+  ✔ retryAsync should throw after max attempts (3.44861ms)
+  ✔ measureAsync should return result and duration (49.936601ms)
+  ✔ measureSync should return result and duration (6.198316ms)
+  ✔ formatDuration should format correctly (0.073177ms)
+  ✔ parseDuration should parse correctly (0.176993ms)
+  ✔ parseDuration should throw on invalid format (0.095801ms)
+  ✔ createQueue should process tasks with concurrency (100.528934ms)
+  ✔ debounce should delay execution (100.586373ms)
+  ✔ throttle should limit execution frequency (100.571595ms)
+✔ TimeUtils (546.042797ms)
+
+📡 Fetching GET https://api.example.com/user...
+✅ Types generated successfully!
+📝 Output: /tmp/sutils-gen-nLUkS1/types.ts
+
+Generated types:
+──────────────────────────────────────────────────
+// Auto-generated types from API response
+// Generated at 2026-02-03T15:50:52.499Z
+
+export interface User {
+  name: string;
+  age: number;
+  tags: string[];
+  optional?: null;
+}
+
+──────────────────────────────────────────────────
+✔ generateTypesFromEndpoint writes types for arrays and optional fields (3.282167ms)
+✔ UrlBuilder.path handles segments correctly (0.596923ms)
+✔ UrlBuilder.query handles various types (0.158719ms)
+✔ UrlBuilder.queryArray handles repeats (0.136607ms)
+✔ UrlBuilder.hash (0.061977ms)
+✔ UrlBuilder methods: toURL and getSearch (0.092013ms)
+✔ UrlBuilder.clone creates independent copy (0.081123ms)
+✔ createUrlBuilder factory works (0.047058ms)
+✔ UrlBuilder.path with empty segments does nothing (0.039804ms)
+✔ UrlBuilder builds basic URL (0.527794ms)
+✔ UrlBuilder adds path segments (0.167275ms)
+✔ UrlBuilder chains multiple path segments (0.078047ms)
+✔ UrlBuilder handles path segments with slashes (0.050135ms)
+✔ UrlBuilder adds query parameters (0.162325ms)
+✔ UrlBuilder chains multiple query calls (0.07453ms)
+✔ UrlBuilder ignores undefined and null query values (0.060113ms)
+✔ UrlBuilder adds array query parameters (0.099227ms)
+✔ UrlBuilder adds hash/fragment (0.072176ms)
+✔ UrlBuilder converts boolean and number query params (0.053501ms)
+✔ UrlBuilder getPathname returns pathname only (0.046658ms)
+✔ UrlBuilder getSearch returns query string (0.098726ms)
+✔ UrlBuilder getHash returns fragment (0.048051ms)
+✔ UrlBuilder clone creates independent copy (0.446771ms)
+✔ UrlBuilder toURL returns URL object (0.089068ms)
+✔ createUrlBuilder factory function works (0.072236ms)
+✔ UrlBuilder handles complex URL building (0.070603ms)
+✔ Validator.isEmpty handles various types (0.477499ms)
+✔ Validator.minLength and maxLength (0.075191ms)
+✔ Validator.isUrl validates URLs (0.073929ms)
+✔ Validator.isPhone formats (0.139312ms)
+✔ Validator.isLocalPhone for different locales (0.20199ms)
+✔ Validator.isCbu validates checksums (0.065623ms)
+✔ Validator.isCuit validates checksums (0.077235ms)
+✔ Validator.isStrongPassword options (0.110378ms)
+✔ Validator.isDateRange validates ranges (0.082455ms)
+✔ Validator.isOneTimeCode validates digits (0.140795ms)
+✔ Validator.isEmail validates typical addresses (0.521121ms)
+✔ Validator.isStrongPassword enforces custom requirements (0.124334ms)
+✔ Validator.isLocalPhone matches locale-aware patterns (0.181742ms)
+✔ Validator.isCuit validates checksum correctly (0.124785ms)
+✔ Validator.isDateRange and isOneTimeCode behave as expected (0.107332ms)
+✔ Validator.isEmpty and length helpers (0.072006ms)
+✔ Validator.matches and isUrl (0.09031ms)
+✔ Validator phone helpers (0.107122ms)
+✔ Validator UUID, DNI, and local phone fallback (0.155292ms)
+✔ Validator CBU validation (0.154801ms)
+✔ WebSocketHelper connects and sends heartbeat (80.017438ms)
+✔ WebSocketHelper receives messages and notifies subscribers (9.966799ms)
+✔ WebSocketHelper.request handles send and response (29.615512ms)
+✔ WebSocketHelper handles reconnection (109.779536ms)
+✔ WebSocketHelper stops reconnecting after max attempts (111.141851ms)
+✔ WebSocketHelper throws if sending while disconnected (0.314823ms)
+✔ WebSocketHelper handles invalid message JSON (9.459354ms)
+✔ WebSocketHelper unsubscribe stops receiving messages (10.484113ms)
+✔ WebSocketHelper request times out when no response (30.915128ms)
+✔ WebSocketHelper notifies error when handler throws (9.410683ms)
+✔ WebSocketHelper connect rejects on constructor error (0.217009ms)
+✔ WebSocketHelper request supports custom responseType (20.620822ms)
+✔ WebSocketHelper notifyError ignores handler exceptions (20.656018ms)
+ℹ tests 650
+ℹ suites 45
+ℹ pass 647
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 3
+ℹ todo 0
+ℹ duration_ms 6136.870935
+ℹ start of coverage report
+ℹ ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ℹ file                      | line % | branch % | funcs % | uncovered lines
+ℹ ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ℹ dist                      |        |          |         | 
+ℹ  index.js                 | 100.00 |   100.00 |  100.00 | 
+ℹ  utils                    |        |          |         | 
+ℹ   core                    |        |          |         | 
+ℹ    ApiClient.js           |  87.74 |    74.70 |   70.27 | 42-49 54-70 75-76 197-198 203-204 249-251 256-258 260-261 276-277 407-408 421-422 425-426 436-437 472-479 481-488 536-539
+ℹ    BatchRequest.js        |  96.71 |    90.91 |  100.00 | 63-67
+ℹ    debug.js               | 100.00 |    88.24 |  100.00 | 
+ℹ    ErrorBoundary.js       |  88.20 |    80.00 |   77.42 | 45-47 51-53 57-59 140-145 148-158 174-175 227-228 252-265
+ℹ    index.js               | 100.00 |   100.00 |  100.00 | 
+ℹ    Logger.js              | 100.00 |    60.98 |  100.00 | 
+ℹ    Profiler.js            | 100.00 |   100.00 |  100.00 | 
+ℹ    RateLimiter.js         |  98.57 |    81.08 |   94.44 | 190-192
+ℹ    RequestCache.js        | 100.00 |    96.67 |  100.00 | 
+ℹ    RequestDeduplicator.js | 100.00 |   100.00 |  100.00 | 
+ℹ    ResponseValidator.js   |  94.81 |    96.36 |  100.00 | 14-15 120-125
+ℹ    RetryPolicy.js         |  97.27 |    94.29 |   93.33 | 100-104
+ℹ   helpers                 |        |          |         | 
+ℹ    ArrayUtils.js          | 100.00 |    98.95 |  100.00 | 
+ℹ    CacheManager.js        |  95.02 |    86.54 |   87.50 | 63-64 118-120 128-129 131-134 217-218
+ℹ    ColorUtils.js          |  98.32 |    82.50 |   97.78 | 59-61 111-115 168-169
+ℹ    CompressionUtils.js    |  88.80 |    80.00 |  100.00 | 66-67 76-77 148-150 169-174 176-180 195-196 215-219 225 234-235
+ℹ    CryptoUtils.js         |  86.10 |    87.50 |  100.00 | 61-62 71-72 117 119-131 147 149-160
+ℹ    DateUtils.js           |  99.04 |    93.55 |  100.00 | 25
+ℹ    DiffUtils.js           |  94.78 |    92.21 |  100.00 | 69-74 123-127 184-185
+ℹ    EnvManager.js          |  96.43 |    80.00 |  100.00 | 21
+ℹ    EventEmitter.js        |  97.11 |    88.64 |  100.00 | 71-72 163-164 173-175
+ℹ    FileUploadHelper.js    | 100.00 |    96.55 |   83.33 | 
+ℹ    FormUtils.js           |  92.96 |    74.23 |   83.33 | 14-15 32 40 43-48 147-150 218-221 241-246 309-310 348-349
+ℹ    HttpStatusHelper.js    | 100.00 |   100.00 |  100.00 | 
+ℹ    NumberUtils.js         |  93.47 |    77.86 |   86.36 | 168-170 187-188 193-194 205-206 292-294 352-354 358-370 372-376 451-452
+ℹ    ObjectUtils.js         |  97.98 |    95.83 |   93.75 | 20 26-27 48 285-286
+ℹ    PaginationHelper.js    |  98.64 |    85.51 |  100.00 | 172-173 184-185
+ℹ    PollingHelper.js       | 100.00 |    98.70 |   95.24 | 
+ℹ    Signal.js              |  97.94 |    96.77 |   95.65 | 62-66
+ℹ    StorageUtils.js        | 100.00 |   100.00 |  100.00 | 
+ℹ    StreamingHelper.js     |  97.04 |    86.96 |   83.33 | 43-44 102-104
+ℹ    StringUtils.js         |  99.42 |    87.06 |   96.43 | 32
+ℹ    TimeUtils.js           |  94.44 |    89.55 |   96.43 | 25-30 32-34 121 170-171 230
+ℹ    UrlBuilder.js          |  98.69 |    96.00 |   94.74 | 106-107
+ℹ    Validator.js           | 100.00 |    83.33 |  100.00 | 
+ℹ    WebSocketHelper.js     |  97.50 |    88.89 |   96.55 | 147-150 204-205
+ℹ   index.js                | 100.00 |   100.00 |  100.00 | 
+ℹ ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ℹ all files                 |  95.68 |    87.21 |   93.47 | 
+ℹ ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ℹ end of coverage report

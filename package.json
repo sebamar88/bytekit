@@ -178,11 +178,21 @@
         "lint:src": "eslint src",
         "lint:fix": "eslint src tests --fix",
         "format": "prettier --write \"src/**/*.{ts,js,json}\" \"tests/**/*.{ts,js,json}\"",
+        "format:check": "prettier --check \"src/**/*.{ts,js,json}\" \"tests/**/*.{ts,js,json}\"",
         "test": "npm run lint && npm run build && node --test tests/*.test.js",
-        "test:coverage": "npm run build && node --experimental-test-coverage --test tests/*.test.js",
+        "test:watch": "vitest",
+        "test:ui": "vitest --ui",
+        "test:coverage": "npm run build && node --experimental-test-coverage --test --test-coverage-include=dist/utils/**/*.js --test-coverage-include=dist/index.js tests/*.test.js",
+        "test:coverage:watch": "vitest --coverage",
+        "test:node": "npm run build && node --test tests/*.test.js",
+        "test:node:coverage": "npm run build && node --experimental-test-coverage --test tests/*.test.js",
         "test:all": "pnpm run test",
+        "typecheck": "tsc --noEmit",
         "wiki:generate": "node scripts/generate-wiki.js",
-        "prepublishOnly": "pnpm run lint:src && pnpm run clean && pnpm run build"
+        "docs:generate": "typedoc",
+        "docs:watch": "typedoc --watch",
+        "docs:serve": "npx http-server docs/api -p 8080 -o",
+        "prepublishOnly": "pnpm run lint:src && pnpm run clean && pnpm run build && pnpm run test:coverage"
     },
     "files": [
         "dist",
@@ -219,12 +229,17 @@
     "devDependencies": {
         "@eslint/js": "^9.0.0",
         "@types/node": "^25.0.3",
+        "@vitest/coverage-v8": "^2.1.8",
+        "@vitest/ui": "^2.1.8",
         "eslint": "^9.0.0",
         "fast-check": "^4.5.2",
         "globals": "^15.0.0",
         "prettier": "^3.0.0",
+        "typedoc": "^0.28.16",
+        "typedoc-plugin-markdown": "^4.9.0",
         "typescript": "^5.9.3",
-        "typescript-eslint": "^8.0.0"
+        "typescript-eslint": "^8.0.0",
+        "vitest": "^2.1.8"
     },
     "peerDependencies": {
         "typescript": ">=4.5.0"
