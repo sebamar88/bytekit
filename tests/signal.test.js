@@ -48,7 +48,7 @@ test("Effect cleanup function is called", () => {
 
     const dispose = effect(() => {
         // Subscribe to signal by accessing its value
-        s.value;
+        const _val = s.value;
         return () => {
             cleanedUp++;
         };
@@ -68,7 +68,7 @@ test("Batch defers notifications", () => {
 
     effect(() => {
         // Subscribe to signal
-        s.value;
+        const _val = s.value;
         effectCount++;
     });
 
@@ -132,7 +132,7 @@ test("Signal subscribers count for debugging", () => {
     const s = signal(0);
     const dispose = effect(() => {
         // Subscribe to signal
-        s.value;
+        const _val = s.value;
     });
     assert.equal(s.subscriberCount, 1);
     dispose();
