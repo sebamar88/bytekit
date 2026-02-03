@@ -1,4 +1,3 @@
-import crossFetch from "cross-fetch";
 import { Logger } from "#core/Logger.js";
 import { StringUtils } from "#helpers/StringUtils.js";
 import {
@@ -235,11 +234,7 @@ export class ApiClient {
         }
         this.baseUrl = new URL(url.endsWith("/") ? url : `${url}/`);
         this.headers = defaultHeaders ?? {};
-        this.fetchImpl =
-            fetchImpl ??
-            (typeof globalThis.fetch === "function"
-                ? globalThis.fetch.bind(globalThis)
-                : (crossFetch as unknown as typeof fetch));
+        this.fetchImpl = fetchImpl ?? globalThis.fetch.bind(globalThis);
         this.locale = locale;
         this.errorMessages = errorMessages ?? {};
         this.timeoutMs = timeoutMs;

@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- **BREAKING**: Removed `cross-fetch` dependency - now using native fetch globally
+    - ApiClient now uses `globalThis.fetch` by default (available in Node.js 18+)
+    - Project is now **true zero-dependencies** (except `tsx` for dev tooling)
+    - Updated documentation to reflect native fetch usage
+    - No API changes required - fully backward compatible for consumers
+
 ## [1.0.14] - 2026-02-03
 
 ### Fixed

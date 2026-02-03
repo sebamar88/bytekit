@@ -14,11 +14,11 @@
 
 ## Highlights / Características
 
--   ✅ **EN:** Fully ESM with `.d.ts` definitions. **ES:** Build 100 % ESM con tipos listos.
--   🌐 **EN:** Works on Node.js 18+ and modern browsers (via `cross-fetch`). **ES:** Compatible con Node.js 18+ y navegadores modernos (usa `cross-fetch`).
--   🔁 **EN:** ApiClient with retries, localized errors, flexible options. **ES:** ApiClient con reintentos, errores localizados y configuración flexible.
--   🧩 **EN:** Helper modules (strings, dates, validators, env, storage). **ES:** Helpers para strings, fechas, validadores, env y storage.
--   🪵 **EN:** Structured logging/profiling: `createLogger`, `Profiler`, `withTiming`. **ES:** Logging/profiling estructurado: `createLogger`, `Profiler`, `withTiming`.
+- ✅ **EN:** Fully ESM with `.d.ts` definitions. **ES:** Build 100 % ESM con tipos listos.
+- 🌐 **EN:** Works on Node.js 18+ and modern browsers (native fetch). **ES:** Compatible con Node.js 18+ y navegadores modernos (fetch nativo).
+- 🔁 **EN:** ApiClient with retries, localized errors, flexible options. **ES:** ApiClient con reintentos, errores localizados y configuración flexible.
+- 🧩 **EN:** Helper modules (strings, dates, validators, env, storage). **ES:** Helpers para strings, fechas, validadores, env y storage.
+- 🪵 **EN:** Structured logging/profiling: `createLogger`, `Profiler`, `withTiming`. **ES:** Logging/profiling estructurado: `createLogger`, `Profiler`, `withTiming`.
 
 ## Installation / Instalación
 
@@ -830,7 +830,7 @@ class TimeUtils {
 
 ```ts
 class EventEmitter<
-    Events extends Record<string, unknown> = Record<string, unknown>
+    Events extends Record<string, unknown> = Record<string, unknown>,
 > {
     on<K extends keyof Events>(
         event: K,
@@ -859,7 +859,7 @@ class EventEmitter<
 }
 
 function createEventEmitter<
-    Events extends Record<string, unknown> = Record<string, unknown>
+    Events extends Record<string, unknown> = Record<string, unknown>,
 >(options?: EventEmitterOptions): EventEmitter<Events>;
 ```
 
@@ -1014,19 +1014,19 @@ class CompressionUtils {
 
 ## ApiClient Details / Detalles del ApiClient
 
--   `baseUrl`: **EN** required prefix for relative endpoints. **ES** prefijo requerido para endpoints relativos.
--   `defaultHeaders`: **EN** shared headers merged per request. **ES** cabeceras comunes que se combinan en cada request.
--   `locale` + `errorMessages`: **EN** localized HTTP errors. **ES** mensajes localizados por código HTTP.
--   `fetchImpl`: **EN** inject your own fetch (tests, custom environments). **ES** inyectá tu propio `fetch` (tests o entornos custom).
--   `retryPolicy`: **EN** configure automatic retries with exponential backoff. **ES** configura reintentos automáticos con backoff exponencial.
--   `circuitBreaker`: **EN** configure circuit breaker to prevent cascading failures. **ES** configura circuit breaker para evitar fallos en cascada.
+- `baseUrl`: **EN** required prefix for relative endpoints. **ES** prefijo requerido para endpoints relativos.
+- `defaultHeaders`: **EN** shared headers merged per request. **ES** cabeceras comunes que se combinan en cada request.
+- `locale` + `errorMessages`: **EN** localized HTTP errors. **ES** mensajes localizados por código HTTP.
+- `fetchImpl`: **EN** inject your own fetch (tests, custom environments). **ES** inyectá tu propio `fetch` (tests o entornos custom).
+- `retryPolicy`: **EN** configure automatic retries with exponential backoff. **ES** configura reintentos automáticos con backoff exponencial.
+- `circuitBreaker`: **EN** configure circuit breaker to prevent cascading failures. **ES** configura circuit breaker para evitar fallos en cascada.
 
 Each `request` (and `get`, `post`, `put`, `patch`, `delete`) accepts / Cada request acepta:
 
--   `searchParams`: **EN** serializes to URLSearchParams. **ES** se serializa automáticamente.
--   `body`: **EN** strings, serializable objects, or `FormData`. **ES** strings, objetos serializables o `FormData`.
--   `errorLocale`: **EN** override language per request. **ES** forzá un idioma específico.
--   Native `RequestInit` fields (`headers`, `signal`, etc.).
+- `searchParams`: **EN** serializes to URLSearchParams. **ES** se serializa automáticamente.
+- `body`: **EN** strings, serializable objects, or `FormData`. **ES** strings, objetos serializables o `FormData`.
+- `errorLocale`: **EN** override language per request. **ES** forzá un idioma específico.
+- Native `RequestInit` fields (`headers`, `signal`, etc.).
 
 ```ts
 import { HttpError } from "bytekit";
@@ -1042,7 +1042,7 @@ try {
 
 ### Paginated Lists / Listados Paginados
 
--   **getList**: **EN** fetch paginated data with built-in support for `pagination`, `sort`, and `filters`. Returns a typed `PaginatedResponse` with metadata. **ES** obtiene datos paginados con soporte para `pagination`, `sort` y `filters`. Devuelve `PaginatedResponse` con metadatos.
+- **getList**: **EN** fetch paginated data with built-in support for `pagination`, `sort`, and `filters`. Returns a typed `PaginatedResponse` with metadata. **ES** obtiene datos paginados con soporte para `pagination`, `sort` y `filters`. Devuelve `PaginatedResponse` con metadatos.
 
 ```ts
 import { ApiClient } from "bytekit";
@@ -1079,8 +1079,8 @@ const filtered = await api.getList<User>("/users", {
 
 ### Retry Policy & Circuit Breaker
 
--   **RetryPolicy**: **EN** automatic retry with exponential backoff for transient failures. **ES** reintentos automáticos con backoff exponencial para fallos transitorios.
--   **CircuitBreaker**: **EN** prevent cascading failures by stopping requests when service is down. **ES** evita fallos en cascada deteniendo requests cuando el servicio está caído.
+- **RetryPolicy**: **EN** automatic retry with exponential backoff for transient failures. **ES** reintentos automáticos con backoff exponencial para fallos transitorios.
+- **CircuitBreaker**: **EN** prevent cascading failures by stopping requests when service is down. **ES** evita fallos en cascada deteniendo requests cuando el servicio está caído.
 
 ```ts
 import { ApiClient } from "bytekit";
@@ -1105,7 +1105,7 @@ const data = await api.get("/users");
 
 ### Response Validation
 
--   **ResponseValidator**: **EN** validate API responses against schemas before using them. **ES** valida respuestas de API contra esquemas antes de usarlas.
+- **ResponseValidator**: **EN** validate API responses against schemas before using them. **ES** valida respuestas de API contra esquemas antes de usarlas.
 
 ```ts
 import { ApiClient, ValidationSchema } from "bytekit";
@@ -1129,7 +1129,7 @@ const users = await api.get<User[]>("/users", {
 
 ### File Upload Helper
 
--   **FileUploadHelper**: **EN** upload files with progress tracking, chunking, and retry support. **ES** sube archivos con seguimiento de progreso, chunking y reintentos.
+- **FileUploadHelper**: **EN** upload files with progress tracking, chunking, and retry support. **ES** sube archivos con seguimiento de progreso, chunking y reintentos.
 
 ```ts
 import { FileUploadHelper } from "bytekit";
@@ -1158,7 +1158,7 @@ if (file) {
 
 ### Streaming Helper
 
--   **StreamingHelper**: **EN** stream JSON lines, Server-Sent Events, or download files with progress. **ES** transmite JSON lines, Server-Sent Events o descarga archivos con progreso.
+- **StreamingHelper**: **EN** stream JSON lines, Server-Sent Events, or download files with progress. **ES** transmite JSON lines, Server-Sent Events o descarga archivos con progreso.
 
 ```ts
 import { StreamingHelper } from "bytekit";
@@ -1189,7 +1189,7 @@ const blob = await StreamingHelper.downloadStream("/api/export.csv", {
 
 ### WebSocket Helper
 
--   **WebSocketHelper**: **EN** manage WebSocket connections with auto-reconnect, heartbeat, and typed messages. **ES** gestiona conexiones WebSocket con reconexión automática, heartbeat y mensajes tipados.
+- **WebSocketHelper**: **EN** manage WebSocket connections with auto-reconnect, heartbeat, and typed messages. **ES** gestiona conexiones WebSocket con reconexión automática, heartbeat y mensajes tipados.
 
 ```ts
 import { WebSocketHelper } from "bytekit";
@@ -1225,7 +1225,7 @@ ws.close();
 
 ### Request Caching
 
--   **RequestCache**: **EN** cache HTTP responses with TTL and stale-while-revalidate support. **ES** cachea respuestas HTTP con TTL y soporte para stale-while-revalidate.
+- **RequestCache**: **EN** cache HTTP responses with TTL and stale-while-revalidate support. **ES** cachea respuestas HTTP con TTL y soporte para stale-while-revalidate.
 
 ```ts
 import { RequestCache } from "bytekit";
@@ -1259,8 +1259,8 @@ console.log(`Hit rate: ${stats.hitRate * 100}%`);
 
 ### Rate Limiting
 
--   **RateLimiter**: **EN** token bucket rate limiter for smooth request throttling. **ES** limitador de tasa con token bucket para throttling suave.
--   **SlidingWindowRateLimiter**: **EN** sliding window rate limiter for precise rate control. **ES** limitador de ventana deslizante para control preciso de tasa.
+- **RateLimiter**: **EN** token bucket rate limiter for smooth request throttling. **ES** limitador de tasa con token bucket para throttling suave.
+- **SlidingWindowRateLimiter**: **EN** sliding window rate limiter for precise rate control. **ES** limitador de ventana deslizante para control preciso de tasa.
 
 ```ts
 import { RateLimiter, SlidingWindowRateLimiter } from "bytekit";
@@ -1295,7 +1295,7 @@ if (slidingLimiter.isAllowed("https://api.example.com/users")) {
 
 ### Request Deduplication
 
--   **RequestDeduplicator**: **EN** deduplicate in-flight requests to avoid redundant API calls. **ES** deduplica requests en vuelo para evitar llamadas redundantes.
+- **RequestDeduplicator**: **EN** deduplicate in-flight requests to avoid redundant API calls. **ES** deduplica requests en vuelo para evitar llamadas redundantes.
 
 ```ts
 import { RequestDeduplicator } from "bytekit";
@@ -1324,7 +1324,7 @@ console.log(`In-flight: ${dedup.getInFlightCount()}`);
 
 ### Object Utilities
 
--   **ObjectUtils**: **EN** everyday object manipulation utilities (isEmpty, deepClone, merge, pick, omit, flatten, groupBy, etc.). **ES** utilidades cotidianas para manipular objetos.
+- **ObjectUtils**: **EN** everyday object manipulation utilities (isEmpty, deepClone, merge, pick, omit, flatten, groupBy, etc.). **ES** utilidades cotidianas para manipular objetos.
 
 ```ts
 import { ObjectUtils } from "bytekit";
@@ -1383,7 +1383,7 @@ ObjectUtils.deepEqual({ a: 1 }, { a: 1 }); // true
 
 ### Array Utilities
 
--   **ArrayUtils**: **EN** everyday array manipulation utilities (chunk, flatten, unique, shuffle, zip, partition, etc.). **ES** utilidades cotidianas para manipular arrays.
+- **ArrayUtils**: **EN** everyday array manipulation utilities (chunk, flatten, unique, shuffle, zip, partition, etc.). **ES** utilidades cotidianas para manipular arrays.
 
 ```ts
 import { ArrayUtils } from "bytekit";
@@ -1441,7 +1441,7 @@ ArrayUtils.transpose([
 
 ### Error Boundary
 
--   **ErrorBoundary**: **EN** comprehensive error handling with automatic retry logic, error history tracking, and global error handlers. **ES** manejo completo de errores con reintentos automáticos, historial de errores y handlers globales.
+- **ErrorBoundary**: **EN** comprehensive error handling with automatic retry logic, error history tracking, and global error handlers. **ES** manejo completo de errores con reintentos automáticos, historial de errores y handlers globales.
 
 ```ts
 import {
@@ -1555,7 +1555,7 @@ try {
 
 ### Form Utilities
 
--   **FormUtils**: **EN** form validation and state management with built-in validators, async validation, and framework-agnostic design. **ES** validación de formularios y gestión de estado con validadores integrados, validación async y agnóstico del framework.
+- **FormUtils**: **EN** form validation and state management with built-in validators, async validation, and framework-agnostic design. **ES** validación de formularios y gestión de estado con validadores integrados, validación async y agnóstico del framework.
 
 ```ts
 import { FormUtils, createForm, Validators } from "bytekit";
@@ -1691,17 +1691,17 @@ const apiKey = env.require("API_KEY");
 
 ```
 
--   `DateUtils`: **EN** safe parsing, add/subtract, configurable diffs, `isSameDay`. **ES** parseo seguro, sumas/restas, diferencias configurables e `isSameDay`.
--   `StringUtils`: **EN** slugify, capitalize, masking, interpolation, query strings. **ES** slugify, capitalización, máscaras, interpolación, query strings.
--   `Validator`: **EN** lightweight synchronous validators. **ES** validadores sincrónicos livianos.
--   `StorageManager`: **EN** safe wrapper for `localStorage`/`sessionStorage`. **ES** adaptador seguro para storage del navegador.
+- `DateUtils`: **EN** safe parsing, add/subtract, configurable diffs, `isSameDay`. **ES** parseo seguro, sumas/restas, diferencias configurables e `isSameDay`.
+- `StringUtils`: **EN** slugify, capitalize, masking, interpolation, query strings. **ES** slugify, capitalización, máscaras, interpolación, query strings.
+- `Validator`: **EN** lightweight synchronous validators. **ES** validadores sincrónicos livianos.
+- `StorageManager`: **EN** safe wrapper for `localStorage`/`sessionStorage`. **ES** adaptador seguro para storage del navegador.
 
 ## Toolkit Catalog / Catálogo de herramientas
 
 ### ApiClient
 
--   **EN**: Typed HTTP client with retries, localized errors, interceptors, and custom fetch support for Node/browsers.
-    **ES**: Cliente HTTP tipado con reintentos, errores localizados, interceptores y `fetch` personalizable para Node/navegadores.
+- **EN**: Typed HTTP client with retries, localized errors, interceptors, and custom fetch support for Node/browsers.
+  **ES**: Cliente HTTP tipado con reintentos, errores localizados, interceptores y `fetch` personalizable para Node/navegadores.
 
 ```ts
 import { ApiClient } from "bytekit";
@@ -1718,8 +1718,8 @@ const user = await api.get("/users/1", {
 
 ### createLogger
 
--   **EN**: Structured logger with levels, namespaces, transports for Node/browser, and child loggers.  
-    **ES**: Logger estructurado con niveles, namespaces, transports para Node/browser y loggers hijos.
+- **EN**: Structured logger with levels, namespaces, transports for Node/browser, and child loggers.  
+  **ES**: Logger estructurado con niveles, namespaces, transports para Node/browser y loggers hijos.
 
 ```ts
 import { createLogger } from "bytekit";
@@ -1733,8 +1733,8 @@ workerLogger.debug("processing batch", { size: 20 });
 
 ### Timing & Debug Utilities
 
--   **EN**: `createStopwatch`, `withTiming`, `measureAsync`, `captureDebug`, and `Profiler` help you capture execution times and emit logs automatically.  
-    **ES**: `createStopwatch`, `withTiming`, `measureAsync`, `captureDebug` y `Profiler` facilitan medir tiempos y loguear automáticamente.
+- **EN**: `createStopwatch`, `withTiming`, `measureAsync`, `captureDebug`, and `Profiler` help you capture execution times and emit logs automatically.  
+  **ES**: `createStopwatch`, `withTiming`, `measureAsync`, `captureDebug` y `Profiler` facilitan medir tiempos y loguear automáticamente.
 
 ```ts
 import { createStopwatch, withTiming, measureAsync, Profiler } from "bytekit";
@@ -1757,13 +1757,13 @@ console.table(profiler.summary());
 
 ### DateUtils
 
--   **parse / isValid**: **EN** accept `Date`, ISO strings, timestamps; return normalized Date or boolean. **ES** aceptan `Date`, string ISO o timestamp y devuelven Date normalizada o booleano.
--   **toISODate**: **EN** format to `YYYY-MM-DD` without timezone surprises. **ES** formatea como `YYYY-MM-DD` evitando problemas de zona horaria.
--   **startOfDay / endOfDay**: **EN** clamp hours to `00:00:00.000` or `23:59:59.999`. **ES** ajusta horas al inicio o final del día.
--   **add**: **EN** add duration (`days`, `hours`, `minutes`, `seconds`, `milliseconds`). **ES** suma duraciones con granularidad configurable.
--   **diff / diffInDays**: **EN** difference between two dates with unit + rounding + absolute options. **ES** diferencia entre fechas con unidad, redondeo y valor absoluto configurable.
--   **isSameDay / isBefore / isAfter**: **EN** compare normalized dates. **ES** compara fechas normalizadas.
--   **format**: **EN** locale-aware short date (`es-AR` default). **ES** formatea con `toLocaleDateString`.
+- **parse / isValid**: **EN** accept `Date`, ISO strings, timestamps; return normalized Date or boolean. **ES** aceptan `Date`, string ISO o timestamp y devuelven Date normalizada o booleano.
+- **toISODate**: **EN** format to `YYYY-MM-DD` without timezone surprises. **ES** formatea como `YYYY-MM-DD` evitando problemas de zona horaria.
+- **startOfDay / endOfDay**: **EN** clamp hours to `00:00:00.000` or `23:59:59.999`. **ES** ajusta horas al inicio o final del día.
+- **add**: **EN** add duration (`days`, `hours`, `minutes`, `seconds`, `milliseconds`). **ES** suma duraciones con granularidad configurable.
+- **diff / diffInDays**: **EN** difference between two dates with unit + rounding + absolute options. **ES** diferencia entre fechas con unidad, redondeo y valor absoluto configurable.
+- **isSameDay / isBefore / isAfter**: **EN** compare normalized dates. **ES** compara fechas normalizadas.
+- **format**: **EN** locale-aware short date (`es-AR` default). **ES** formatea con `toLocaleDateString`.
 
 ```ts
 DateUtils.isSameDay("2024-10-10", new Date());
@@ -1776,14 +1776,14 @@ DateUtils.diff(new Date("2024-01-01"), Date.now(), {
 
 ### StringUtils
 
--   **removeDiacritics / compactWhitespace**: **EN** normalize text for comparisons or rendering. **ES** normalizan texto para comparaciones o UI.
--   **slugify**: **EN** create URL-friendly IDs with configurable separator/lowercase. **ES** genera slugs configurables.
--   **capitalize / capitalizeWords**: **EN/ES** capitaliza respetando locale.
--   **truncate**: **EN** trims long strings with optional ellipsis + word boundaries. **ES** recorta textos largos respetando palabras.
--   **mask**: **EN** hide sensitive parts with custom `maskChar`, `visibleStart`, `visibleEnd`. **ES** oculta secciones sensibles con máscara configurable.
--   **interpolate**: **EN** replace `{{placeholders}}` with nested object values (strict/fallback/transform). **ES** interpolación con soporte para rutas y validación.
--   **initials**: **EN** generate up to `limit` initials. **ES** genera iniciales rápido.
--   **toQueryString**: **EN** serialize nested objects/arrays with formats (`repeat`, `bracket`, `comma`). **ES** serializa objetos y arrays a query strings.
+- **removeDiacritics / compactWhitespace**: **EN** normalize text for comparisons or rendering. **ES** normalizan texto para comparaciones o UI.
+- **slugify**: **EN** create URL-friendly IDs with configurable separator/lowercase. **ES** genera slugs configurables.
+- **capitalize / capitalizeWords**: **EN/ES** capitaliza respetando locale.
+- **truncate**: **EN** trims long strings with optional ellipsis + word boundaries. **ES** recorta textos largos respetando palabras.
+- **mask**: **EN** hide sensitive parts with custom `maskChar`, `visibleStart`, `visibleEnd`. **ES** oculta secciones sensibles con máscara configurable.
+- **interpolate**: **EN** replace `{{placeholders}}` with nested object values (strict/fallback/transform). **ES** interpolación con soporte para rutas y validación.
+- **initials**: **EN** generate up to `limit` initials. **ES** genera iniciales rápido.
+- **toQueryString**: **EN** serialize nested objects/arrays with formats (`repeat`, `bracket`, `comma`). **ES** serializa objetos y arrays a query strings.
 
 ```ts
 StringUtils.mask("4242424242424242", { visibleStart: 4, visibleEnd: 2 });
@@ -1796,8 +1796,8 @@ StringUtils.toQueryString({
 
 ### StorageManager
 
--   **StorageManager**: **EN** wraps any `Storage` (default `localStorage`) with safe JSON parsing and TTL support. **ES** envuelve cualquier `Storage` con parseo seguro y expiración opcional.
--   **set/get/remove/clear**: **EN** persist typed values, remove expired entries automatically. **ES** guarda valores tipados y limpia expirados.
+- **StorageManager**: **EN** wraps any `Storage` (default `localStorage`) with safe JSON parsing and TTL support. **ES** envuelve cualquier `Storage` con parseo seguro y expiración opcional.
+- **set/get/remove/clear**: **EN** persist typed values, remove expired entries automatically. **ES** guarda valores tipados y limpia expirados.
 
 ```ts
 const storage = new StorageManager(sessionStorage);
@@ -1807,8 +1807,8 @@ const session = storage.get<{ token: string }>("session");
 
 ### EnvManager
 
--   **get / require**: **EN** read ENV vars from Node (via `process.env`) or Vite-style browser builds (`import.meta.env`). **ES** lee env vars en Node o navegador y marca obligatorias con `require`.
--   **isProd**: **EN** check `NODE_ENV`/`MODE`. **ES** detecta modo producción.
+- **get / require**: **EN** read ENV vars from Node (via `process.env`) or Vite-style browser builds (`import.meta.env`). **ES** lee env vars en Node o navegador y marca obligatorias con `require`.
+- **isProd**: **EN** check `NODE_ENV`/`MODE`. **ES** detecta modo producción.
 
 ```ts
 const env = new EnvManager();
@@ -1820,10 +1820,10 @@ if (env.isProd()) {
 
 ### Validator
 
--   **Identity**: **EN** `isEmail`, `isUUIDv4`, `isDni`, `isCuit`, `isCbu`. **ES** validaciones de identidad y banking locales.
--   **Phones**: **EN** `isInternationalPhone`, `isPhoneE164`, `isLocalPhone(locale)`. **ES** valida teléfonos internacionales y locales con patrones por país.
--   **Security**: **EN** `isStrongPassword`, `isOneTimeCode`. **ES** contraseñas fuertes y códigos OTP.
--   **General**: **EN** `isUrl`, `isEmpty`, length guards, regex matcher, `isDateRange`. **ES** helpers generales para formularios.
+- **Identity**: **EN** `isEmail`, `isUUIDv4`, `isDni`, `isCuit`, `isCbu`. **ES** validaciones de identidad y banking locales.
+- **Phones**: **EN** `isInternationalPhone`, `isPhoneE164`, `isLocalPhone(locale)`. **ES** valida teléfonos internacionales y locales con patrones por país.
+- **Security**: **EN** `isStrongPassword`, `isOneTimeCode`. **ES** contraseñas fuertes y códigos OTP.
+- **General**: **EN** `isUrl`, `isEmpty`, length guards, regex matcher, `isDateRange`. **ES** helpers generales para formularios.
 
 ```ts
 Validator.isStrongPassword("SecurePass!2024", { minLength: 10 });
@@ -1832,8 +1832,8 @@ Validator.isLocalPhone("11 5555-7777", "es-AR");
 
 ### EventEmitter
 
--   **EN**: Pub/sub event system with sync/async listeners, once listeners, error handling, and listener tracking.  
-    **ES**: Sistema de eventos pub/sub con listeners síncronos/asíncronos, listeners únicos, manejo de errores y seguimiento.
+- **EN**: Pub/sub event system with sync/async listeners, once listeners, error handling, and listener tracking.  
+  **ES**: Sistema de eventos pub/sub con listeners síncronos/asíncronos, listeners únicos, manejo de errores y seguimiento.
 
 ```ts
 import { EventEmitter, createEventEmitter } from "bytekit";
@@ -1880,8 +1880,8 @@ const events = createEventEmitter<{ message: string }>();
 
 ### DiffUtils
 
--   **EN**: Deep object comparison, patch generation/application, and merge strategies for tracking changes.  
-    **ES**: Comparación profunda de objetos, generación/aplicación de parches y estrategias de merge para rastrear cambios.
+- **EN**: Deep object comparison, patch generation/application, and merge strategies for tracking changes.  
+  **ES**: Comparación profunda de objetos, generación/aplicación de parches y estrategias de merge para rastrear cambios.
 
 ```ts
 import { DiffUtils } from "bytekit";
@@ -1919,8 +1919,8 @@ DiffUtils.deepEqual({ a: { b: 1 } }, { a: { b: 2 } }); // false
 
 ### PollingHelper
 
--   **EN**: Intelligent polling with exponential backoff, stop conditions, and max attempts for async operations.  
-    **ES**: Polling inteligente con backoff exponencial, condiciones de parada e intentos máximos para operaciones async.
+- **EN**: Intelligent polling with exponential backoff, stop conditions, and max attempts for async operations.  
+  **ES**: Polling inteligente con backoff exponencial, condiciones de parada e intentos máximos para operaciones async.
 
 ```ts
 import { PollingHelper, createPoller } from "bytekit";
@@ -1964,8 +1964,8 @@ const filePoller = createPoller(
 
 ### CryptoUtils
 
--   **EN**: Token/UUID generation, base64 encoding, hashing, HMAC, and constant-time comparison for security.  
-    **ES**: Generación de tokens/UUIDs, codificación base64, hashing, HMAC y comparación en tiempo constante para seguridad.
+- **EN**: Token/UUID generation, base64 encoding, hashing, HMAC, and constant-time comparison for security.  
+  **ES**: Generación de tokens/UUIDs, codificación base64, hashing, HMAC y comparación en tiempo constante para seguridad.
 
 ```ts
 import { CryptoUtils } from "bytekit";
@@ -1995,8 +1995,8 @@ const signature = await CryptoUtils.hmac("message", "secret");
 
 ### PaginationHelper
 
--   **EN**: Offset-limit and cursor-based pagination with state tracking and navigation.  
-    **ES**: Paginación offset-limit y basada en cursores con seguimiento de estado y navegación.
+- **EN**: Offset-limit and cursor-based pagination with state tracking and navigation.  
+  **ES**: Paginación offset-limit y basada en cursores con seguimiento de estado y navegación.
 
 ```ts
 import { PaginationHelper, createPaginator } from "bytekit";
@@ -2049,8 +2049,8 @@ const userPaginator = createPaginator(users, { pageSize: 20 });
 
 ### CacheManager
 
--   **EN**: Multi-tier cache (memory + localStorage) with TTL, LRU eviction, and statistics for performance optimization.  
-    **ES**: Cache multi-nivel (memoria + localStorage) con TTL, evicción LRU y estadísticas para optimización de rendimiento.
+- **EN**: Multi-tier cache (memory + localStorage) with TTL, LRU eviction, and statistics for performance optimization.  
+  **ES**: Cache multi-nivel (memoria + localStorage) con TTL, evicción LRU y estadísticas para optimización de rendimiento.
 
 ```ts
 import { CacheManager, createCacheManager } from "bytekit";
@@ -2103,8 +2103,8 @@ const apiCache = createCacheManager({ maxSize: 50 });
 
 ### CompressionUtils
 
--   **EN**: String compression, base64 encoding, JSON minification, and gzip/deflate support for data optimization.  
-    **ES**: Compresión de strings, codificación base64, minificación JSON y soporte gzip/deflate para optimización de datos.
+- **EN**: String compression, base64 encoding, JSON minification, and gzip/deflate support for data optimization.  
+  **ES**: Compresión de strings, codificación base64, minificación JSON y soporte gzip/deflate para optimización de datos.
 
 ```ts
 import { CompressionUtils } from "bytekit";
@@ -2150,8 +2150,8 @@ const inflated = await CompressionUtils.inflate(deflated);
 
 ## Compatibility / Compatibilidad
 
--   Node.js >= 18 (ESM, `fetch`, `AbortController`, `URL`).
--   Modern browsers (ships optional `cross-fetch` polyfill).
+- Node.js >= 18 (ESM, native `fetch`, `AbortController`, `URL`).
+- Modern browsers with native fetch support.
 
 ## CLI scaffolding / Generador CLI
 
@@ -2166,16 +2166,16 @@ npx sutils create users
 
 **What is generated / Qué se genera:**
 
--   `api/<resource>/index.ts`: typed CRUD helpers built on `bytekit`' `ApiClient`, including shape placeholders, filter helpers, and `list/get/create/update/delete` functions.
--   `hooks/<resource>/use<ResourcePlural>.ts`: Query library hooks (React Query or RTK Query, configurable via `--queryLib`) that invalidate the corresponding queries and wire mutations.
--   `hooks/<resource>/index.ts`: re-exports the generated hooks.
+- `api/<resource>/index.ts`: typed CRUD helpers built on `bytekit`' `ApiClient`, including shape placeholders, filter helpers, and `list/get/create/update/delete` functions.
+- `hooks/<resource>/use<ResourcePlural>.ts`: Query library hooks (React Query or RTK Query, configurable via `--queryLib`) that invalidate the corresponding queries and wire mutations.
+- `hooks/<resource>/index.ts`: re-exports the generated hooks.
 
 The generator accepts `--apiDir`, `--hooksDir`, `--route`, `--queryLib`, and `--force`; directories default to `api`/`hooks`, the route defaults to the resource name, `--queryLib` defaults to `react-query`, and `--force` overwrites existing files. It also respects nested resource paths like `admin/users`.
 
 **Query Library Options / Opciones de Librería de Queries:**
 
--   `--queryLib=react-query` (default): Generates hooks using `@tanstack/react-query` (React Query).
--   `--queryLib=rtk-query`: Generates API slice using `@reduxjs/toolkit/query/react` (RTK Query).
+- `--queryLib=react-query` (default): Generates hooks using `@tanstack/react-query` (React Query).
+- `--queryLib=rtk-query`: Generates API slice using `@reduxjs/toolkit/query/react` (RTK Query).
 
 **Examples / Ejemplos:**
 
@@ -2263,10 +2263,10 @@ npx sutils types https://api.example.com/users --method=POST --header=Authorizat
 
 **Options / Opciones:**
 
--   `--method=<METHOD>`: HTTP method (default: GET). Supports GET, POST, PUT, PATCH, DELETE.
--   `--output=<file>`: Output file path (default: types.ts).
--   `--name=<name>`: Type name (default: ApiResponse).
--   `--header=<key:value>`: Custom header (can be used multiple times).
+- `--method=<METHOD>`: HTTP method (default: GET). Supports GET, POST, PUT, PATCH, DELETE.
+- `--output=<file>`: Output file path (default: types.ts).
+- `--name=<name>`: Type name (default: ApiResponse).
+- `--header=<key:value>`: Custom header (can be used multiple times).
 
 **Example output / Ejemplo de salida:**
 
@@ -2310,12 +2310,12 @@ npm install --save-dev typescript@^5.9.3
 
 The package leverages these ES2023 features:
 
--   `Array.prototype.findLast()` - Find last element matching predicate
--   `Array.prototype.findLastIndex()` - Find last index matching predicate
--   `Array.prototype.at()` - Access array elements with negative indices
--   `String.prototype.at()` - Access string characters with negative indices
--   `Object.hasOwn()` - Check object property ownership
--   Experimental Decorators
+- `Array.prototype.findLast()` - Find last element matching predicate
+- `Array.prototype.findLastIndex()` - Find last index matching predicate
+- `Array.prototype.at()` - Access array elements with negative indices
+- `String.prototype.at()` - Access string characters with negative indices
+- `Object.hasOwn()` - Check object property ownership
+- Experimental Decorators
 
 ### Migration from Older Versions / Migración desde Versiones Antiguas
 
@@ -2382,8 +2382,8 @@ import { ApiClient, DateUtils } from "bytekit";
 
 ### Version History / Historial de Versiones
 
--   **v0.1.10+** - `bytekit` (current)
--   **v0.1.9 and earlier** - `@sebamar88/utils` (deprecated)
+- **v0.1.10+** - `bytekit` (current)
+- **v0.1.9 and earlier** - `@sebamar88/utils` (deprecated)
 
 **EN:** The package was renamed from `@sebamar88/utils` to `bytekit` starting with v0.1.10. All functionality remains the same.
 

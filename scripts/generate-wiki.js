@@ -11,190 +11,192 @@ import fs from "fs";
 import path from "path";
 
 class GitHubWikiGenerator {
-  constructor() {
-    this.readmePath = "README-back.md";
-    this.wikiDir = "wiki-pages";
-    this.modules = [];
+    constructor() {
+        this.readmePath = "README-back.md";
+        this.wikiDir = "wiki-pages";
+        this.modules = [];
 
-    // Lista explícita de módulos válidos
-    this.validModules = [
-      "ApiClient",
-      "Logger",
-      "Profiler",
-      "RetryPolicy",
-      "ResponseValidator",
-      "RequestCache",
-      "RateLimiter",
-      "RequestDeduplicator",
-      "ErrorBoundary",
-      "DateUtils",
-      "StringUtils",
-      "Validator",
-      "EnvManager",
-      "StorageUtils",
-      "FileUploadHelper",
-      "StreamingHelper",
-      "WebSocketHelper",
-      "ArrayUtils",
-      "ObjectUtils",
-      "FormUtils",
-      "TimeUtils",
-      "EventEmitter",
-      "DiffUtils",
-      "PollingHelper",
-      "CryptoUtils",
-      "PaginationHelper",
-      "CacheManager",
-      "CompressionUtils",
-    ];
-  }
-
-  /**
-   * Ejecuta el proceso completo de generación
-   */
-  async generate() {
-    console.log("🚀 Generando páginas wiki desde README...");
-
-    // Crear directorio para páginas wiki
-    if (!fs.existsSync(this.wikiDir)) {
-      fs.mkdirSync(this.wikiDir, { recursive: true });
+        // Lista explícita de módulos válidos
+        this.validModules = [
+            "ApiClient",
+            "Logger",
+            "Profiler",
+            "RetryPolicy",
+            "ResponseValidator",
+            "RequestCache",
+            "RateLimiter",
+            "RequestDeduplicator",
+            "ErrorBoundary",
+            "DateUtils",
+            "StringUtils",
+            "Validator",
+            "EnvManager",
+            "StorageUtils",
+            "FileUploadHelper",
+            "StreamingHelper",
+            "WebSocketHelper",
+            "ArrayUtils",
+            "ObjectUtils",
+            "FormUtils",
+            "TimeUtils",
+            "EventEmitter",
+            "DiffUtils",
+            "PollingHelper",
+            "CryptoUtils",
+            "PaginationHelper",
+            "CacheManager",
+            "CompressionUtils",
+        ];
     }
 
-    // Leer README
-    const readmeContent = fs.readFileSync(this.readmePath, "utf-8");
+    /**
+     * Ejecuta el proceso completo de generación
+     */
+    async generate() {
+        console.log("🚀 Generando páginas wiki desde README...");
 
-    // Extraer módulos
-    this.extractModules(readmeContent);
+        // Crear directorio para páginas wiki
+        if (!fs.existsSync(this.wikiDir)) {
+            fs.mkdirSync(this.wikiDir, { recursive: true });
+        }
 
-    // Generar páginas wiki
-    this.generateWikiPages();
+        // Leer README
+        const readmeContent = fs.readFileSync(this.readmePath, "utf-8");
 
-    // Generar README optimizado
-    this.generateOptimizedReadme(readmeContent);
+        // Extraer módulos
+        this.extractModules(readmeContent);
 
-    // Generar índice de wiki
-    this.generateWikiIndex();
+        // Generar páginas wiki
+        this.generateWikiPages();
 
-    console.log(
-      `✅ Generadas ${this.modules.length} páginas wiki en ./${this.wikiDir}/`
-    );
-    console.log("📝 README optimizado generado como README-optimized.md");
-    console.log("📚 Índice de wiki generado como wiki-pages/Home.md");
-    console.log("\n📋 Próximos pasos:");
-    console.log("1. Revisa las páginas generadas en ./wiki-pages/");
-    console.log("2. Copia el contenido a tu GitHub Wiki");
-    console.log("3. Reemplaza tu README.md con README-optimized.md");
-  }
+        // Generar README optimizado
+        this.generateOptimizedReadme(readmeContent);
 
-  /**
-   * Extrae módulos específicos del README
-   */
-  extractModules(content) {
-    this.validModules.forEach((moduleName) => {
-      const moduleContent = this.extractSingleModule(content, moduleName);
-      if (moduleContent) {
-        this.modules.push({
-          name: moduleName,
-          content: moduleContent,
-          category: this.determineCategory(moduleName),
+        // Generar índice de wiki
+        this.generateWikiIndex();
+
+        console.log(
+            `✅ Generadas ${this.modules.length} páginas wiki en ./${this.wikiDir}/`
+        );
+        console.log("📝 README optimizado generado como README-optimized.md");
+        console.log("📚 Índice de wiki generado como wiki-pages/Home.md");
+        console.log("\n📋 Próximos pasos:");
+        console.log("1. Revisa las páginas generadas en ./wiki-pages/");
+        console.log("2. Copia el contenido a tu GitHub Wiki");
+        console.log("3. Reemplaza tu README.md con README-optimized.md");
+    }
+
+    /**
+     * Extrae módulos específicos del README
+     */
+    extractModules(content) {
+        this.validModules.forEach((moduleName) => {
+            const moduleContent = this.extractSingleModule(content, moduleName);
+            if (moduleContent) {
+                this.modules.push({
+                    name: moduleName,
+                    content: moduleContent,
+                    category: this.determineCategory(moduleName),
+                });
+            }
         });
-      }
-    });
 
-    console.log(`📦 Extraídos ${this.modules.length} módulos:`);
-    this.modules.forEach((m) => console.log(`   - ${m.name} (${m.category})`));
-  }
-
-  /**
-   * Extrae un módulo específico del contenido
-   */
-  extractSingleModule(content, moduleName) {
-    const lines = content.split("\n");
-    let startIndex = -1;
-    let endIndex = -1;
-
-    // Buscar el inicio del módulo
-    for (let i = 0; i < lines.length; i++) {
-      if (lines[i].match(new RegExp(`^####\\s+${moduleName}\\s*$`))) {
-        startIndex = i;
-        break;
-      }
+        console.log(`📦 Extraídos ${this.modules.length} módulos:`);
+        this.modules.forEach((m) =>
+            console.log(`   - ${m.name} (${m.category})`)
+        );
     }
 
-    if (startIndex === -1) return null;
+    /**
+     * Extrae un módulo específico del contenido
+     */
+    extractSingleModule(content, moduleName) {
+        const lines = content.split("\n");
+        let startIndex = -1;
+        let endIndex = -1;
 
-    // Buscar el final del módulo
-    for (let i = startIndex + 1; i < lines.length; i++) {
-      if (lines[i].match(/^####\s+/) || lines[i].match(/^###\s+/)) {
-        endIndex = i;
-        break;
-      }
+        // Buscar el inicio del módulo
+        for (let i = 0; i < lines.length; i++) {
+            if (lines[i].match(new RegExp(`^####\\s+${moduleName}\\s*$`))) {
+                startIndex = i;
+                break;
+            }
+        }
+
+        if (startIndex === -1) return null;
+
+        // Buscar el final del módulo
+        for (let i = startIndex + 1; i < lines.length; i++) {
+            if (lines[i].match(/^####\s+/) || lines[i].match(/^###\s+/)) {
+                endIndex = i;
+                break;
+            }
+        }
+
+        if (endIndex === -1) endIndex = lines.length;
+
+        return lines.slice(startIndex, endIndex).join("\n").trim();
     }
 
-    if (endIndex === -1) endIndex = lines.length;
+    /**
+     * Determina la categoría de un módulo
+     */
+    determineCategory(moduleName) {
+        const coreModules = [
+            "ApiClient",
+            "Logger",
+            "Profiler",
+            "RetryPolicy",
+            "ResponseValidator",
+            "RequestCache",
+            "RateLimiter",
+            "RequestDeduplicator",
+            "ErrorBoundary",
+        ];
 
-    return lines.slice(startIndex, endIndex).join("\n").trim();
-  }
+        const helperModules = [
+            "DateUtils",
+            "StringUtils",
+            "Validator",
+            "EnvManager",
+            "StorageUtils",
+            "FileUploadHelper",
+            "StreamingHelper",
+            "WebSocketHelper",
+            "ArrayUtils",
+            "ObjectUtils",
+            "FormUtils",
+            "TimeUtils",
+        ];
 
-  /**
-   * Determina la categoría de un módulo
-   */
-  determineCategory(moduleName) {
-    const coreModules = [
-      "ApiClient",
-      "Logger",
-      "Profiler",
-      "RetryPolicy",
-      "ResponseValidator",
-      "RequestCache",
-      "RateLimiter",
-      "RequestDeduplicator",
-      "ErrorBoundary",
-    ];
-
-    const helperModules = [
-      "DateUtils",
-      "StringUtils",
-      "Validator",
-      "EnvManager",
-      "StorageUtils",
-      "FileUploadHelper",
-      "StreamingHelper",
-      "WebSocketHelper",
-      "ArrayUtils",
-      "ObjectUtils",
-      "FormUtils",
-      "TimeUtils",
-    ];
-
-    if (coreModules.includes(moduleName)) {
-      return "Core";
-    } else if (helperModules.includes(moduleName)) {
-      return "Helpers";
-    } else {
-      return "Utilities";
+        if (coreModules.includes(moduleName)) {
+            return "Core";
+        } else if (helperModules.includes(moduleName)) {
+            return "Helpers";
+        } else {
+            return "Utilities";
+        }
     }
-  }
 
-  /**
-   * Genera páginas wiki individuales
-   */
-  generateWikiPages() {
-    this.modules.forEach((module) => {
-      const wikiContent = this.generateModuleWikiPage(module);
-      const filename = `${module.name}.md`;
-      const filepath = path.join(this.wikiDir, filename);
+    /**
+     * Genera páginas wiki individuales
+     */
+    generateWikiPages() {
+        this.modules.forEach((module) => {
+            const wikiContent = this.generateModuleWikiPage(module);
+            const filename = `${module.name}.md`;
+            const filepath = path.join(this.wikiDir, filename);
 
-      fs.writeFileSync(filepath, wikiContent, "utf-8");
-      console.log(`📄 Generada página wiki: ${filename}`);
-    });
-  }
+            fs.writeFileSync(filepath, wikiContent, "utf-8");
+            console.log(`📄 Generada página wiki: ${filename}`);
+        });
+    }
 
-  /**
-   * Genera el contenido de una página wiki para un módulo
-   */
-  generateModuleWikiPage(module) {
-    return `# ${module.name}
+    /**
+     * Genera el contenido de una página wiki para un módulo
+     */
+    generateModuleWikiPage(module) {
+        return `# ${module.name}
 
 > **Categoría:** ${module.category} | **[⬅️ Volver al índice](Home)**
 
@@ -228,24 +230,24 @@ import { ${module.name} } from "bytekit";
 
 **💡 ¿Encontraste un error o tienes una sugerencia?** [Abre un issue](https://github.com/sebamar88/bytekit/issues) o contribuye al proyecto.
 `;
-  }
+    }
 
-  /**
-   * Obtiene la ruta de importación para un módulo
-   */
-  getImportPath(moduleName) {
-    return moduleName
-      .toLowerCase()
-      .replace(/([A-Z])/g, "-$1")
-      .replace(/^-/, "");
-  }
+    /**
+     * Obtiene la ruta de importación para un módulo
+     */
+    getImportPath(moduleName) {
+        return moduleName
+            .toLowerCase()
+            .replace(/([A-Z])/g, "-$1")
+            .replace(/^-/, "");
+    }
 
-  /**
-   * Genera un README minimalista con enlaces a wiki
-   */
-  generateOptimizedReadme(originalContent) {
-    // Crear un README balanceado con más información útil
-    const balancedReadme = `# bytekit
+    /**
+     * Genera un README minimalista con enlaces a wiki
+     */
+    generateOptimizedReadme(originalContent) {
+        // Crear un README balanceado con más información útil
+        const balancedReadme = `# bytekit
 
 > **Previously known as:** \`@sebamar88/utils\` (v0.1.9 and earlier)
 
@@ -257,7 +259,7 @@ import { ${module.name} } from "bytekit";
 ## ✨ Highlights / Características
 
 - ✅ **EN:** Fully ESM with \`.d.ts\` definitions. **ES:** Build 100% ESM con tipos listos.
-- 🌐 **EN:** Works on Node.js 18+ and modern browsers (via \`cross-fetch\`). **ES:** Compatible con Node.js 18+ y navegadores modernos (usa \`cross-fetch\`).
+- 🌐 **EN:** Works on Node.js 18+ and modern browsers (native fetch). **ES:** Compatible con Node.js 18+ y navegadores modernos (fetch nativo).
 - 🔁 **EN:** ApiClient with retries, localized errors, flexible options. **ES:** ApiClient con reintentos, errores localizados y configuración flexible.
 - 🧩 **EN:** Helper modules (strings, dates, validators, env, storage). **ES:** Helpers para strings, fechas, validadores, env y storage.
 - 🪵 **EN:** Structured logging/profiling: \`createLogger\`, \`Profiler\`, \`withTiming\`. **ES:** Logging/profiling estructurado: \`createLogger\`, \`Profiler\`, \`withTiming\`.
@@ -356,49 +358,49 @@ function Users() {
 ## 📚 Complete Documentation / Documentación Completa
 
 **EN:** For detailed documentation of all ${
-      this.modules.length
-    } modules, visit our comprehensive GitHub Wiki.  
+            this.modules.length
+        } modules, visit our comprehensive GitHub Wiki.  
 **ES:** Para documentación detallada de todos los ${
-      this.modules.length
-    } módulos, visita nuestra GitHub Wiki completa.
+            this.modules.length
+        } módulos, visita nuestra GitHub Wiki completa.
 
 ### 🔗 Quick Links by Category / Enlaces Rápidos por Categoría
 
 #### 🔧 Core Modules (${
-      this.getModulesByCategory("Core").length
-    }) - Essential functionality / Funcionalidad esencial
+            this.getModulesByCategory("Core").length
+        }) - Essential functionality / Funcionalidad esencial
 ${this.getModulesByCategory("Core")
-  .map(
-    (m) =>
-      `- **[${m.name}](https://github.com/sebamar88/bytekit/wiki/${
-        m.name
-      })** - ${this.getModuleDescription(m.name, "en")}`
-  )
-  .join("\n")}
+    .map(
+        (m) =>
+            `- **[${m.name}](https://github.com/sebamar88/bytekit/wiki/${
+                m.name
+            })** - ${this.getModuleDescription(m.name, "en")}`
+    )
+    .join("\n")}
 
 #### 🛠️ Helper Modules (${
-      this.getModulesByCategory("Helpers").length
-    }) - Common utilities / Utilidades comunes
+            this.getModulesByCategory("Helpers").length
+        }) - Common utilities / Utilidades comunes
 ${this.getModulesByCategory("Helpers")
-  .map(
-    (m) =>
-      `- **[${m.name}](https://github.com/sebamar88/bytekit/wiki/${
-        m.name
-      })** - ${this.getModuleDescription(m.name, "en")}`
-  )
-  .join("\n")}
+    .map(
+        (m) =>
+            `- **[${m.name}](https://github.com/sebamar88/bytekit/wiki/${
+                m.name
+            })** - ${this.getModuleDescription(m.name, "en")}`
+    )
+    .join("\n")}
 
 #### ⚡ Utility Modules (${
-      this.getModulesByCategory("Utilities").length
-    }) - Advanced features / Características avanzadas
+            this.getModulesByCategory("Utilities").length
+        }) - Advanced features / Características avanzadas
 ${this.getModulesByCategory("Utilities")
-  .map(
-    (m) =>
-      `- **[${m.name}](https://github.com/sebamar88/bytekit/wiki/${
-        m.name
-      })** - ${this.getModuleDescription(m.name, "en")}`
-  )
-  .join("\n")}
+    .map(
+        (m) =>
+            `- **[${m.name}](https://github.com/sebamar88/bytekit/wiki/${
+                m.name
+            })** - ${this.getModuleDescription(m.name, "en")}`
+    )
+    .join("\n")}
 
 **[🏠 Browse Full Wiki Index →](https://github.com/sebamar88/bytekit/wiki)**
 
@@ -468,72 +470,72 @@ MIT © [Sebastián Martinez](https://github.com/sebamar88)
 **💡 Need help?** Check the **[Wiki](https://github.com/sebamar88/bytekit/wiki)** or **[open an issue](https://github.com/sebamar88/bytekit/issues)**.
 `;
 
-    fs.writeFileSync("README-optimized.md", balancedReadme, "utf-8");
-  }
+        fs.writeFileSync("README-optimized.md", balancedReadme, "utf-8");
+    }
 
-  /**
-   * Obtiene módulos por categoría
-   */
-  getModulesByCategory(category) {
-    return this.modules.filter((m) => m.category === category);
-  }
+    /**
+     * Obtiene módulos por categoría
+     */
+    getModulesByCategory(category) {
+        return this.modules.filter((m) => m.category === category);
+    }
 
-  /**
-   * Obtiene descripción breve de un módulo
-   */
-  getModuleDescription(moduleName, lang) {
-    const descriptions = {
-      ApiClient: {
-        en: "Typed HTTP client with retries, localized errors, and custom fetch support",
-        es: "Cliente HTTP tipado con reintentos, errores localizados y soporte fetch personalizado",
-      },
-      Logger: {
-        en: "Structured logger with levels, namespaces, and transports for Node/browser",
-        es: "Logger estructurado con niveles, namespaces y transports para Node/browser",
-      },
-      DateUtils: {
-        en: "Safe date parsing, manipulation, and formatting utilities",
-        es: "Utilidades seguras para parseo, manipulación y formato de fechas",
-      },
-      StringUtils: {
-        en: "Text processing utilities: slugify, capitalize, mask, interpolate",
-        es: "Utilidades de procesamiento de texto: slugify, capitalizar, máscaras, interpolación",
-      },
-      ArrayUtils: {
-        en: "Array manipulation utilities: chunk, flatten, unique, shuffle, zip",
-        es: "Utilidades de manipulación de arrays: chunk, flatten, unique, shuffle, zip",
-      },
-      ObjectUtils: {
-        en: "Object manipulation utilities: merge, pick, omit, flatten, groupBy",
-        es: "Utilidades de manipulación de objetos: merge, pick, omit, flatten, groupBy",
-      },
-      Validator: {
-        en: "Validation utilities for emails, phones, passwords, and more",
-        es: "Utilidades de validación para emails, teléfonos, contraseñas y más",
-      },
-      CacheManager: {
-        en: "Multi-tier cache with TTL, LRU eviction, and statistics",
-        es: "Cache multi-nivel con TTL, evicción LRU y estadísticas",
-      },
-      CryptoUtils: {
-        en: "Token/UUID generation, base64 encoding, hashing, and HMAC",
-        es: "Generación de tokens/UUIDs, codificación base64, hashing y HMAC",
-      },
-    };
+    /**
+     * Obtiene descripción breve de un módulo
+     */
+    getModuleDescription(moduleName, lang) {
+        const descriptions = {
+            ApiClient: {
+                en: "Typed HTTP client with retries, localized errors, and custom fetch support",
+                es: "Cliente HTTP tipado con reintentos, errores localizados y soporte fetch personalizado",
+            },
+            Logger: {
+                en: "Structured logger with levels, namespaces, and transports for Node/browser",
+                es: "Logger estructurado con niveles, namespaces y transports para Node/browser",
+            },
+            DateUtils: {
+                en: "Safe date parsing, manipulation, and formatting utilities",
+                es: "Utilidades seguras para parseo, manipulación y formato de fechas",
+            },
+            StringUtils: {
+                en: "Text processing utilities: slugify, capitalize, mask, interpolate",
+                es: "Utilidades de procesamiento de texto: slugify, capitalizar, máscaras, interpolación",
+            },
+            ArrayUtils: {
+                en: "Array manipulation utilities: chunk, flatten, unique, shuffle, zip",
+                es: "Utilidades de manipulación de arrays: chunk, flatten, unique, shuffle, zip",
+            },
+            ObjectUtils: {
+                en: "Object manipulation utilities: merge, pick, omit, flatten, groupBy",
+                es: "Utilidades de manipulación de objetos: merge, pick, omit, flatten, groupBy",
+            },
+            Validator: {
+                en: "Validation utilities for emails, phones, passwords, and more",
+                es: "Utilidades de validación para emails, teléfonos, contraseñas y más",
+            },
+            CacheManager: {
+                en: "Multi-tier cache with TTL, LRU eviction, and statistics",
+                es: "Cache multi-nivel con TTL, evicción LRU y estadísticas",
+            },
+            CryptoUtils: {
+                en: "Token/UUID generation, base64 encoding, hashing, and HMAC",
+                es: "Generación de tokens/UUIDs, codificación base64, hashing y HMAC",
+            },
+        };
 
-    return (
-      descriptions[moduleName]?.[lang] ||
-      (lang === "en"
-        ? `${moduleName} utilities and helpers`
-        : `Utilidades y helpers de ${moduleName}`)
-    );
-  }
+        return (
+            descriptions[moduleName]?.[lang] ||
+            (lang === "en"
+                ? `${moduleName} utilities and helpers`
+                : `Utilidades y helpers de ${moduleName}`)
+        );
+    }
 
-  /**
-   * Genera página de índice principal de la wiki
-   */
-  generateWikiIndex() {
-    const indexContent = `# 📚 Bytekit Wiki
+    /**
+     * Genera página de índice principal de la wiki
+     */
+    generateWikiIndex() {
+        const indexContent = `# 📚 Bytekit Wiki
 
 **EN:** Welcome to the comprehensive documentation for Bytekit utilities.  
 **ES:** Bienvenido a la documentación completa de las utilidades de Bytekit.
@@ -545,42 +547,42 @@ MIT © [Sebastián Martinez](https://github.com/sebamar88)
 **ES:** Módulos esenciales para clientes HTTP, logging y funcionalidad core.
 
 ${this.getModulesByCategory("Core")
-  .map(
-    (m) =>
-      `- **[${m.name}](${m.name})** - ${this.getModuleDescription(
-        m.name,
-        "en"
-      )}`
-  )
-  .join("\n")}
+    .map(
+        (m) =>
+            `- **[${m.name}](${m.name})** - ${this.getModuleDescription(
+                m.name,
+                "en"
+            )}`
+    )
+    .join("\n")}
 
 ### Helper Modules / Módulos Helpers
 **EN:** Utility modules for common tasks like date manipulation, string processing, and validation.  
 **ES:** Módulos de utilidad para tareas comunes como manipulación de fechas, procesamiento de strings y validación.
 
 ${this.getModulesByCategory("Helpers")
-  .map(
-    (m) =>
-      `- **[${m.name}](${m.name})** - ${this.getModuleDescription(
-        m.name,
-        "en"
-      )}`
-  )
-  .join("\n")}
+    .map(
+        (m) =>
+            `- **[${m.name}](${m.name})** - ${this.getModuleDescription(
+                m.name,
+                "en"
+            )}`
+    )
+    .join("\n")}
 
 ### Utility Modules / Módulos Utilities  
 **EN:** Advanced utilities for events, caching, compression, and specialized tasks.  
 **ES:** Utilidades avanzadas para eventos, caching, compresión y tareas especializadas.
 
 ${this.getModulesByCategory("Utilities")
-  .map(
-    (m) =>
-      `- **[${m.name}](${m.name})** - ${this.getModuleDescription(
-        m.name,
-        "en"
-      )}`
-  )
-  .join("\n")}
+    .map(
+        (m) =>
+            `- **[${m.name}](${m.name})** - ${this.getModuleDescription(
+                m.name,
+                "en"
+            )}`
+    )
+    .join("\n")}
 
 ## 📖 Getting Started / Comenzando
 
@@ -616,15 +618,19 @@ const slug = StringUtils.slugify("Hello World");
 **💡 ¿Necesitas ayuda?** [Abre un issue](https://github.com/sebamar88/bytekit/issues) o consulta los [ejemplos](https://github.com/sebamar88/bytekit/tree/main/examples).
 `;
 
-    fs.writeFileSync(path.join(this.wikiDir, "Home.md"), indexContent, "utf-8");
-    console.log("🏠 Generada página de índice: Home.md");
-  }
+        fs.writeFileSync(
+            path.join(this.wikiDir, "Home.md"),
+            indexContent,
+            "utf-8"
+        );
+        console.log("🏠 Generada página de índice: Home.md");
+    }
 }
 
 // Ejecutar si se llama directamente
 if (import.meta.url === `file://${process.argv[1]}`) {
-  const generator = new GitHubWikiGenerator();
-  generator.generate().catch(console.error);
+    const generator = new GitHubWikiGenerator();
+    generator.generate().catch(console.error);
 }
 
 export default GitHubWikiGenerator;

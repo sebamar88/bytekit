@@ -23,12 +23,12 @@
 ## ✨ Highlights / Características
 
 - ✅ **EN:** Fully ESM with `.d.ts` definitions and tree-shakeable exports. **ES:** Build 100% ESM con tipos listos y exports tree-shakeable.
-- 🌐 **EN:** Works on Node.js 18+ and modern browsers (via `cross-fetch`). **ES:** Compatible con Node.js 18+ y navegadores modernos (usa `cross-fetch`).
+- 🌐 **EN:** Works on Node.js 18+ and modern browsers (native fetch). **ES:** Compatible con Node.js 18+ y navegadores modernos (fetch nativo).
 - 🔁 **EN:** ApiClient with retries, circuit breaker, localized errors, and flexible options. **ES:** ApiClient con reintentos, circuit breaker, errores localizados y configuración flexible.
 - 🧩 **EN:** 28 helper modules (strings, dates, validators, env, storage, crypto, cache). **ES:** 28 módulos helpers (strings, fechas, validadores, env, storage, crypto, cache).
 - 🪵 **EN:** Structured logging/profiling: `createLogger`, `Profiler`, `withTiming`. **ES:** Logging/profiling estructurado: `createLogger`, `Profiler`, `withTiming`.
 - 🎯 **EN:** 95%+ test coverage with comprehensive test suite. **ES:** >95% de cobertura de tests con suite completa.
-- 📦 **EN:** Zero dependencies (except `cross-fetch` for isomorphic support). **ES:** Cero dependencias (excepto `cross-fetch` para soporte isomórfico).
+- 📦 **EN:** True zero dependencies (uses native fetch). **ES:** Verdadero zero dependencies (usa fetch nativo).
 - ⚡ **EN:** Optimized for performance and small bundle size. **ES:** Optimizado para rendimiento y tamaño mínimo.
 
 ## 🚀 Quick Start / Inicio Rápido

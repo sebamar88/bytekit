@@ -187,7 +187,7 @@ test(array-utils): add edge case tests for chunk function
 
 ```typescript
 // 1. Imports (external first, then internal)
-import { fetch } from "cross-fetch";
+// Native fetch is available globally in Node.js 18+ and browsers
 import { Logger } from "./logger";
 
 // 2. Types and Interfaces

@@ -223,7 +223,6 @@
         "node": ">=18"
     },
     "dependencies": {
-        "cross-fetch": "^4.1.0",
         "tsx": "^4.21.0"
     },
     "devDependencies": {
