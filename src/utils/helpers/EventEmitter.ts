@@ -18,7 +18,7 @@ export interface EventEmitterOptions {
  * Event emitter for pub/sub communication
  */
 export class EventEmitter<
-    Events extends Record<string, unknown> = Record<string, unknown>
+    Events extends Record<string, unknown> = Record<string, unknown>,
 > {
     private eventMap: Map<string, Set<EventListener>> = new Map();
     private onceMap: Map<string, Set<EventListener>> = new Map();
@@ -66,6 +66,7 @@ export class EventEmitter<
             this.onceMap.set(event as string, new Set());
         }
 
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const onceListener: any = async (data: unknown) => {
             await listener(data as Events[K]);
             this.off(event, onceListener);
@@ -96,6 +97,7 @@ export class EventEmitter<
         for (const handler of handlers) {
             if (
                 handler === listener ||
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 (handler as any)._originalListener === listener
             ) {
                 handlers.delete(handler);
@@ -108,6 +110,7 @@ export class EventEmitter<
             for (const handler of onceHandlers) {
                 if (
                     handler === listener ||
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
                     (handler as any)._originalListener === listener
                 ) {
                     onceHandlers.delete(handler);
@@ -266,7 +269,7 @@ export class EventEmitter<
  * Factory function for creating event emitters
  */
 export function createEventEmitter<
-    Events extends Record<string, unknown> = Record<string, unknown>
+    Events extends Record<string, unknown> = Record<string, unknown>,
 >(options?: EventEmitterOptions): EventEmitter<Events> {
     return new EventEmitter(options);
 }

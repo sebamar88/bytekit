@@ -124,7 +124,7 @@ test("CryptoUtils base64 uses browser btoa/atob when available", () => {
     globalThis.atob = originalAtob;
 });
 
-test("CryptoUtils fallback paths when crypto is missing", () => {
+test("CryptoUtils throws error when crypto is missing", () => {
     const originalCrypto = globalThis.crypto;
     let overridden = false;
 
@@ -139,11 +139,16 @@ test("CryptoUtils fallback paths when crypto is missing", () => {
         return;
     }
 
-    const token = CryptoUtils.generateToken(4);
-    assert.equal(token.length, 8);
+    // Should throw error when crypto is not available
+    assert.throws(
+        () => CryptoUtils.generateToken(4),
+        /Secure random generation unavailable/
+    );
 
-    const bytes = CryptoUtils.randomBytes(4);
-    assert.equal(bytes.length, 4);
+    assert.throws(
+        () => CryptoUtils.randomBytes(4),
+        /Secure random generation unavailable/
+    );
 
     if (overridden) {
         Object.defineProperty(globalThis, "crypto", {
@@ -154,7 +159,7 @@ test("CryptoUtils fallback paths when crypto is missing", () => {
     }
 });
 
-test("CryptoUtils UUID fallback when randomUUID is unavailable", () => {
+test("CryptoUtils UUID uses getRandomValues fallback when randomUUID is unavailable", () => {
     const originalCrypto = globalThis.crypto;
     let overridden = false;
 
@@ -162,7 +167,7 @@ test("CryptoUtils UUID fallback when randomUUID is unavailable", () => {
         Object.defineProperty(globalThis, "crypto", {
             value: {
                 getRandomValues: (arr) => originalCrypto.getRandomValues(arr),
-                randomUUID: undefined, // explicitly undefined to test fallback
+                randomUUID: undefined, // explicitly undefined to test fallback to getRandomValues
             },
             configurable: true,
             writable: true,

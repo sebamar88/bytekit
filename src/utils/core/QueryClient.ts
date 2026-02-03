@@ -229,6 +229,7 @@ export class QueryClient {
         try {
             // Execute request
             const method = options.method ?? "POST";
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
             const {
                 callbacks: _callbacks,
                 onMutate: _onMutate,
@@ -435,6 +436,7 @@ export class QueryClient {
         try {
             // Execute request
             const method = options.method ?? "GET";
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
             const {
                 queryKey: _queryKey,
                 callbacks: _callbacks,

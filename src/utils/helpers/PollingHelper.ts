@@ -182,6 +182,7 @@ export class PollingHelper<T = unknown> {
 
             attempt++;
 
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
             const { result, error, responseTime } = await this.executeAttempt(
                 attempt,
                 responseTimes
