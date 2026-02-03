@@ -124,7 +124,7 @@ export class QueryClient {
         // Setup window focus refetch
         if (
             this.config.refetchOnWindowFocus &&
-            typeof globalThis.window !== "undefined"
+            globalThis.window !== undefined
         ) {
             globalThis.window.addEventListener("focus", () =>
                 this.refetchStaleQueries()
@@ -134,7 +134,7 @@ export class QueryClient {
         // Setup reconnect refetch
         if (
             this.config.refetchOnReconnect &&
-            typeof globalThis.window !== "undefined"
+            globalThis.window !== undefined
         ) {
             globalThis.window.addEventListener("online", () =>
                 this.refetchStaleQueries()

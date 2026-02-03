@@ -45,7 +45,7 @@ const fullName = computed(() => `${firstName.value} ${lastName.value}`);
 
 let updateCount = 0;
 effect(() => {
-    fullName.value; // Access to track
+    void fullName.value; // Access to track
     updateCount++;
 });
 

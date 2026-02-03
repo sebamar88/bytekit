@@ -125,7 +125,7 @@ try {
     let cleanupCalls = 0;
     
     const dispose = effect(() => {
-        count.value; // Access to track dependency
+        void count.value; // Access to track dependency
         return () => {
             cleanupCalls++;
         };

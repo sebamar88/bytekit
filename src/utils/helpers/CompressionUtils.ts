@@ -87,9 +87,9 @@ export class CompressionUtils {
      */
     static base64UrlEncode(str: string): string {
         return this.base64Encode(str)
-            .replaceAll(/\+/g, "-")
-            .replaceAll(/\//g, "_")
-            .replaceAll(/=/g, "");
+            .replaceAll("+", "-")
+            .replaceAll("/", "_")
+            .replaceAll("=", "");
     }
 
     /**
@@ -98,7 +98,7 @@ export class CompressionUtils {
     static base64UrlDecode(str: string): string {
         const padded = str + "=".repeat((4 - (str.length % 4)) % 4);
         return this.base64Decode(
-            padded.replaceAll(/-/g, "+").replaceAll(/_/g, "/")
+            padded.replaceAll("-", "+").replaceAll("_", "/")
         );
     }
 

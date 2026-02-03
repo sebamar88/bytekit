@@ -298,8 +298,8 @@ export const StringUtils = {
 
         // Insert separators at word boundaries (camelCase/PascalCase)
         const withSeparators = input
-            .replace(/([a-z])([A-Z])/g, "$1-$2")
-            .replace(/([A-Z])([A-Z][a-z])/g, "$1-$2");
+            .replaceAll(/([a-z])([A-Z])/g, "$1-$2")
+            .replaceAll(/([A-Z])([A-Z][a-z])/g, "$1-$2");
 
         // Split by non-alphanumeric chars and capitalize all
         const words = withSeparators
@@ -317,9 +317,9 @@ export const StringUtils = {
         if (!input) return "";
 
         return input
-            .replace(/([a-z])([A-Z])/g, "$1-$2")
-            .replace(/(\d)([A-Z])/g, "$1-$2")
-            .replace(/[\s_]+/g, "-")
+            .replaceAll(/([a-z])([A-Z])/g, "$1-$2")
+            .replaceAll(/(\d)([A-Z])/g, "$1-$2")
+            .replaceAll(/[\s_]+/g, "-")
             .toLowerCase();
     },
 
@@ -328,9 +328,9 @@ export const StringUtils = {
         if (!input) return "";
 
         return input
-            .replace(/([a-z])([A-Z])/g, "$1_$2")
-            .replace(/(\d)([A-Z])/g, "$1_$2")
-            .replace(/[\s-]+/g, "_")
+            .replaceAll(/([a-z])([A-Z])/g, "$1_$2")
+            .replaceAll(/(\d)([A-Z])/g, "$1_$2")
+            .replaceAll(/[\s-]+/g, "_")
             .toLowerCase();
     },
 };

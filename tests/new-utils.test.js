@@ -229,7 +229,6 @@ test("PollingHelper abort controller works", async () => {
 });
 
 test("PollingHelper applies jitter", async () => {
-    const _intervals = [];
     let attempts = 0;
 
     const poller = new PollingHelper(
