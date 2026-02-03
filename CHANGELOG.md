@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.13] - 2026-02-03
+
+### Fixed
+
+- **Tests**: Updated CryptoUtils tests to expect errors when crypto API is unavailable
+    - Fixed test `"CryptoUtils throws error when crypto is missing"` to properly test error throwing
+    - Fixed test `"CryptoUtils UUID uses getRandomValues fallback"` to test secure fallback
+- **Code Quality**: Suppressed intentional ESLint warnings with proper comments
+    - Added `eslint-disable-next-line` for destructured variables used in spread operator exclusion
+    - Suppressed `@typescript-eslint/no-unused-vars` in `QueryClient`, `ApiClient`, and `PollingHelper`
+    - Suppressed `@typescript-eslint/no-explicit-any` in `EventEmitter` for dynamic typing needs
+
 ## [1.0.12] - 2026-02-03
 
 ### Security
@@ -156,6 +168,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - EnvManager, StorageUtils
 - FileUploadHelper, StreamingHelper, WebSocketHelper
 
+[1.0.13]: https://github.com/sebamar88/bytekit/compare/v1.0.12...v1.0.13
 [1.0.12]: https://github.com/sebamar88/bytekit/compare/v1.0.7...v1.0.12
 [1.0.7]: https://github.com/sebamar88/bytekit/compare/v1.0.4...v1.0.7
 [1.0.4]: https://github.com/sebamar88/bytekit/compare/v0.2.4...v1.0.4
