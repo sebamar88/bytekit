@@ -160,7 +160,10 @@ test("CryptoUtils UUID fallback when randomUUID is unavailable", () => {
 
     try {
         Object.defineProperty(globalThis, "crypto", {
-            value: { getRandomValues: originalCrypto.getRandomValues },
+            value: {
+                getRandomValues: (arr) => originalCrypto.getRandomValues(arr),
+                randomUUID: undefined, // explicitly undefined to test fallback
+            },
             configurable: true,
             writable: true,
         });
