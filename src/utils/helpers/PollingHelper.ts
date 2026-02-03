@@ -295,14 +295,9 @@ export class PollingHelper<T = unknown> {
             typeof this.options.jitter === "number" ? this.options.jitter : 10;
         const jitterAmount = interval * (jitterPercent / 100);
         // Add random jitter: -jitterAmount to +jitterAmount
-        let randomValue: number;
-        if (typeof crypto !== "undefined" && crypto.getRandomValues) {
-            const array = new Uint32Array(1);
-            crypto.getRandomValues(array);
-            randomValue = array[0] / (0xffffffff + 1);
-        } else {
-            randomValue = Math.random();
-        }
+        const array = new Uint32Array(1);
+        crypto.getRandomValues(array);
+        const randomValue = array[0] / (0xffffffff + 1);
         return interval + (randomValue * jitterAmount * 2 - jitterAmount);
     }
 

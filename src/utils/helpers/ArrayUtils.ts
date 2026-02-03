@@ -101,14 +101,9 @@ export class ArrayUtils {
     static shuffle<T>(arr: T[]): T[] {
         const result = [...arr];
         for (let i = result.length - 1; i > 0; i--) {
-            let j: number;
-            if (typeof crypto !== "undefined" && crypto.getRandomValues) {
-                const array = new Uint32Array(1);
-                crypto.getRandomValues(array);
-                j = array[0] % (i + 1);
-            } else {
-                j = Math.floor(Math.random() * (i + 1));
-            }
+            const array = new Uint32Array(1);
+            crypto.getRandomValues(array);
+            const j = array[0] % (i + 1);
             [result[i], result[j]] = [result[j], result[i]];
         }
         return result;
@@ -119,14 +114,9 @@ export class ArrayUtils {
      */
     static random<T>(arr: T[]): T | undefined {
         if (arr.length === 0) return undefined;
-        let index: number;
-        if (typeof crypto !== "undefined" && crypto.getRandomValues) {
-            const array = new Uint32Array(1);
-            crypto.getRandomValues(array);
-            index = array[0] % arr.length;
-        } else {
-            index = Math.floor(Math.random() * arr.length);
-        }
+        const array = new Uint32Array(1);
+        crypto.getRandomValues(array);
+        const index = array[0] % arr.length;
         return arr[index];
     }
 

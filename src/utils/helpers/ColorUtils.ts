@@ -528,16 +528,9 @@ export class ColorUtils {
      * ColorUtils.random(); // '#a3f2b1' (random)
      */
     static random(): string {
-        let r: number, g: number, b: number;
-        if (typeof crypto !== "undefined" && crypto.getRandomValues) {
-            const array = new Uint8Array(3);
-            crypto.getRandomValues(array);
-            [r, g, b] = array;
-        } else {
-            r = Math.floor(Math.random() * 256);
-            g = Math.floor(Math.random() * 256);
-            b = Math.floor(Math.random() * 256);
-        }
+        const array = new Uint8Array(3);
+        crypto.getRandomValues(array);
+        const [r, g, b] = array;
         return this.rgbToHex(r, g, b);
     }
 
@@ -545,16 +538,10 @@ export class ColorUtils {
      * Generate a random color with specific lightness
      */
     static randomWithLightness(lightness: number): string {
-        let h: number, s: number;
-        if (typeof crypto !== "undefined" && crypto.getRandomValues) {
-            const array = new Uint16Array(2);
-            crypto.getRandomValues(array);
-            h = array[0] % 360;
-            s = (array[1] % 41) + 60; // 60-100% saturation
-        } else {
-            h = Math.floor(Math.random() * 360);
-            s = Math.floor(Math.random() * 40) + 60;
-        }
+        const array = new Uint16Array(2);
+        crypto.getRandomValues(array);
+        const h = array[0] % 360;
+        const s = (array[1] % 41) + 60; // 60-100% saturation
         return this.hslToHex(h, s, lightness);
     }
 

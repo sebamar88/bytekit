@@ -3,7 +3,6 @@
  * Isomorphic crypto operations for Node.js and browsers
  *
  * @security All cryptographic functions use secure random generation (crypto.getRandomValues)
- * @warning Fallback implementations using Math.random() should NOT be used in production
  */
 
 /**
@@ -15,28 +14,16 @@ export class CryptoUtils {
      * @param length - Length of the token in bytes (default: 32)
      * @returns Hex-encoded random string
      * @security Uses crypto.getRandomValues() for secure random generation
-     * @throws {Error} If crypto API is unavailable in production environment
+     * @throws {Error} If crypto API is unavailable
      */
     static generateToken(length: number = 32): string {
         const bytes = new Uint8Array(length);
         if (typeof globalThis !== "undefined" && globalThis.crypto) {
             globalThis.crypto.getRandomValues(bytes);
         } else {
-            // Insecure fallback - should only be used in development/testing
-            if (
-                typeof process !== "undefined" &&
-                process.env.NODE_ENV === "production"
-            ) {
-                throw new Error(
-                    "Secure random generation unavailable in production. crypto API required."
-                );
-            }
-            console.warn(
-                "⚠️  SECURITY WARNING: Using insecure Math.random() for token generation. Not suitable for production!"
+            throw new Error(
+                "Secure random generation unavailable. crypto API required."
             );
-            for (let i = 0; i < length; i++) {
-                bytes[i] = Math.floor(Math.random() * 256);
-            }
         }
         return Array.from(bytes)
             .map((b) => b.toString(16).padStart(2, "0"))
@@ -47,7 +34,7 @@ export class CryptoUtils {
      * Generate cryptographically secure UUID v4
      * @returns UUID v4 string in format xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx
      * @security Uses crypto.randomUUID() when available
-     * @throws {Error} If crypto API is unavailable in production environment
+     * @throws {Error} If crypto API is unavailable
      */
     static generateUUID(): string {
         if (
@@ -75,33 +62,9 @@ export class CryptoUtils {
             return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
         }
 
-        // Insecure fallback - should only be used in development/testing
-        if (
-            typeof process !== "undefined" &&
-            process.env.NODE_ENV === "production"
-        ) {
-            throw new Error(
-                "Secure random generation unavailable in production. crypto API required."
-            );
-        }
-        console.warn(
-            "⚠️  SECURITY WARNING: Using insecure Math.random() for UUID generation. Not suitable for production!"
+        throw new Error(
+            "Secure random generation unavailable. crypto API required."
         );
-
-        const chars = "0123456789abcdef";
-        let uuid = "";
-        for (let i = 0; i < 36; i++) {
-            if (i === 8 || i === 13 || i === 18 || i === 23) {
-                uuid += "-";
-            } else if (i === 14) {
-                uuid += "4";
-            } else if (i === 19) {
-                uuid += chars[(Math.random() * 4) | 8];
-            } else {
-                uuid += chars[Math.floor(Math.random() * 16)];
-            }
-        }
-        return uuid;
     }
 
     /**
@@ -302,9 +265,9 @@ export class CryptoUtils {
         if (typeof globalThis !== "undefined" && globalThis.crypto) {
             globalThis.crypto.getRandomValues(bytes);
         } else {
-            for (let i = 0; i < length; i++) {
-                bytes[i] = Math.floor(Math.random() * 256);
-            }
+            throw new Error(
+                "Secure random generation unavailable. crypto API required."
+            );
         }
         return bytes;
     }

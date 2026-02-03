@@ -221,12 +221,9 @@ export class NumberUtils {
      */
     static random(min: number, max: number): number {
         const range = max - min + 1;
-        if (typeof crypto !== "undefined" && crypto.getRandomValues) {
-            const array = new Uint32Array(1);
-            crypto.getRandomValues(array);
-            return min + (array[0] % range);
-        }
-        return Math.floor(Math.random() * range) + min;
+        const array = new Uint32Array(1);
+        crypto.getRandomValues(array);
+        return min + (array[0] % range);
     }
 
     /**
@@ -235,14 +232,9 @@ export class NumberUtils {
      * NumberUtils.randomFloat(0, 1); // Random float between 0 and 1
      */
     static randomFloat(min: number, max: number, decimals: number = 2): number {
-        let random: number;
-        if (typeof crypto !== "undefined" && crypto.getRandomValues) {
-            const array = new Uint32Array(1);
-            crypto.getRandomValues(array);
-            random = array[0] / (0xffffffff + 1); // Normalize to 0-1
-        } else {
-            random = Math.random();
-        }
+        const array = new Uint32Array(1);
+        crypto.getRandomValues(array);
+        const random = array[0] / (0xffffffff + 1); // Normalize to 0-1
         const value = random * (max - min) + min;
         return this.round(value, decimals);
     }

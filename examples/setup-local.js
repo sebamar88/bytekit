@@ -16,12 +16,19 @@ const __dirname = dirname(__filename);
 
 const examples = ["react-app", "vue-app", "svelte-app"];
 
+// Define a secure PATH with only system directories
+const securePath = "/usr/local/bin:/usr/bin:/bin";
+
 console.log("🚀 Setting up examples for local testing...\n");
 
 // Step 1: Link bytekit globally
 console.log("📦 Linking bytekit globally...");
 try {
-    execSync("npm link", { cwd: join(__dirname, ".."), stdio: "inherit" });
+    execSync("npm link", {
+        cwd: join(__dirname, ".."),
+        stdio: "inherit",
+        env: { ...process.env, PATH: securePath },
+    });
     console.log("✅ bytekit linked globally\n");
 } catch (error) {
     console.error("❌ Failed to link bytekit");
@@ -42,11 +49,19 @@ for (const example of examples) {
     try {
         // Install dependencies
         console.log(`  Installing dependencies...`);
-        execSync("npm install", { cwd: examplePath, stdio: "inherit" });
+        execSync("npm install", {
+            cwd: examplePath,
+            stdio: "inherit",
+            env: { ...process.env, PATH: securePath },
+        });
 
         // Link bytekit
         console.log(`  Linking bytekit...`);
-        execSync("npm link bytekit", { cwd: examplePath, stdio: "inherit" });
+        execSync("npm link bytekit", {
+            cwd: examplePath,
+            stdio: "inherit",
+            env: { ...process.env, PATH: securePath },
+        });
 
         console.log(`✅ ${example} ready!`);
     } catch (error) {
