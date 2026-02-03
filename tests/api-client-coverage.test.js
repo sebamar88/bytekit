@@ -6,11 +6,11 @@ describe("ApiClient Coverage", () => {
     let originalFetch;
 
     beforeEach(() => {
-        originalFetch = global.fetch;
+        originalFetch = globalThis.fetch;
     });
 
     afterEach(() => {
-        global.fetch = originalFetch;
+        globalThis.fetch = originalFetch;
         try {
             mock.reset();
         } catch {
@@ -32,11 +32,11 @@ describe("ApiClient Coverage", () => {
                     );
                 })
         );
-        
+
         const client = new ApiClient({
             baseUrl: "https://api.example.com",
             timeoutMs: 100,
-            fetchImpl: (...args) => mockFetch(...args)
+            fetchImpl: (...args) => mockFetch(...args),
         });
 
         await assert.rejects(
@@ -44,7 +44,11 @@ describe("ApiClient Coverage", () => {
                 await client.get("/timeout");
             },
             (err) => {
-                return err instanceof ApiError || err.message.includes("timeout") || err.code === 408;
+                return (
+                    err instanceof ApiError ||
+                    err.message.includes("timeout") ||
+                    err.code === 408
+                );
             }
         );
     });
@@ -64,7 +68,7 @@ describe("ApiClient Coverage", () => {
         const client = new ApiClient({
             baseUrl: "https://api.example.com",
             defaultHeaders: { "X-Test": "true" },
-            fetchImpl: (...args) => mockFetch(...args)
+            fetchImpl: (...args) => mockFetch(...args),
         });
 
         await client.get("/headers", {
@@ -72,21 +76,23 @@ describe("ApiClient Coverage", () => {
         });
 
         // Headers check...
-        if (capturedHeaders && typeof capturedHeaders.get === 'function') {
-             assert.equal(capturedHeaders.get("x-test"), "true");
-             assert.equal(capturedHeaders.get("x-custom"), "value");
+        if (capturedHeaders && typeof capturedHeaders.get === "function") {
+            assert.equal(capturedHeaders.get("x-test"), "true");
+            assert.equal(capturedHeaders.get("x-custom"), "value");
         } else {
-             // Fallback if plain object
-             assert.ok(capturedHeaders["X-Test"] || capturedHeaders["x-test"]);
+            // Fallback if plain object
+            assert.ok(capturedHeaders["X-Test"] || capturedHeaders["x-test"]);
         }
     });
 
     it("should handle network errors (fetch throws)", async () => {
-        const mockFetch = mock.fn(() => Promise.reject(new Error("Network Error")));
+        const mockFetch = mock.fn(() =>
+            Promise.reject(new Error("Network Error"))
+        );
 
         const client = new ApiClient({
             baseUrl: "https://api.example.com",
-            fetchImpl: (...args) => mockFetch(...args)
+            fetchImpl: (...args) => mockFetch(...args),
         });
 
         await assert.rejects(
@@ -94,7 +100,7 @@ describe("ApiClient Coverage", () => {
                 await client.get("/network-error");
             },
             {
-                message: "Network Error", 
+                message: "Network Error",
             }
         );
     });
@@ -106,13 +112,15 @@ describe("ApiClient Coverage", () => {
                 status: 200,
                 headers: new Headers({ "content-type": "text/plain" }),
                 text: async () => "Simple text response",
-                json: async () => { throw new Error("Invalid JSON"); }
+                json: async () => {
+                    throw new Error("Invalid JSON");
+                },
             })
         );
 
         const client = new ApiClient({
             baseUrl: "https://api.example.com",
-            fetchImpl: (...args) => mockFetch(...args)
+            fetchImpl: (...args) => mockFetch(...args),
         });
 
         const response = await client.get("/text");

@@ -31,7 +31,7 @@ test("EnvManager.isProd checks NODE_ENV and MODE flags", () => {
 test("EnvManager.get uses import.meta.env in browser mode", () => {
     // Simulate browser environment
     globalThis.window = {};
-    // @ts-ignore
+    // @ts-expect-error - Testing error handling
     globalThis.document = {};
 
     const env = new EnvManager();
@@ -39,6 +39,6 @@ test("EnvManager.get uses import.meta.env in browser mode", () => {
     assert.equal(value, undefined);
 
     delete globalThis.window;
-    // @ts-ignore
+    // @ts-expect-error - Testing error handling
     delete globalThis.document;
 });

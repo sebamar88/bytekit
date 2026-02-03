@@ -344,11 +344,12 @@ export class ApiClient {
         }
 
         // Extract only needed properties for request
-        const { pagination, sort, filters, ...requestOptions } = options ?? {};
-        // Avoid unused var warnings
-        void pagination;
-        void sort;
-        void filters;
+        const {
+            pagination: _pagination,
+            sort: _sort,
+            filters: _filters,
+            ...requestOptions
+        } = options ?? {};
 
         return this.request<PaginatedResponse<T>>(path, {
             ...requestOptions,
@@ -356,6 +357,134 @@ export class ApiClient {
             searchParams,
         });
     }
+
+    /**
+     * Prepares request configuration with headers, body, and interceptors
+     */
+    private async prepareRequestConfig(
+        path: string,
+        requestOptions: Partial<RequestOptions>,
+        skipInterceptors?: boolean
+    ): Promise<{ url: string; init: RequestInit; timeout: number }> {
+        let url = this.buildUrl(path, requestOptions.searchParams);
+        const {
+            headers: overrideHeaders,
+            body,
+            timeoutMs,
+            ...rest
+        } = requestOptions;
+
+        const headers = this.mergeHeaders(overrideHeaders);
+        const preparedBody = this.prepareBody(body);
+
+        // Only set Content-Type if not already present and there is a body
+        if (
+            preparedBody &&
+            !(body instanceof FormData) &&
+            !headers.has("Content-Type")
+        ) {
+            headers.set("Content-Type", "application/json");
+        }
+
+        const controller = new AbortController();
+        const signal = controller.signal;
+        const timeout = timeoutMs ?? this.timeoutMs;
+
+        // Convert Headers to plain object for compatibility with all fetch implementations
+        const headersObject: Record<string, string> = {};
+        headers.forEach((value, key) => {
+            headersObject[key] = value;
+        });
+
+        let init: RequestInit = {
+            ...rest,
+            headers: headersObject,
+            body: preparedBody,
+            signal,
+        };
+
+        // Request interceptor
+        const interceptorsEnabled =
+            !!this.interceptors &&
+            !this.disableInterceptors &&
+            !skipInterceptors;
+        if (interceptorsEnabled && this.interceptors?.request) {
+            [url, init] = await this.interceptors.request(url, init);
+        }
+
+        return { url, init, timeout };
+    }
+
+    /**
+     * Processes response and handles different content types
+     */
+    private async processResponse<T>(
+        response: Response,
+        validateResponse?: ValidationSchema
+    ): Promise<T> {
+        if (response.status === 204) {
+            return undefined as T;
+        }
+
+        const contentType = response.headers.get("content-type") || "";
+        let data: T;
+
+        if (/json/i.test(contentType)) {
+            data = (await response.json()) as T;
+        } else {
+            data = (await response.text()) as unknown as T;
+        }
+
+        // Validate response if schema provided
+        if (validateResponse) {
+            const errors = ResponseValidator.validate(data, validateResponse);
+            if (errors.length > 0) {
+                throw new Error(
+                    `Response validation failed: ${errors
+                        .map((e) => e.message)
+                        .join(", ")}`
+                );
+            }
+        }
+
+        return data;
+    }
+
+    /**
+     * Handles request errors with proper logging
+     */
+    private handleRequestError(
+        err: unknown,
+        path: string,
+        method?: string
+    ): never {
+        if (err instanceof Error && err.name === "AbortError") {
+            throw new ApiError(408, "Timeout", "Request timeout", null, true);
+        }
+
+        // Enhanced logging for ApiError
+        if (err instanceof ApiError) {
+            this.logger?.error(
+                "API Request failed",
+                {
+                    path,
+                    method,
+                    status: err.status,
+                    statusText: err.statusText,
+                    body: err.body,
+                },
+                err
+            );
+        } else {
+            this.logger?.error(
+                "Request failed",
+                { path, method },
+                err instanceof Error ? err : new Error(String(err))
+            );
+        }
+        throw err;
+    }
+
     async request<T>(path: string, options: RequestOptions = {}): Promise<T> {
         const {
             validateResponse,
@@ -367,52 +496,16 @@ export class ApiClient {
 
         const executeRequest = async (): Promise<T> => {
             return this.circuitBreaker.execute(async () => {
-                let url = this.buildUrl(path, requestOptions.searchParams);
-                const {
-                    headers: overrideHeaders,
-                    body,
-                    timeoutMs,
-                    errorLocale,
-                    ...rest
-                } = requestOptions;
+                const { errorLocale, ...rest } = requestOptions;
 
-                const headers = this.mergeHeaders(overrideHeaders);
-                const preparedBody = this.prepareBody(body);
+                // Prepare request configuration
+                const { url, init, timeout } = await this.prepareRequestConfig(
+                    path,
+                    requestOptions,
+                    skipInterceptors
+                );
 
-                // Solo setear Content-Type si no existe ya y hay body
-                if (
-                    preparedBody &&
-                    !(body instanceof FormData) &&
-                    !headers.has("Content-Type")
-                ) {
-                    headers.set("Content-Type", "application/json");
-                }
-
-                const controller = new AbortController();
-                const signal = controller.signal;
-                const timeout = timeoutMs ?? this.timeoutMs;
-
-                // Convertir Headers a objeto plano para compatibilidad con todas las implementaciones de fetch
-                const headersObject: Record<string, string> = {};
-                headers.forEach((value, key) => {
-                    headersObject[key] = value;
-                });
-
-                let init: RequestInit = {
-                    ...rest,
-                    headers: headersObject,
-                    body: preparedBody,
-                    signal,
-                };
-
-                // Request interceptor
-                const interceptorsEnabled =
-                    !!this.interceptors &&
-                    !this.disableInterceptors &&
-                    !skipInterceptors;
-                if (interceptorsEnabled && this.interceptors?.request)
-                    [url, init] = await this.interceptors.request(url, init);
-
+                // Log request
                 const shouldLogHeaders = logHeaders ?? this.logHeaders;
                 const headersForLog = shouldLogHeaders
                     ? this.redactHeaders(this.normalizeHeaders(init.headers))
@@ -422,17 +515,21 @@ export class ApiClient {
                     method: rest.method,
                     url,
                     ...(shouldLogHeaders ? { headers: headersForLog } : {}),
-                    body,
+                    body: rest.body,
                 });
 
                 try {
                     const response = await this.withTimeout(
                         this.fetchImpl(url, init),
                         timeout,
-                        controller
+                        new AbortController()
                     );
 
                     // Response interceptor
+                    const interceptorsEnabled =
+                        !!this.interceptors &&
+                        !this.disableInterceptors &&
+                        !skipInterceptors;
                     const finalResponse =
                         interceptorsEnabled && this.interceptors?.response
                             ? await this.interceptors.response(response)
@@ -442,34 +539,11 @@ export class ApiClient {
                         throw await this.toApiError(finalResponse, errorLocale);
                     }
 
-                    if (finalResponse.status === 204) {
-                        return undefined as T;
-                    }
-
-                    const contentType =
-                        finalResponse.headers.get("content-type") || "";
-                    let data: T;
-
-                    if (/json/i.test(contentType)) {
-                        data = (await finalResponse.json()) as T;
-                    } else {
-                        data = (await finalResponse.text()) as unknown as T;
-                    }
-
-                    // Validate response if schema provided
-                    if (validateResponse) {
-                        const errors = ResponseValidator.validate(
-                            data,
-                            validateResponse
-                        );
-                        if (errors.length > 0) {
-                            throw new Error(
-                                `Response validation failed: ${errors
-                                    .map((e) => e.message)
-                                    .join(", ")}`
-                            );
-                        }
-                    }
+                    // Process response
+                    const data = await this.processResponse<T>(
+                        finalResponse,
+                        validateResponse
+                    );
 
                     this.logger?.debug("HTTP Response", {
                         status: finalResponse.status,
@@ -479,37 +553,7 @@ export class ApiClient {
 
                     return data;
                 } catch (err: unknown) {
-                    if (err instanceof Error && err.name === "AbortError") {
-                        throw new ApiError(
-                            408,
-                            "Timeout",
-                            "Request timeout",
-                            null,
-                            true
-                        );
-                    }
-
-                    // Logging mejorado para ApiError
-                    if (err instanceof ApiError) {
-                        this.logger?.error(
-                            "API Request failed",
-                            {
-                                path,
-                                method: rest.method,
-                                status: err.status,
-                                statusText: err.statusText,
-                                body: err.body,
-                            },
-                            err
-                        );
-                    } else {
-                        this.logger?.error(
-                            "Request failed",
-                            { path, method: rest.method },
-                            err instanceof Error ? err : new Error(String(err))
-                        );
-                    }
-                    throw err;
+                    this.handleRequestError(err, path, rest.method);
                 }
             });
         };

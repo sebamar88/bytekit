@@ -23,7 +23,7 @@ test("Custom error classes work correctly", () => {
 
     const rateLimit = new RateLimitError("Too many requests", 60);
     assert.equal(rateLimit.statusCode, 429);
-    // @ts-ignore
+    // @ts-expect-error - Test type override
     assert.equal(rateLimit.context.metadata.retryAfter, 60);
 });
 
@@ -40,7 +40,7 @@ test("ErrorBoundary.handle calls handlers and logs", async () => {
         debug: () => {},
     };
 
-    // @ts-ignore
+    // @ts-expect-error - Test type override
     const eb = new ErrorBoundary({
         logger: mockLogger,
         onError: () => {
@@ -110,7 +110,7 @@ test("ErrorBoundary.wrap wraps functions", async () => {
 
 test("ErrorBoundary history management", () => {
     const eb = new ErrorBoundary();
-    // @ts-ignore (protected/private handle normally, but we use it via history)
+    // @ts-expect-error (protected/private handle normally, but we use it via history)
     eb.handle(new Error("1"));
     eb.handle(new Error("2"));
 
@@ -148,7 +148,7 @@ test("ErrorBoundary handles errors thrown by onError and handlers", async () => 
     };
 
     const eb = new ErrorBoundary({
-        // @ts-ignore
+        // @ts-expect-error - Test type override
         logger: mockLogger,
         onError: () => {
             throw new Error("onError fail");

@@ -88,9 +88,9 @@ test("CompressionUtils base64 uses browser btoa/atob when available", () => {
     const originalBtoa = globalThis.btoa;
     const originalAtob = globalThis.atob;
 
-    // @ts-ignore
+    // @ts-expect-error - Testing error handling
     globalThis.btoa = (value) => Buffer.from(value, "utf-8").toString("base64");
-    // @ts-ignore
+    // @ts-expect-error - Testing error handling
     globalThis.atob = (value) => Buffer.from(value, "base64").toString("utf-8");
 
     const original = "browser-base64";

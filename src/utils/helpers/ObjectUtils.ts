@@ -37,7 +37,7 @@ export class ObjectUtils {
         if (obj instanceof Object) {
             const cloned = {} as T;
             for (const key in obj) {
-                if (Object.prototype.hasOwnProperty.call(obj, key)) {
+                if (Object.hasOwn(obj, key)) {
                     (cloned as Record<string, unknown>)[key] = this.deepClone(
                         obj[key as keyof T]
                     );
@@ -63,31 +63,35 @@ export class ObjectUtils {
     static deepMerge(
         ...objects: Array<Record<string, unknown>>
     ): Record<string, unknown> {
-        return objects.reduce((acc, obj) => {
-            for (const key in obj) {
-                if (Object.prototype.hasOwnProperty.call(obj, key)) {
-                    const accValue = (acc as Record<string, unknown>)[key];
-                    const objValue = obj[key];
+        return objects.reduce(
+            (acc, obj) => {
+                for (const key in obj) {
+                    if (Object.hasOwn(obj, key)) {
+                        const accValue = (acc as Record<string, unknown>)[key];
+                        const objValue = obj[key];
 
-                    if (
-                        typeof accValue === "object" &&
-                        accValue !== null &&
-                        !Array.isArray(accValue) &&
-                        typeof objValue === "object" &&
-                        objValue !== null &&
-                        !Array.isArray(objValue)
-                    ) {
-                        (acc as Record<string, unknown>)[key] = this.deepMerge(
-                            accValue as Record<string, unknown>,
-                            objValue as Record<string, unknown>
-                        );
-                    } else {
-                        (acc as Record<string, unknown>)[key] = objValue;
+                        if (
+                            typeof accValue === "object" &&
+                            accValue !== null &&
+                            !Array.isArray(accValue) &&
+                            typeof objValue === "object" &&
+                            objValue !== null &&
+                            !Array.isArray(objValue)
+                        ) {
+                            (acc as Record<string, unknown>)[key] =
+                                this.deepMerge(
+                                    accValue as Record<string, unknown>,
+                                    objValue as Record<string, unknown>
+                                );
+                        } else {
+                            (acc as Record<string, unknown>)[key] = objValue;
+                        }
                     }
                 }
-            }
-            return acc;
-        }, {} as Record<string, unknown>);
+                return acc;
+            },
+            {} as Record<string, unknown>
+        );
     }
 
     /**
@@ -175,7 +179,7 @@ export class ObjectUtils {
         const result: Record<string, unknown> = {};
 
         for (const key in obj) {
-            if (Object.prototype.hasOwnProperty.call(obj, key)) {
+            if (Object.hasOwn(obj, key)) {
                 const value = obj[key];
                 const newKey = prefix ? `${prefix}.${key}` : key;
 
@@ -205,7 +209,7 @@ export class ObjectUtils {
         const result: Record<string, unknown> = {};
 
         for (const key in obj) {
-            if (Object.prototype.hasOwnProperty.call(obj, key)) {
+            if (Object.hasOwn(obj, key)) {
                 this.set(result, key, obj[key]);
             }
         }
@@ -223,10 +227,7 @@ export class ObjectUtils {
         const result: Partial<T> = {};
 
         for (const key in obj) {
-            if (
-                Object.prototype.hasOwnProperty.call(obj, key) &&
-                predicate(key, obj[key])
-            ) {
+            if (Object.hasOwn(obj, key) && predicate(key, obj[key])) {
                 result[key as keyof T] = obj[key];
             }
         }
@@ -244,7 +245,7 @@ export class ObjectUtils {
         const result: Record<string, R> = {};
 
         for (const key in obj) {
-            if (Object.prototype.hasOwnProperty.call(obj, key)) {
+            if (Object.hasOwn(obj, key)) {
                 result[key] = mapper(obj[key], key);
             }
         }
@@ -281,7 +282,7 @@ export class ObjectUtils {
         const result: Record<string | number, string> = {};
 
         for (const key in obj) {
-            if (Object.prototype.hasOwnProperty.call(obj, key)) {
+            if (Object.hasOwn(obj, key)) {
                 result[obj[key]] = key;
             }
         }
@@ -296,14 +297,17 @@ export class ObjectUtils {
         arr: T[],
         key: keyof T
     ): Record<string, T[]> {
-        return arr.reduce((acc, item) => {
-            const groupKey = String(item[key]);
-            if (!acc[groupKey]) {
-                acc[groupKey] = [];
-            }
-            acc[groupKey].push(item);
-            return acc;
-        }, {} as Record<string, T[]>);
+        return arr.reduce(
+            (acc, item) => {
+                const groupKey = String(item[key]);
+                if (!acc[groupKey]) {
+                    acc[groupKey] = [];
+                }
+                acc[groupKey].push(item);
+                return acc;
+            },
+            {} as Record<string, T[]>
+        );
     }
 
     /**
@@ -313,10 +317,13 @@ export class ObjectUtils {
         arr: T[],
         key: keyof T
     ): Record<string, T> {
-        return arr.reduce((acc, item) => {
-            acc[String(item[key])] = item;
-            return acc;
-        }, {} as Record<string, T>);
+        return arr.reduce(
+            (acc, item) => {
+                acc[String(item[key])] = item;
+                return acc;
+            },
+            {} as Record<string, T>
+        );
     }
 
     /**
@@ -389,9 +396,12 @@ export class ObjectUtils {
         keys: T[],
         value: unknown
     ): Record<T, unknown> {
-        return keys.reduce((acc, key) => {
-            acc[key] = value;
-            return acc;
-        }, {} as Record<T, unknown>);
+        return keys.reduce(
+            (acc, key) => {
+                acc[key] = value;
+                return acc;
+            },
+            {} as Record<T, unknown>
+        );
     }
 }

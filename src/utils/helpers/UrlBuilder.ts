@@ -21,7 +21,7 @@ export class UrlBuilder {
      */
     path(...segments: string[]): this {
         const cleanSegments = segments
-            .map((s) => s.replace(/^\/+|\/+$/g, ""))
+            .map((s) => s.replaceAll(/^\/+|\/+$/g, ""))
             .filter(Boolean);
 
         if (cleanSegments.length === 0) {

@@ -28,7 +28,7 @@ export interface FieldError {
 }
 
 export interface FormState<
-    T extends Record<string, unknown> = Record<string, unknown>
+    T extends Record<string, unknown> = Record<string, unknown>,
 > {
     values: T;
     errors: Record<string, string>;
@@ -39,7 +39,7 @@ export interface FormState<
 }
 
 export interface FormConfig<
-    T extends Record<string, unknown> = Record<string, unknown>
+    T extends Record<string, unknown> = Record<string, unknown>,
 > {
     initialValues: T;
     rules?: Record<keyof T, FieldRule>;
@@ -147,7 +147,7 @@ export const Validators = {
  * Form validation and state management
  */
 export class FormUtils<
-    T extends Record<string, unknown> = Record<string, unknown>
+    T extends Record<string, unknown> = Record<string, unknown>,
 > {
     private state: FormState<T>;
     private rules: Record<keyof T, FieldRule>;
@@ -264,7 +264,7 @@ export class FormUtils<
                     value,
                     typeof rule.minLength === "number"
                         ? rule.minLength
-                        : parseInt(rule.minLength as string),
+                        : Number.parseInt(rule.minLength as string),
                     typeof rule.minLength === "string"
                         ? rule.minLength
                         : undefined
@@ -277,7 +277,7 @@ export class FormUtils<
                     value,
                     typeof rule.maxLength === "number"
                         ? rule.maxLength
-                        : parseInt(rule.maxLength as string),
+                        : Number.parseInt(rule.maxLength as string),
                     typeof rule.maxLength === "string"
                         ? rule.maxLength
                         : undefined
@@ -318,7 +318,7 @@ export class FormUtils<
                     value,
                     typeof rule.min === "number"
                         ? rule.min
-                        : parseInt(rule.min as string),
+                        : Number.parseInt(rule.min as string),
                     typeof rule.min === "string" ? rule.min : undefined
                 );
                 if (result !== true) errors.push(result as string);
@@ -329,7 +329,7 @@ export class FormUtils<
                     value,
                     typeof rule.max === "number"
                         ? rule.max
-                        : parseInt(rule.max as string),
+                        : Number.parseInt(rule.max as string),
                     typeof rule.max === "string" ? rule.max : undefined
                 );
                 if (result !== true) errors.push(result as string);
@@ -509,7 +509,7 @@ export class FormUtils<
  * Factory function for creating forms
  */
 export function createForm<
-    T extends Record<string, unknown> = Record<string, unknown>
+    T extends Record<string, unknown> = Record<string, unknown>,
 >(config: FormConfig<T>): FormUtils<T> {
     return new FormUtils(config);
 }

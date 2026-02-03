@@ -48,21 +48,13 @@ const safeString = (value: InterpolableValue) =>
 const removeDiacritics = (value: string) =>
     value.normalize("NFD").replace(DIACRITICS_REGEX, "");
 
-const isPlainObject = (
-    value: unknown
-): value is Record<string, unknown> =>
+const isPlainObject = (value: unknown): value is Record<string, unknown> =>
     typeof value === "object" && value !== null && !Array.isArray(value);
 
 const splitWords = (value: string | null | undefined) =>
-    safeString(value)
-        .trim()
-        .split(/\s+/)
-        .filter(Boolean);
+    safeString(value).trim().split(/\s+/).filter(Boolean);
 
-const getPathValue = (
-    record: Record<string, unknown>,
-    path: string
-): unknown =>
+const getPathValue = (record: Record<string, unknown>, path: string): unknown =>
     path
         .replace(/\[(\d+)\]/g, ".$1")
         .split(".")
@@ -116,9 +108,7 @@ const buildQueryPairs = (
         if (options.arrayFormat === "comma") {
             const serialized = value
                 .map((entry) => serializeValue(entry))
-                .filter(
-                    (entry) => !(options.skipEmptyString && entry === "")
-                )
+                .filter((entry) => !(options.skipEmptyString && entry === ""))
                 .join(",");
             if (serialized || !options.skipEmptyString)
                 pairs.push([key, serialized]);
@@ -135,8 +125,7 @@ const buildQueryPairs = (
 
     if (isPlainObject(value)) {
         const entries = Object.entries(value);
-        if (options.sortKeys)
-            entries.sort(([a], [b]) => a.localeCompare(b));
+        if (options.sortKeys) entries.sort(([a], [b]) => a.localeCompare(b));
         for (const [childKey, childValue] of entries) {
             const nextKey = key ? `${key}[${childKey}]` : childKey;
             buildQueryPairs(nextKey, childValue, options, pairs);
@@ -164,10 +153,7 @@ export const StringUtils = {
             .replace(NON_ALPHANUMERIC_REGEX, separator)
             .replace(new RegExp(`${escapedSeparator}+`, "g"), separator)
             .replace(
-                new RegExp(
-                    `^${escapedSeparator}|${escapedSeparator}$`,
-                    "g"
-                ),
+                new RegExp(`^${escapedSeparator}|${escapedSeparator}$`, "g"),
                 ""
             );
     },
@@ -279,5 +265,56 @@ export const StringUtils = {
                 return `${encodedKey}=${encodedValue}`;
             })
             .join("&");
+    },
+
+    camelCase: (value: string | null | undefined) => {
+        const input = safeString(value).trim();
+        if (!input) return "";
+
+        // Insert separators at word boundaries (camelCase/PascalCase)
+        const withSeparators = input
+            .replace(/([a-z])([A-Z])/g, "$1-$2")
+            .replace(/([A-Z])([A-Z][a-z])/g, "$1-$2");
+
+        return withSeparators
+            .toLowerCase()
+            .replace(/[^a-zA-Z0-9]+(.)/g, (_, chr) => chr.toUpperCase());
+    },
+
+    pascalCase: (value: string | null | undefined) => {
+        const input = safeString(value).trim();
+        if (!input) return "";
+
+        // Insert separators at word boundaries (camelCase/PascalCase)
+        const withSeparators = input
+            .replace(/([a-z])([A-Z])/g, "$1-$2")
+            .replace(/([A-Z])([A-Z][a-z])/g, "$1-$2");
+
+        return withSeparators
+            .toLowerCase()
+            .replace(/[^a-zA-Z0-9]+(.)/g, (_, chr) => chr.toUpperCase())
+            .replace(/^[a-z]/, (chr) => chr.toUpperCase());
+    },
+
+    kebabCase: (value: string | null | undefined) => {
+        const input = safeString(value).trim();
+        if (!input) return "";
+
+        return input
+            .replace(/([a-z])([A-Z])/g, "$1-$2")
+            .replace(/([0-9])([A-Z])/g, "$1-$2")
+            .replace(/[\s_]+/g, "-")
+            .toLowerCase();
+    },
+
+    snakeCase: (value: string | null | undefined) => {
+        const input = safeString(value).trim();
+        if (!input) return "";
+
+        return input
+            .replace(/([a-z])([A-Z])/g, "$1_$2")
+            .replace(/([0-9])([A-Z])/g, "$1_$2")
+            .replace(/[\s-]+/g, "_")
+            .toLowerCase();
     },
 };

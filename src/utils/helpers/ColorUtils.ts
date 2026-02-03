@@ -75,9 +75,9 @@ export class ColorUtils {
         if (!result) return null;
 
         return {
-            r: parseInt(result[1], 16),
-            g: parseInt(result[2], 16),
-            b: parseInt(result[3], 16),
+            r: Number.parseInt(result[1], 16),
+            g: Number.parseInt(result[2], 16),
+            b: Number.parseInt(result[3], 16),
         };
     }
 
@@ -106,14 +106,17 @@ export class ColorUtils {
             return null;
         }
 
-        const result = /^([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(cleanHex);
+        const result =
+            /^([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(
+                cleanHex
+            );
         if (!result) return null;
 
         return {
-            r: parseInt(result[1], 16),
-            g: parseInt(result[2], 16),
-            b: parseInt(result[3], 16),
-            a: parseInt(result[4], 16) / 255,
+            r: Number.parseInt(result[1], 16),
+            g: Number.parseInt(result[2], 16),
+            b: Number.parseInt(result[3], 16),
+            a: Number.parseInt(result[4], 16) / 255,
         };
     }
 
@@ -280,7 +283,8 @@ export class ColorUtils {
                 return p;
             };
 
-            const q = lVal < 0.5 ? lVal * (1 + sVal) : lVal + sVal - lVal * sVal;
+            const q =
+                lVal < 0.5 ? lVal * (1 + sVal) : lVal + sVal - lVal * sVal;
             const p = 2 * lVal - q;
             r = hue2rgb(p, q, h + 1 / 3);
             g = hue2rgb(p, q, h);
@@ -443,7 +447,9 @@ export class ColorUtils {
 
         const [r, g, b] = [rgb.r, rgb.g, rgb.b].map((c) => {
             c /= 255;
-            return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+            return c <= 0.03928
+                ? c / 12.92
+                : Math.pow((c + 0.055) / 1.055, 2.4);
         });
 
         return 0.2126 * r + 0.7152 * g + 0.0722 * b;
@@ -493,7 +499,11 @@ export class ColorUtils {
     /**
      * Check if contrast meets WCAG AA standard (4.5:1 for normal text)
      */
-    static meetsContrastAA(color1: string, color2: string, largeText: boolean = false): boolean {
+    static meetsContrastAA(
+        color1: string,
+        color2: string,
+        largeText: boolean = false
+    ): boolean {
         const ratio = this.contrast(color1, color2);
         return largeText ? ratio >= 3 : ratio >= 4.5;
     }
@@ -501,7 +511,11 @@ export class ColorUtils {
     /**
      * Check if contrast meets WCAG AAA standard (7:1 for normal text)
      */
-    static meetsContrastAAA(color1: string, color2: string, largeText: boolean = false): boolean {
+    static meetsContrastAAA(
+        color1: string,
+        color2: string,
+        largeText: boolean = false
+    ): boolean {
         const ratio = this.contrast(color1, color2);
         return largeText ? ratio >= 4.5 : ratio >= 7;
     }
@@ -589,7 +603,11 @@ export class ColorUtils {
      * @example
      * ColorUtils.gradient('#ff0000', '#0000ff', 5); // Red to blue in 5 steps
      */
-    static gradient(startColor: string, endColor: string, steps: number): string[] {
+    static gradient(
+        startColor: string,
+        endColor: string,
+        steps: number
+    ): string[] {
         const colors: string[] = [];
         for (let i = 0; i < steps; i++) {
             const weight = (i / (steps - 1)) * 100;
@@ -650,9 +668,9 @@ export class ColorUtils {
         );
         if (rgbMatch) {
             return this.rgbToHex(
-                parseInt(rgbMatch[1]),
-                parseInt(rgbMatch[2]),
-                parseInt(rgbMatch[3])
+                Number.parseInt(rgbMatch[1]),
+                Number.parseInt(rgbMatch[2]),
+                Number.parseInt(rgbMatch[3])
             );
         }
 
@@ -662,9 +680,9 @@ export class ColorUtils {
         );
         if (hslMatch) {
             return this.hslToHex(
-                parseInt(hslMatch[1]),
-                parseInt(hslMatch[2]),
-                parseInt(hslMatch[3])
+                Number.parseInt(hslMatch[1]),
+                Number.parseInt(hslMatch[2]),
+                Number.parseInt(hslMatch[3])
             );
         }
 

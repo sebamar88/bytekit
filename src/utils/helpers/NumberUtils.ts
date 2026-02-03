@@ -52,13 +52,19 @@ export class NumberUtils {
      * NumberUtils.format(1234567.89, 'es-AR'); // '1.234.567,89'
      * NumberUtils.format(1234567.89, 'en-US'); // '1,234,567.89'
      */
-    static format(value: number, locale?: string, options?: FormatNumberOptions): string {
+    static format(
+        value: number,
+        locale?: string,
+        options?: FormatNumberOptions
+    ): string {
         const opts: Intl.NumberFormatOptions = {
             minimumFractionDigits: options?.minimumFractionDigits,
             maximumFractionDigits: options?.maximumFractionDigits,
             useGrouping: options?.useGrouping ?? true,
         };
-        return new Intl.NumberFormat(locale ?? options?.locale, opts).format(value);
+        return new Intl.NumberFormat(locale ?? options?.locale, opts).format(
+            value
+        );
     }
 
     /**
@@ -336,7 +342,10 @@ export class NumberUtils {
             if (n < 20) return ones[n];
             if (n < 100) {
                 const remainder = n % 10;
-                return tens[Math.floor(n / 10)] + (remainder ? "-" + ones[remainder] : "");
+                return (
+                    tens[Math.floor(n / 10)] +
+                    (remainder ? "-" + ones[remainder] : "")
+                );
             }
             if (n < 1000) {
                 const remainder = n % 100;
@@ -421,39 +430,58 @@ export class NumberUtils {
             "noventa",
         ];
 
+        /**
+         * Helper to convert hundreds
+         */
+        const convertHundreds = (n: number): string => {
+            const remainder = n % 100;
+            const hundreds = Math.floor(n / 100);
+            const hundredNames: Record<number, string> = {
+                1: "ciento",
+                5: "quinientos",
+                7: "setecientos",
+                9: "novecientos",
+            };
+            const prefix = hundredNames[hundreds] || ones[hundreds] + "cientos";
+            return prefix + (remainder ? " " + convert(remainder) : "");
+        };
+
+        /**
+         * Helper to convert thousands
+         */
+        const convertThousands = (n: number): string => {
+            const remainder = n % 1000;
+            const thousands = Math.floor(n / 1000);
+            const prefix =
+                thousands === 1 ? "mil" : convert(thousands) + " mil";
+            return prefix + (remainder ? " " + convert(remainder) : "");
+        };
+
+        /**
+         * Helper to convert millions
+         */
+        const convertMillions = (n: number): string => {
+            const remainder = n % 1000000;
+            const millions = Math.floor(n / 1000000);
+            const prefix =
+                millions === 1 ? "un millón" : convert(millions) + " millones";
+            return prefix + (remainder ? " " + convert(remainder) : "");
+        };
+
         const convert = (n: number): string => {
             if (n === 0) return "";
             if (n < 30) return ones[n];
             if (n < 100) {
                 const remainder = n % 10;
-                return tens[Math.floor(n / 10)] + (remainder ? " y " + ones[remainder] : "");
+                return (
+                    tens[Math.floor(n / 10)] +
+                    (remainder ? " y " + ones[remainder] : "")
+                );
             }
             if (n === 100) return "cien";
-            if (n < 1000) {
-                const remainder = n % 100;
-                const hundreds = Math.floor(n / 100);
-                const prefix =
-                    hundreds === 1
-                        ? "ciento"
-                        : hundreds === 5
-                          ? "quinientos"
-                          : hundreds === 7
-                            ? "setecientos"
-                            : hundreds === 9
-                              ? "novecientos"
-                              : ones[hundreds] + "cientos";
-                return prefix + (remainder ? " " + convert(remainder) : "");
-            }
-            if (n < 1000000) {
-                const remainder = n % 1000;
-                const thousands = Math.floor(n / 1000);
-                const prefix = thousands === 1 ? "mil" : convert(thousands) + " mil";
-                return prefix + (remainder ? " " + convert(remainder) : "");
-            }
-            const remainder = n % 1000000;
-            const millions = Math.floor(n / 1000000);
-            const prefix = millions === 1 ? "un millón" : convert(millions) + " millones";
-            return prefix + (remainder ? " " + convert(remainder) : "");
+            if (n < 1000) return convertHundreds(n);
+            if (n < 1000000) return convertThousands(n);
+            return convertMillions(n);
         };
 
         const isNegative = value < 0;
@@ -474,7 +502,11 @@ export class NumberUtils {
         const sizes = ["Bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"];
         const i = Math.floor(Math.log(bytes) / Math.log(k));
 
-        return parseFloat((bytes / Math.pow(k, i)).toFixed(decimals)) + " " + sizes[i];
+        return (
+            Number.parseFloat((bytes / Math.pow(k, i)).toFixed(decimals)) +
+            " " +
+            sizes[i]
+        );
     }
 
     /**
@@ -486,7 +518,8 @@ export class NumberUtils {
     static parse(value: string, locale: string = "en"): number {
         // Determine decimal and thousand separators based on locale
         const parts = new Intl.NumberFormat(locale).formatToParts(1000000.1);
-        const decimalSep = parts.find((p) => p.type === "decimal")?.value ?? ".";
+        const decimalSep =
+            parts.find((p) => p.type === "decimal")?.value ?? ".";
         const groupSep = parts.find((p) => p.type === "group")?.value ?? ",";
 
         let normalized = value;
@@ -500,9 +533,9 @@ export class NumberUtils {
         }
 
         // Remove currency symbols and other non-numeric characters (except - and .)
-        normalized = normalized.replace(/[^\d.-]/g, "");
+        normalized = normalized.replaceAll(/[^\d.-]/g, "");
 
-        return parseFloat(normalized);
+        return Number.parseFloat(normalized);
     }
 
     /**
@@ -544,7 +577,9 @@ export class NumberUtils {
         if (values.length === 0) return 0;
         const sorted = [...values].sort((a, b) => a - b);
         const mid = Math.floor(sorted.length / 2);
-        return sorted.length % 2 !== 0 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2;
+        return sorted.length % 2 !== 0
+            ? sorted[mid]
+            : (sorted[mid - 1] + sorted[mid]) / 2;
     }
 
     /**
@@ -588,11 +623,16 @@ export class NumberUtils {
     /**
      * Calculate the standard deviation
      */
-    static standardDeviation(values: number[], population: boolean = true): number {
+    static standardDeviation(
+        values: number[],
+        population: boolean = true
+    ): number {
         if (values.length === 0) return 0;
         const avg = this.average(values);
         const squareDiffs = values.map((val) => Math.pow(val - avg, 2));
-        const avgSquareDiff = this.sum(squareDiffs) / (population ? values.length : values.length - 1);
+        const avgSquareDiff =
+            this.sum(squareDiffs) /
+            (population ? values.length : values.length - 1);
         return Math.sqrt(avgSquareDiff);
     }
 
@@ -603,7 +643,10 @@ export class NumberUtils {
         if (values.length === 0) return 0;
         const avg = this.average(values);
         const squareDiffs = values.map((val) => Math.pow(val - avg, 2));
-        return this.sum(squareDiffs) / (population ? values.length : values.length - 1);
+        return (
+            this.sum(squareDiffs) /
+            (population ? values.length : values.length - 1)
+        );
     }
 
     /**
@@ -618,6 +661,8 @@ export class NumberUtils {
         const lower = Math.floor(index);
         const upper = Math.ceil(index);
         if (lower === upper) return sorted[lower];
-        return sorted[lower] + (sorted[upper] - sorted[lower]) * (index - lower);
+        return (
+            sorted[lower] + (sorted[upper] - sorted[lower]) * (index - lower)
+        );
     }
 }

@@ -178,7 +178,9 @@ import { StringUtils } from "bytekit";
 // Format
 StringUtils.capitalize("hello world"); // "Hello world"
 StringUtils.camelCase("hello_world"); // "helloWorld"
+StringUtils.pascalCase("hello_world"); // "HelloWorld"
 StringUtils.kebabCase("HelloWorld"); // "hello-world"
+StringUtils.snakeCase("HelloWorld"); // "hello_world"
 
 // Truncate
 StringUtils.truncate("Long text here", { maxLength: 10 });
@@ -408,8 +410,11 @@ console.log(users);
 ```typescript
 import { StringUtils } from "bytekit";
 
-console.log(StringUtils.capitalize("hello world"));
-console.log(StringUtils.camelCase("hello_world"));
+console.log(StringUtils.capitalize("hello world")); // "Hello world"
+console.log(StringUtils.camelCase("hello_world")); // "helloWorld"
+console.log(StringUtils.pascalCase("hello_world")); // "HelloWorld"
+console.log(StringUtils.kebabCase("HelloWorld")); // "hello-world"
+console.log(StringUtils.snakeCase("HelloWorld")); // "hello_world"
 console.log(StringUtils.truncate("Long text", { maxLength: 5 }));
 ```
 

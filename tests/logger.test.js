@@ -34,7 +34,7 @@ test("Logger.silent() suppresses all logs", () => {
     };
 
     const logger = Logger.silent();
-    // @ts-ignore (inject transport for testing)
+    // @ts-expect-error (inject transport for testing)
     logger.transports = [transport];
 
     logger.error("error");

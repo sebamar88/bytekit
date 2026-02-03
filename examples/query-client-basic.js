@@ -29,7 +29,9 @@ const queryClient = createQueryClient(apiClient, {
         },
         onSettled: (data, error, context) => {
             const duration = Date.now() - context.timestamp;
-            console.log(`🏁 [${context.method}] ${context.url} - Completed in ${duration}ms`);
+            console.log(
+                `🏁 [${context.method}] ${context.url} - Completed in ${duration}ms`
+            );
         },
     },
 });
@@ -216,7 +218,7 @@ async function runExamples() {
 
 // Run if executed directly
 if (import.meta.url === `file://${process.argv[1]}`) {
-    runExamples();
+    await runExamples();
 }
 
 export { runExamples };

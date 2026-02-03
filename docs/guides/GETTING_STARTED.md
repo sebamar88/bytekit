@@ -192,6 +192,70 @@ const api = new ApiClient({
 });
 ```
 
+## 🌍 Environment-Specific Configuration
+
+### Dynamic Base URL Based on Environment
+
+Configure ApiClient differently for Node.js vs browser environments:
+
+```typescript
+import { ApiClient } from "bytekit";
+
+// Detect environment
+const isNode = typeof process !== "undefined" && process.versions?.node;
+
+const api = new ApiClient({
+    baseUrl: isNode
+        ? process.env.API_URL || "http://localhost:3000/api"
+        : "https://api.example.com",
+
+    defaultHeaders: {
+        "User-Agent": isNode ? "MyApp-Server" : "MyApp-Browser",
+    },
+
+    timeoutMs: isNode ? 30000 : 10000, // Different timeouts
+});
+```
+
+### Using Environment Variables
+
+```typescript
+import { ApiClient } from "bytekit";
+import { EnvManager } from "bytekit/env-manager";
+
+const env = new EnvManager();
+
+const api = new ApiClient({
+    baseUrl:
+        env.get("API_URL") ||
+        (typeof window !== "undefined"
+            ? window.location.origin + "/api"
+            : "http://localhost:3000"),
+});
+```
+
+### Factory Function Pattern
+
+```typescript
+function createApiClient() {
+    const isNode = typeof process !== "undefined";
+
+    return new ApiClient(
+        isNode
+            ? {
+                  baseUrl: process.env.API_URL || "http://localhost:3000",
+                  timeoutMs: 30000,
+              }
+            : {
+                  baseUrl: "/api",
+                  timeoutMs: 10000,
+              }
+    );
+}
+
+const api = createApiClient();
+```
+
 ## 🛠️ Utility Helpers
 
 ### String Utilities
@@ -199,13 +263,19 @@ const api = new ApiClient({
 ```typescript
 import { StringUtils } from "bytekit";
 
-// Slugify
-const slug = StringUtils.slugify("Hello World! 🌍");
-// => 'hello-world'
+// Case conversion
+StringUtils.camelCase("hello_world"); // => 'helloWorld'
+StringUtils.pascalCase("hello_world"); // => 'HelloWorld'
+StringUtils.kebabCase("HelloWorld"); // => 'hello-world'
+StringUtils.snakeCase("HelloWorld"); // => 'hello_world'
 
 // Capitalize
 const capitalized = StringUtils.capitalize("hello world");
 // => 'Hello world'
+
+// Slugify
+const slug = StringUtils.slugify("Hello World! 🌍");
+// => 'hello-world'
 
 // Mask sensitive data
 const masked = StringUtils.mask("1234567890", {

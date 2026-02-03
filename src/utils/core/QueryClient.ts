@@ -37,7 +37,10 @@ export interface QueryClientConfig {
 /**
  * Query options
  */
-export interface QueryOptions<T = unknown> extends Omit<RequestOptions, "method"> {
+export interface QueryOptions<T = unknown> extends Omit<
+    RequestOptions,
+    "method"
+> {
     /** Unique identifier for the query */
     queryKey: string[];
     /** API endpoint path */
@@ -84,7 +87,9 @@ export interface MutationOptions<T = unknown> extends RequestOptions {
  */
 export class QueryClient {
     private apiClient: ApiClient;
-    private eventEmitter: EventEmitter<QueryClientEvents & Record<string, unknown>>;
+    private eventEmitter: EventEmitter<
+        QueryClientEvents & Record<string, unknown>
+    >;
     private cache: CacheManager<CachedQuery>;
     private stateManager: Map<string, RequestState>;
     private config: Required<QueryClientConfig>;
@@ -92,7 +97,9 @@ export class QueryClient {
 
     constructor(apiClient: ApiClient, options: QueryClientConfig = {}) {
         this.apiClient = apiClient;
-        this.eventEmitter = new EventEmitter<QueryClientEvents & Record<string, unknown>>();
+        this.eventEmitter = new EventEmitter<
+            QueryClientEvents & Record<string, unknown>
+        >();
         this.stateManager = new Map();
         this.pendingRequests = new Map();
 
@@ -116,17 +123,19 @@ export class QueryClient {
         // Setup window focus refetch
         if (
             this.config.refetchOnWindowFocus &&
-            typeof window !== "undefined"
+            typeof globalThis.window !== "undefined"
         ) {
-            window.addEventListener("focus", () => this.refetchStaleQueries());
+            globalThis.window.addEventListener("focus", () =>
+                this.refetchStaleQueries()
+            );
         }
 
         // Setup reconnect refetch
         if (
             this.config.refetchOnReconnect &&
-            typeof window !== "undefined"
+            typeof globalThis.window !== "undefined"
         ) {
-            window.addEventListener("online", () =>
+            globalThis.window.addEventListener("online", () =>
                 this.refetchStaleQueries()
             );
         }
@@ -166,11 +175,14 @@ export class QueryClient {
         };
 
         // Initialize state
-        const initialState = cached
-            ? createLoadingState<T>(cached.data as T)
-            : options.placeholderData
-              ? createLoadingState<T>(options.placeholderData)
-              : createLoadingState<T>();
+        let initialState: RequestState<T>;
+        if (cached) {
+            initialState = createLoadingState<T>(cached.data as T);
+        } else if (options.placeholderData) {
+            initialState = createLoadingState<T>(options.placeholderData);
+        } else {
+            initialState = createLoadingState<T>();
+        }
 
         this.stateManager.set(cacheKey, initialState);
 
@@ -210,28 +222,40 @@ export class QueryClient {
         }
 
         // Execute callbacks
-        await this.executeCallbacks(
-            "onStart",
-            context,
-            options.callbacks,
-            undefined
-        );
+        await this.executeCallbacks("onStart", context, options.callbacks);
         this.eventEmitter.emit("query:start", { context });
 
         try {
             // Execute request
             const method = options.method ?? "POST";
-            const { callbacks: _callbacks, onMutate: _onMutate, invalidateQueries: _invalidate, ...requestOptions } = options;
+            const {
+                callbacks: _callbacks,
+                onMutate: _onMutate,
+                invalidateQueries: _invalidate,
+                ...requestOptions
+            } = options;
 
             let result: T;
             if (method === "POST") {
-                result = await this.apiClient.post<T>(options.path, requestOptions);
+                result = await this.apiClient.post<T>(
+                    options.path,
+                    requestOptions
+                );
             } else if (method === "PUT") {
-                result = await this.apiClient.put<T>(options.path, requestOptions);
+                result = await this.apiClient.put<T>(
+                    options.path,
+                    requestOptions
+                );
             } else if (method === "PATCH") {
-                result = await this.apiClient.patch<T>(options.path, requestOptions);
+                result = await this.apiClient.patch<T>(
+                    options.path,
+                    requestOptions
+                );
             } else {
-                result = await this.apiClient.delete<T>(options.path, requestOptions);
+                result = await this.apiClient.delete<T>(
+                    options.path,
+                    requestOptions
+                );
             }
 
             // Success callbacks
@@ -297,7 +321,9 @@ export class QueryClient {
     /**
      * Get current state of a query
      */
-    getQueryState<T = unknown>(queryKey: string[]): RequestState<T> | undefined {
+    getQueryState<T = unknown>(
+        queryKey: string[]
+    ): RequestState<T> | undefined {
         const cacheKey = this.getCacheKey(queryKey);
         return this.stateManager.get(cacheKey) as RequestState<T> | undefined;
     }
@@ -402,30 +428,51 @@ export class QueryClient {
         const cacheKey = this.getCacheKey(options.queryKey);
 
         // Execute callbacks
-        await this.executeCallbacks(
-            "onStart",
-            context,
-            options.callbacks,
-            undefined
-        );
+        await this.executeCallbacks("onStart", context, options.callbacks);
         this.eventEmitter.emit("query:start", { context });
 
         try {
             // Execute request
             const method = options.method ?? "GET";
-            const { queryKey: _queryKey, callbacks: _callbacks, initialData: _initialData, placeholderData: _placeholderData, staleTime: _staleTime, cacheTime: _cacheTime, refetchInterval: _refetchInterval, refetchOnWindowFocus: _refetchOnWindowFocus, refetchOnReconnect: _refetchOnReconnect, ...requestOptions } = options;
+            const {
+                queryKey: _queryKey,
+                callbacks: _callbacks,
+                initialData: _initialData,
+                placeholderData: _placeholderData,
+                staleTime: _staleTime,
+                cacheTime: _cacheTime,
+                refetchInterval: _refetchInterval,
+                refetchOnWindowFocus: _refetchOnWindowFocus,
+                refetchOnReconnect: _refetchOnReconnect,
+                ...requestOptions
+            } = options;
 
             let result: T;
             if (method === "GET") {
-                result = await this.apiClient.get<T>(options.path, requestOptions);
+                result = await this.apiClient.get<T>(
+                    options.path,
+                    requestOptions
+                );
             } else if (method === "POST") {
-                result = await this.apiClient.post<T>(options.path, requestOptions);
+                result = await this.apiClient.post<T>(
+                    options.path,
+                    requestOptions
+                );
             } else if (method === "PUT") {
-                result = await this.apiClient.put<T>(options.path, requestOptions);
+                result = await this.apiClient.put<T>(
+                    options.path,
+                    requestOptions
+                );
             } else if (method === "PATCH") {
-                result = await this.apiClient.patch<T>(options.path, requestOptions);
+                result = await this.apiClient.patch<T>(
+                    options.path,
+                    requestOptions
+                );
             } else {
-                result = await this.apiClient.delete<T>(options.path, requestOptions);
+                result = await this.apiClient.delete<T>(
+                    options.path,
+                    requestOptions
+                );
             }
 
             // Update state
@@ -441,7 +488,11 @@ export class QueryClient {
                 staleTime: options.staleTime ?? this.config.defaultStaleTime,
                 cacheTime: options.cacheTime ?? this.config.defaultCacheTime,
             };
-            this.cache.set(cacheKey, cachedQuery as CachedQuery, cachedQuery.cacheTime);
+            this.cache.set(
+                cacheKey,
+                cachedQuery as CachedQuery,
+                cachedQuery.cacheTime
+            );
 
             // Success callbacks
             await this.executeCallbacks(
@@ -461,8 +512,7 @@ export class QueryClient {
                 "onSettled",
                 context,
                 options.callbacks,
-                result,
-                undefined
+                result
             );
             this.eventEmitter.emit("query:settled", {
                 data: result,
@@ -511,6 +561,122 @@ export class QueryClient {
         }
     }
 
+    /**
+     * Execute onStart callbacks
+     */
+    private async executeOnStartCallbacks<T>(
+        context: RequestContext,
+        callbacks?: RequestLifecycleCallbacks<T>
+    ): Promise<void> {
+        const globalCallback = this.config.globalCallbacks.onStart;
+        const localCallback = callbacks?.onStart;
+
+        if (globalCallback) {
+            await (
+                globalCallback as (
+                    context: RequestContext
+                ) => void | Promise<void>
+            )(context);
+        }
+        if (localCallback) {
+            await (
+                localCallback as (
+                    context: RequestContext
+                ) => void | Promise<void>
+            )(context);
+        }
+    }
+
+    /**
+     * Execute onSuccess callbacks
+     */
+    private async executeOnSuccessCallbacks<T>(
+        data: T,
+        context: RequestContext,
+        callbacks?: RequestLifecycleCallbacks<T>
+    ): Promise<void> {
+        const globalCallback = this.config.globalCallbacks.onSuccess;
+        const localCallback = callbacks?.onSuccess;
+
+        if (globalCallback) {
+            await (
+                globalCallback as (
+                    data: T,
+                    context: RequestContext
+                ) => void | Promise<void>
+            )(data, context);
+        }
+        if (localCallback) {
+            await (
+                localCallback as (
+                    data: T,
+                    context: RequestContext
+                ) => void | Promise<void>
+            )(data, context);
+        }
+    }
+
+    /**
+     * Execute onError callbacks
+     */
+    private async executeOnErrorCallbacks<T>(
+        error: ApiError,
+        context: RequestContext,
+        callbacks?: RequestLifecycleCallbacks<T>
+    ): Promise<void> {
+        const globalCallback = this.config.globalCallbacks.onError;
+        const localCallback = callbacks?.onError;
+
+        if (globalCallback) {
+            await (
+                globalCallback as (
+                    error: ApiError,
+                    context: RequestContext
+                ) => void | Promise<void>
+            )(error, context);
+        }
+        if (localCallback) {
+            await (
+                localCallback as (
+                    error: ApiError,
+                    context: RequestContext
+                ) => void | Promise<void>
+            )(error, context);
+        }
+    }
+
+    /**
+     * Execute onSettled callbacks
+     */
+    private async executeOnSettledCallbacks<T>(
+        data: T | undefined,
+        error: ApiError | undefined,
+        context: RequestContext,
+        callbacks?: RequestLifecycleCallbacks<T>
+    ): Promise<void> {
+        const globalCallback = this.config.globalCallbacks.onSettled;
+        const localCallback = callbacks?.onSettled;
+
+        if (globalCallback) {
+            await (
+                globalCallback as (
+                    data: T | undefined,
+                    error: ApiError | undefined,
+                    context: RequestContext
+                ) => void | Promise<void>
+            )(data, error, context);
+        }
+        if (localCallback) {
+            await (
+                localCallback as (
+                    data: T | undefined,
+                    error: ApiError | undefined,
+                    context: RequestContext
+                ) => void | Promise<void>
+            )(data, error, context);
+        }
+    }
+
     private async executeCallbacks<T>(
         type: "onStart" | "onSuccess" | "onError" | "onSettled",
         context: RequestContext,
@@ -518,37 +684,19 @@ export class QueryClient {
         data?: T,
         error?: ApiError
     ): Promise<void> {
-        const globalCallback = this.config.globalCallbacks[type];
-        const localCallback = callbacks?.[type];
-
         if (type === "onStart") {
-            if (globalCallback) {
-                await (globalCallback as (context: RequestContext) => void | Promise<void>)(context);
-            }
-            if (localCallback) {
-                await (localCallback as (context: RequestContext) => void | Promise<void>)(context);
-            }
+            await this.executeOnStartCallbacks(context, callbacks);
         } else if (type === "onSuccess" && data !== undefined) {
-            if (globalCallback) {
-                await (globalCallback as (data: T, context: RequestContext) => void | Promise<void>)(data, context);
-            }
-            if (localCallback) {
-                await (localCallback as (data: T, context: RequestContext) => void | Promise<void>)(data, context);
-            }
+            await this.executeOnSuccessCallbacks(data, context, callbacks);
         } else if (type === "onError" && error) {
-            if (globalCallback) {
-                await (globalCallback as (error: ApiError, context: RequestContext) => void | Promise<void>)(error, context);
-            }
-            if (localCallback) {
-                await (localCallback as (error: ApiError, context: RequestContext) => void | Promise<void>)(error, context);
-            }
+            await this.executeOnErrorCallbacks(error, context, callbacks);
         } else if (type === "onSettled") {
-            if (globalCallback) {
-                await (globalCallback as (data: T | undefined, error: ApiError | undefined, context: RequestContext) => void | Promise<void>)(data, error, context);
-            }
-            if (localCallback) {
-                await (localCallback as (data: T | undefined, error: ApiError | undefined, context: RequestContext) => void | Promise<void>)(data, error, context);
-            }
+            await this.executeOnSettledCallbacks(
+                data,
+                error,
+                context,
+                callbacks
+            );
         }
     }
 

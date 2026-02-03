@@ -21,6 +21,45 @@ export interface UploadResponse {
 
 export class FileUploadHelper {
     /**
+     * Upload a chunk with retry logic
+     */
+    private static async uploadChunkWithRetry(
+        chunk: Blob,
+        endpoint: string,
+        chunkIndex: number,
+        totalChunks: number,
+        headers: Record<string, string>,
+        timeout: number,
+        maxRetries: number
+    ): Promise<void> {
+        let retries = 0;
+        let success = false;
+
+        while (retries < maxRetries && !success) {
+            try {
+                await this.uploadChunk(
+                    chunk,
+                    endpoint,
+                    chunkIndex,
+                    totalChunks,
+                    headers,
+                    timeout
+                );
+                success = true;
+            } catch (error) {
+                retries++;
+                if (retries >= maxRetries) {
+                    throw error;
+                }
+                // Exponential backoff
+                await new Promise((resolve) =>
+                    setTimeout(resolve, Math.pow(2, retries) * 1000)
+                );
+            }
+        }
+    }
+
+    /**
      * Upload a file with progress tracking and chunking support
      */
     static async uploadFile(
@@ -46,34 +85,20 @@ export class FileUploadHelper {
                 const end = Math.min(start + chunkSize, totalSize);
                 const chunk = file.slice(start, end);
 
-                let retries = 0;
-                let success = false;
+                const chunkHeaders = {
+                    ...headers,
+                    ...(chunks > 1 ? { "X-Upload-ID": uploadId } : {}),
+                };
 
-                while (retries < maxRetries && !success) {
-                    try {
-                        await this.uploadChunk(
-                            chunk,
-                            endpoint,
-                            i,
-                            chunks,
-                            { 
-                                ...headers, 
-                                ...(chunks > 1 ? { "X-Upload-ID": uploadId } : {}) 
-                            },
-                            timeout
-                        );
-                        success = true;
-                    } catch (error) {
-                        retries++;
-                        if (retries >= maxRetries) {
-                            throw error;
-                        }
-                        // Exponential backoff
-                        await new Promise((resolve) =>
-                            setTimeout(resolve, Math.pow(2, retries) * 1000)
-                        );
-                    }
-                }
+                await this.uploadChunkWithRetry(
+                    chunk,
+                    endpoint,
+                    i,
+                    chunks,
+                    chunkHeaders,
+                    timeout,
+                    maxRetries
+                );
 
                 if (onProgress) {
                     onProgress({

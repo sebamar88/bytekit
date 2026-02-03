@@ -10,7 +10,7 @@ const originalFetch = globalThis.fetch;
 // ============================================================================
 
 test("FileUploadHelper.validateFile validates file size", () => {
-    // @ts-ignore
+    // @ts-expect-error - Test type override
     const mockFile = { size: 200 * 1024 * 1024, name: "large.txt", type: "text/plain" };
     const result = FileUploadHelper.validateFile(mockFile, { maxSize: 100 * 1024 * 1024 });
     
@@ -19,7 +19,7 @@ test("FileUploadHelper.validateFile validates file size", () => {
 });
 
 test("FileUploadHelper.validateFile validates file type", () => {
-    // @ts-ignore
+    // @ts-expect-error - Test type override
     const mockFile = { size: 1000, name: "image.png", type: "image/png" };
     const result = FileUploadHelper.validateFile(mockFile, { allowedTypes: ["image/jpeg"] });
     
@@ -28,7 +28,7 @@ test("FileUploadHelper.validateFile validates file type", () => {
 });
 
 test("FileUploadHelper.validateFile validates file extension", () => {
-    // @ts-ignore
+    // @ts-expect-error - Test type override
     const mockFile = { size: 1000, name: "doc.pdf", type: "application/pdf" };
     const result = FileUploadHelper.validateFile(mockFile, { allowedExtensions: ["txt", "docx"] });
     
@@ -37,7 +37,7 @@ test("FileUploadHelper.validateFile validates file extension", () => {
 });
 
 test("FileUploadHelper.validateFile passes for valid file", () => {
-    // @ts-ignore
+    // @ts-expect-error - Test type override
     const mockFile = { size: 1000, name: "image.jpg", type: "image/jpeg" };
     const result = FileUploadHelper.validateFile(mockFile, {
         maxSize: 2000,

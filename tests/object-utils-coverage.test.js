@@ -37,7 +37,7 @@ test("ObjectUtils.deepMerge combines structures", () => {
     const obj2 = { b: { d: 3 }, e: 4 };
     
     const merged = ObjectUtils.deepMerge(obj1, obj2);
-    // @ts-ignore
+    // @ts-expect-error - Test type override
     assert.deepEqual(merged, { a: 1, b: { c: 2, d: 3 }, e: 4 });
 });
 
@@ -54,7 +54,7 @@ test("ObjectUtils.get and set with paths", () => {
     
     const target = {};
     ObjectUtils.set(target, "a.b.c", 42);
-    // @ts-ignore
+    // @ts-expect-error - Test type override
     assert.equal(target.a.b.c, 42);
 });
 

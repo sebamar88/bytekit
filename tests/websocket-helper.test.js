@@ -47,7 +47,7 @@ class MockWebSocket {
     }
 }
 
-// @ts-ignore
+// @ts-expect-error - Test type override
 globalThis.WebSocket = MockWebSocket;
 
 // ============================================================================
@@ -65,7 +65,7 @@ test("WebSocketHelper connects and sends heartbeat", async () => {
 
     // Wait for heartbeat
     await new Promise((r) => setTimeout(r, 70));
-    // @ts-ignore
+    // @ts-expect-error - Test type override
     assert.match(wsh.ws.lastSent, /"type":"ping"/);
 
     wsh.close();
@@ -81,7 +81,7 @@ test("WebSocketHelper receives messages and notifies subscribers", async () => {
     });
 
     // Simulate server message
-    // @ts-ignore
+    // @ts-expect-error - Test type override
     wsh.ws._receive({ type: "chat", data: { text: "hello" } });
 
     assert.deepEqual(receivedData, { text: "hello" });
@@ -96,7 +96,7 @@ test("WebSocketHelper.request handles send and response", async () => {
 
     // Simulate server response after a short delay
     setTimeout(() => {
-        // @ts-ignore
+        // @ts-expect-error - Test type override
         wsh.ws._receive({ type: "get_user:response", data: { name: "John" } });
     }, 20);
 
@@ -119,7 +119,7 @@ test("WebSocketHelper handles reconnection", async () => {
     });
 
     // Simulate unexpected close
-    // @ts-ignore
+    // @ts-expect-error - Test type override
     wsh.ws.close();
 
     // Wait for reconnect attempt
@@ -154,7 +154,7 @@ test("WebSocketHelper stops reconnecting after max attempts", async () => {
         if (this.onclose) this.onclose();
     };
 
-    // @ts-ignore (force close)
+    // @ts-expect-error (force close)
     wsh.ws.close();
 
     await new Promise((r) => setTimeout(r, 100));
@@ -177,7 +177,7 @@ test("WebSocketHelper handles invalid message JSON", async () => {
         errorCaught = true;
     });
 
-    // @ts-ignore
+    // @ts-expect-error - Test type override
     wsh.ws.onmessage({ data: "invalid json" });
 
     assert.equal(errorCaught, true);
@@ -194,7 +194,7 @@ test("WebSocketHelper unsubscribe stops receiving messages", async () => {
     });
     unsubscribe();
 
-    // @ts-ignore
+    // @ts-expect-error - Test type override
     wsh.ws._receive({ type: "notice", data: { ok: true } });
 
     assert.equal(received, 0);
@@ -224,7 +224,7 @@ test("WebSocketHelper notifies error when handler throws", async () => {
         throw new Error("Handler failed");
     });
 
-    // @ts-ignore
+    // @ts-expect-error - Test type override
     wsh.ws._receive({ type: "boom", data: { ok: true } });
 
     assert.equal(errorNotified, true);
@@ -235,12 +235,14 @@ test("WebSocketHelper connect rejects on constructor error", async () => {
     const OriginalWebSocket = globalThis.WebSocket;
 
     class FailingWebSocket {
+        readyState = 0;
+
         constructor() {
             throw new Error("Constructor failed");
         }
     }
 
-    // @ts-ignore
+    // @ts-expect-error - Test type override
     globalThis.WebSocket = FailingWebSocket;
 
     const wsh = new WebSocketHelper("ws://localhost");
@@ -256,7 +258,7 @@ test("WebSocketHelper request supports custom responseType", async () => {
     const promise = wsh.request("get_user", { id: 1 }, "user:loaded");
 
     setTimeout(() => {
-        // @ts-ignore
+        // @ts-expect-error - Test type override
         wsh.ws._receive({ type: "user:loaded", data: { id: 1 } });
     }, 10);
 
@@ -279,7 +281,7 @@ test("WebSocketHelper notifyError ignores handler exceptions", async () => {
         throw new Error("handler failed");
     });
 
-    // @ts-ignore
+    // @ts-expect-error - Test type override
     wsh.ws._error();
 
     await new Promise((r) => setTimeout(r, 10));

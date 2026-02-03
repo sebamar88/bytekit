@@ -19,6 +19,68 @@ export interface ValidationError {
 }
 
 export class ResponseValidator {
+    /**
+     * Validates type-specific data
+     */
+    private static validateByType(
+        data: unknown,
+        schema: ValidationSchema,
+        path: string
+    ): ValidationError[] {
+        const errors: ValidationError[] = [];
+
+        if (
+            schema.type === "object" &&
+            typeof data === "object" &&
+            !Array.isArray(data)
+        ) {
+            errors.push(
+                ...this.validateObject(
+                    data as Record<string, unknown>,
+                    schema,
+                    path
+                )
+            );
+        } else if (schema.type === "array" && Array.isArray(data)) {
+            errors.push(...this.validateArray(data, schema, path));
+        } else if (schema.type === "string" && typeof data === "string") {
+            errors.push(...this.validateString(data, schema, path));
+        } else if (schema.type === "number" && typeof data === "number") {
+            errors.push(...this.validateNumber(data, schema, path));
+        } else if (schema.type === "boolean" && typeof data === "boolean") {
+            errors.push(...this.validateBoolean(data, schema, path));
+        }
+
+        return errors;
+    }
+
+    /**
+     * Validates custom validation rules
+     */
+    private static validateCustom(
+        data: unknown,
+        schema: ValidationSchema,
+        path: string
+    ): ValidationError[] {
+        const errors: ValidationError[] = [];
+
+        if (schema.custom) {
+            const result = schema.custom(data);
+            if (result !== true) {
+                errors.push({
+                    path,
+                    message:
+                        typeof result === "string"
+                            ? result
+                            : "Custom validation failed",
+                    value: data,
+                });
+            }
+        }
+
+        return errors;
+    }
+
     static validate(
         data: unknown,
         schema: ValidationSchema,
@@ -42,9 +104,7 @@ export class ResponseValidator {
 
         // Check type
         if (schema.type) {
-            const actualType = Array.isArray(data)
-                ? "array"
-                : typeof data;
+            const actualType = Array.isArray(data) ? "array" : typeof data;
             if (actualType !== schema.type) {
                 errors.push({
                     path,
@@ -56,29 +116,10 @@ export class ResponseValidator {
         }
 
         // Validate based on type
-        if (schema.type === "object" && typeof data === "object" && !Array.isArray(data)) {
-            errors.push(...this.validateObject(data as Record<string, unknown>, schema, path));
-        } else if (schema.type === "array" && Array.isArray(data)) {
-            errors.push(...this.validateArray(data, schema, path));
-        } else if (schema.type === "string" && typeof data === "string") {
-            errors.push(...this.validateString(data, schema, path));
-        } else if (schema.type === "number" && typeof data === "number") {
-            errors.push(...this.validateNumber(data, schema, path));
-        } else if (schema.type === "boolean" && typeof data === "boolean") {
-            errors.push(...this.validateBoolean(data, schema, path));
-        }
+        errors.push(...this.validateByType(data, schema, path));
 
         // Custom validation
-        if (schema.custom) {
-            const result = schema.custom(data);
-            if (result !== true) {
-                errors.push({
-                    path,
-                    message: typeof result === "string" ? result : "Custom validation failed",
-                    value: data,
-                });
-            }
-        }
+        errors.push(...this.validateCustom(data, schema, path));
 
         return errors;
     }

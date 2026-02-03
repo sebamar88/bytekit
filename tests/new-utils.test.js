@@ -218,7 +218,7 @@ test("PollingHelper abort controller works", async () => {
     );
 
     const promise = poller.startWithAbort();
-    
+
     // Abort after a short delay
     setTimeout(() => poller.abort(), 100);
 
@@ -229,9 +229,9 @@ test("PollingHelper abort controller works", async () => {
 });
 
 test("PollingHelper applies jitter", async () => {
-    const intervals = [];
+    const _intervals = [];
     let attempts = 0;
-    
+
     const poller = new PollingHelper(
         async () => {
             attempts++;
@@ -302,9 +302,7 @@ test("PollingHelper tracks metrics", async () => {
         async () => {
             attempts++;
             // Simulate varying response times
-            await new Promise((resolve) =>
-                setTimeout(resolve, attempts * 10)
-            );
+            await new Promise((resolve) => setTimeout(resolve, attempts * 10));
             return attempts >= 3;
         },
         {
@@ -387,17 +385,14 @@ test("PollingHelper respects maxDuration timeout", async () => {
 
 test("PollingHelper calls onAttempt callback", async () => {
     const attemptLog = [];
-    const poller = new PollingHelper(
-        async () => true,
-        {
-            interval: 10,
-            maxAttempts: 3,
-            stopCondition: (result) => result === true,
-            onAttempt: (attempt, result, error) => {
-                attemptLog.push({ attempt, result, error });
-            },
-        }
-    );
+    const poller = new PollingHelper(async () => true, {
+        interval: 10,
+        maxAttempts: 3,
+        stopCondition: (result) => result === true,
+        onAttempt: (attempt, result, error) => {
+            attemptLog.push({ attempt, result, error });
+        },
+    });
 
     await poller.start();
     assert.equal(attemptLog.length, 1);
@@ -408,17 +403,14 @@ test("PollingHelper calls onAttempt callback", async () => {
 test("PollingHelper calls onSuccess callback", async () => {
     let successCalled = false;
     let successAttempts = 0;
-    const poller = new PollingHelper(
-        async () => true,
-        {
-            interval: 10,
-            stopCondition: (result) => result === true,
-            onSuccess: (result, attempts) => {
-                successCalled = true;
-                successAttempts = attempts;
-            },
-        }
-    );
+    const poller = new PollingHelper(async () => true, {
+        interval: 10,
+        stopCondition: (result) => result === true,
+        onSuccess: (result, attempts) => {
+            successCalled = true;
+            successAttempts = attempts;
+        },
+    });
 
     await poller.start();
     assert.equal(successCalled, true);
@@ -451,7 +443,7 @@ test("PollingHelper calls onError callback", async () => {
 test("PollingHelper handles non-Error exceptions", async () => {
     const poller = new PollingHelper(
         async () => {
-            throw "String error";  
+            throw new Error("String error");
         },
         {
             interval: 10,
@@ -592,18 +584,15 @@ test("PollingHelper returns metrics undefined when no successful attempts", asyn
 
 test("PollingHelper calls onError when max attempts exceeded", async () => {
     let errorCalled = false;
-    const poller = new PollingHelper(
-        async () => false,
-        {
-            interval: 10,
-            maxAttempts: 2,
-            stopCondition: () => false,
-            onError: (error) => {
-                errorCalled = true;
-                assert.equal(error.message, "Max attempts exceeded");
-            },
-        }
-    );
+    const poller = new PollingHelper(async () => false, {
+        interval: 10,
+        maxAttempts: 2,
+        stopCondition: () => false,
+        onError: (error) => {
+            errorCalled = true;
+            assert.equal(error.message, "Max attempts exceeded");
+        },
+    });
 
     await poller.start();
     assert.equal(errorCalled, true);

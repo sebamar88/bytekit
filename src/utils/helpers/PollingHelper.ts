@@ -42,7 +42,9 @@ export interface PollingResult<T = unknown> {
  */
 export class PollingHelper<T = unknown> {
     private fn: () => Promise<T>;
-    private options: Required<Omit<PollingOptions<T>, 'attemptTimeout'>> & { attemptTimeout?: number };
+    private options: Required<Omit<PollingOptions<T>, "attemptTimeout">> & {
+        attemptTimeout?: number;
+    };
     private abortController: AbortController | null = null;
 
     constructor(fn: () => Promise<T>, options: PollingOptions<T> = {}) {
@@ -66,6 +68,104 @@ export class PollingHelper<T = unknown> {
     }
 
     /**
+     * Check if polling should be aborted
+     */
+    private checkAbort(
+        attempt: number,
+        startTime: number
+    ): PollingResult<T> | null {
+        if (this.abortController?.signal.aborted) {
+            return {
+                success: false,
+                error: new Error("Polling aborted"),
+                attempts: attempt,
+                duration: Date.now() - startTime,
+            };
+        }
+
+        const elapsed = Date.now() - startTime;
+        if (elapsed > this.options.maxDuration) {
+            return {
+                success: false,
+                error: new Error("Polling timeout exceeded"),
+                attempts: attempt,
+                duration: elapsed,
+            };
+        }
+
+        return null;
+    }
+
+    /**
+     * Execute a single polling attempt
+     */
+    private async executeAttempt(
+        attempt: number,
+        responseTimes: number[]
+    ): Promise<{ result?: T; error?: Error; responseTime: number }> {
+        const attemptStartTime = Date.now();
+
+        try {
+            // Execute with optional timeout
+            const result = this.options.attemptTimeout
+                ? await this.executeWithTimeout(
+                      this.fn(),
+                      this.options.attemptTimeout
+                  )
+                : await this.fn();
+
+            const responseTime = Date.now() - attemptStartTime;
+            responseTimes.push(responseTime);
+            this.options.onAttempt(attempt, result);
+
+            return { result, responseTime };
+        } catch (error) {
+            const err =
+                error instanceof Error ? error : new Error(String(error));
+            this.options.onAttempt(attempt, undefined, err);
+            return { error: err, responseTime: Date.now() - attemptStartTime };
+        }
+    }
+
+    /**
+     * Handle successful result
+     */
+    private handleSuccess(
+        result: T,
+        attempt: number,
+        startTime: number,
+        responseTimes: number[]
+    ): PollingResult<T> {
+        this.options.onSuccess(result, attempt);
+        return {
+            success: true,
+            result,
+            attempts: attempt,
+            duration: Date.now() - startTime,
+            metrics: this.calculateMetrics(responseTimes),
+        };
+    }
+
+    /**
+     * Handle error result
+     */
+    private handleError(
+        error: Error,
+        attempt: number,
+        startTime: number,
+        responseTimes: number[]
+    ): PollingResult<T> {
+        this.options.onError(error, attempt);
+        return {
+            success: false,
+            error,
+            attempts: attempt,
+            duration: Date.now() - startTime,
+            metrics: this.calculateMetrics(responseTimes),
+        };
+    }
+
+    /**
      * Start polling
      */
     async start(): Promise<PollingResult<T>> {
@@ -73,73 +173,40 @@ export class PollingHelper<T = unknown> {
         let attempt = 0;
         let currentInterval = this.options.interval;
         let lastError: Error | undefined;
-        let lastResult: T | undefined;
         const responseTimes: number[] = [];
 
         while (attempt < this.options.maxAttempts) {
             // Check if aborted
-            if (this.abortController?.signal.aborted) {
-                return {
-                    success: false,
-                    error: new Error("Polling aborted"),
-                    attempts: attempt,
-                    duration: Date.now() - startTime,
-                };
-            }
-
-            const elapsed = Date.now() - startTime;
-            if (elapsed > this.options.maxDuration) {
-                return {
-                    success: false,
-                    error: new Error("Polling timeout exceeded"),
-                    attempts: attempt,
-                    duration: elapsed,
-                };
-            }
+            const abortResult = this.checkAbort(attempt, startTime);
+            if (abortResult) return abortResult;
 
             attempt++;
 
-            try {
-                const attemptStartTime = Date.now();
-                
-                // Execute with optional timeout
-                lastResult = this.options.attemptTimeout
-                    ? await this.executeWithTimeout(
-                          this.fn(),
-                          this.options.attemptTimeout
-                      )
-                    : await this.fn();
-                
-                const responseTime = Date.now() - attemptStartTime;
-                responseTimes.push(responseTime);
-                
-                this.options.onAttempt(attempt, lastResult);
+            const { result, error, responseTime } = await this.executeAttempt(
+                attempt,
+                responseTimes
+            );
 
-                if (this.options.stopCondition(lastResult)) {
-                    this.options.onSuccess(lastResult, attempt);
-                    return {
-                        success: true,
-                        result: lastResult,
-                        attempts: attempt,
-                        duration: Date.now() - startTime,
-                        metrics: this.calculateMetrics(responseTimes),
-                    };
+            if (result !== undefined) {
+                if (this.options.stopCondition(result)) {
+                    return this.handleSuccess(
+                        result,
+                        attempt,
+                        startTime,
+                        responseTimes
+                    );
                 }
-            } catch (error) {
-                lastError =
-                    error instanceof Error ? error : new Error(String(error));
-                this.options.onAttempt(attempt, undefined, lastError);
-                
+            } else if (error) {
+                lastError = error;
+
                 // If retryOnError is false, stop immediately
                 if (!this.options.retryOnError) {
-                    this.options.onError(lastError, attempt);
-                    return {
-                        success: false,
-                        error: lastError,
-                        attempts: attempt,
-                        duration: Date.now() - startTime,
-                        metrics: this.calculateMetrics(responseTimes),
-                    };
+                    return this.handleError(
+                        error,
+                        attempt,
+                        startTime,
+                        responseTimes
+                    );
                 }
             }
 
@@ -153,17 +220,12 @@ export class PollingHelper<T = unknown> {
             }
         }
 
-        this.options.onError(
+        return this.handleError(
             lastError || new Error("Max attempts exceeded"),
-            attempt
+            attempt,
+            startTime,
+            responseTimes
         );
-        return {
-            success: false,
-            error: lastError || new Error("Max attempts exceeded"),
-            attempts: attempt,
-            duration: Date.now() - startTime,
-            metrics: this.calculateMetrics(responseTimes),
-        };
     }
 
     /**
@@ -260,7 +322,11 @@ export class PollingHelper<T = unknown> {
     private calculateMetrics(
         responseTimes: number[]
     ):
-        | { minResponseTime: number; maxResponseTime: number; avgResponseTime: number }
+        | {
+              minResponseTime: number;
+              maxResponseTime: number;
+              avgResponseTime: number;
+          }
         | undefined {
         if (responseTimes.length === 0) return undefined;
 

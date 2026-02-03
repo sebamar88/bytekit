@@ -1,6 +1,9 @@
 /**
  * Cryptographic utilities for hashing, encoding, and token generation
  * Isomorphic crypto operations for Node.js and browsers
+ *
+ * @security All cryptographic functions use secure random generation (crypto.getRandomValues)
+ * @warning Fallback implementations using Math.random() should NOT be used in production
  */
 
 /**
@@ -8,14 +11,29 @@
  */
 export class CryptoUtils {
     /**
-     * Generate random token (hex string)
+     * Generate cryptographically secure random token (hex string)
+     * @param length - Length of the token in bytes (default: 32)
+     * @returns Hex-encoded random string
+     * @security Uses crypto.getRandomValues() for secure random generation
+     * @throws {Error} If crypto API is unavailable in production environment
      */
     static generateToken(length: number = 32): string {
         const bytes = new Uint8Array(length);
         if (typeof globalThis !== "undefined" && globalThis.crypto) {
             globalThis.crypto.getRandomValues(bytes);
         } else {
-            // Fallback for environments without crypto
+            // Insecure fallback - should only be used in development/testing
+            if (
+                typeof process !== "undefined" &&
+                process.env.NODE_ENV === "production"
+            ) {
+                throw new Error(
+                    "Secure random generation unavailable in production. crypto API required."
+                );
+            }
+            console.warn(
+                "⚠️  SECURITY WARNING: Using insecure Math.random() for token generation. Not suitable for production!"
+            );
             for (let i = 0; i < length; i++) {
                 bytes[i] = Math.floor(Math.random() * 256);
             }
@@ -26,7 +44,10 @@ export class CryptoUtils {
     }
 
     /**
-     * Generate random UUID v4
+     * Generate cryptographically secure UUID v4
+     * @returns UUID v4 string in format xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx
+     * @security Uses crypto.randomUUID() when available
+     * @throws {Error} If crypto API is unavailable in production environment
      */
     static generateUUID(): string {
         if (
@@ -36,7 +57,37 @@ export class CryptoUtils {
             return globalThis.crypto.randomUUID();
         }
 
-        // Fallback implementation
+        // Check if we can use getRandomValues for fallback
+        if (
+            typeof globalThis !== "undefined" &&
+            globalThis.crypto?.getRandomValues
+        ) {
+            const bytes = new Uint8Array(16);
+            globalThis.crypto.getRandomValues(bytes);
+
+            // Set version (4) and variant bits
+            bytes[6] = (bytes[6] & 0x0f) | 0x40;
+            bytes[8] = (bytes[8] & 0x3f) | 0x80;
+
+            const hex = Array.from(bytes)
+                .map((b) => b.toString(16).padStart(2, "0"))
+                .join("");
+            return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
+        }
+
+        // Insecure fallback - should only be used in development/testing
+        if (
+            typeof process !== "undefined" &&
+            process.env.NODE_ENV === "production"
+        ) {
+            throw new Error(
+                "Secure random generation unavailable in production. crypto API required."
+            );
+        }
+        console.warn(
+            "⚠️  SECURITY WARNING: Using insecure Math.random() for UUID generation. Not suitable for production!"
+        );
+
         const chars = "0123456789abcdef";
         let uuid = "";
         for (let i = 0; i < 36; i++) {
@@ -80,9 +131,9 @@ export class CryptoUtils {
      */
     static base64UrlEncode(str: string): string {
         return this.base64Encode(str)
-            .replace(/\+/g, "-")
-            .replace(/\//g, "_")
-            .replace(/=/g, "");
+            .replaceAll(/\+/g, "-")
+            .replaceAll(/\//g, "_")
+            .replaceAll(/=/g, "");
     }
 
     /**
@@ -90,7 +141,9 @@ export class CryptoUtils {
      */
     static base64UrlDecode(str: string): string {
         const padded = str + "=".repeat((4 - (str.length % 4)) % 4);
-        return this.base64Decode(padded.replace(/-/g, "+").replace(/_/g, "/"));
+        return this.base64Decode(
+            padded.replaceAll(/-/g, "+").replaceAll(/_/g, "/")
+        );
     }
 
     /**

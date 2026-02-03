@@ -61,4 +61,4 @@ async function testErrorHandling() {
     console.log("  - JSON.stringify(error) - For logging\n");
 }
 
-testErrorHandling().catch(console.error);
+await testErrorHandling();

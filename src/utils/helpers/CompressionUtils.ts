@@ -47,7 +47,7 @@ export class CompressionUtils {
                     num += str[i];
                     i++;
                 }
-                const count = parseInt(num, 10);
+                const count = Number.parseInt(num, 10);
                 const char = str[i];
                 decompressed += char.repeat(count);
                 i++;
@@ -87,9 +87,9 @@ export class CompressionUtils {
      */
     static base64UrlEncode(str: string): string {
         return this.base64Encode(str)
-            .replace(/\+/g, "-")
-            .replace(/\//g, "_")
-            .replace(/=/g, "");
+            .replaceAll(/\+/g, "-")
+            .replaceAll(/\//g, "_")
+            .replaceAll(/=/g, "");
     }
 
     /**
@@ -97,7 +97,9 @@ export class CompressionUtils {
      */
     static base64UrlDecode(str: string): string {
         const padded = str + "=".repeat((4 - (str.length % 4)) % 4);
-        return this.base64Decode(padded.replace(/-/g, "+").replace(/_/g, "/"));
+        return this.base64Decode(
+            padded.replaceAll(/-/g, "+").replaceAll(/_/g, "/")
+        );
     }
 
     /**
@@ -129,7 +131,7 @@ export class CompressionUtils {
      * Minify JSON (remove whitespace)
      */
     static minifyJSON(json: string): string {
-        return json.replace(/\s+/g, " ").trim();
+        return json.replaceAll(/\s+/g, " ").trim();
     }
 
     /**
@@ -259,7 +261,9 @@ export class CompressionUtils {
         const i = Math.floor(Math.log(bytes) / Math.log(k));
 
         return (
-            parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + " " + sizes[i]
+            Number.parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) +
+            " " +
+            sizes[i]
         );
     }
 }

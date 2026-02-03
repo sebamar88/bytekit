@@ -123,7 +123,9 @@ test("StreamingHelper.streamSSE sets up connection", async () => {
                 });
             }
         }
-        close() {}
+        close() {
+            // Intentionally empty - test stub
+        }
     }
 
     globalThis.EventSource = MockEventSource;
@@ -307,7 +309,9 @@ test("StreamingHelper.streamSSE warns on parse error", async () => {
                 this.listeners["message"]({ data: "not-json" });
             }
         }
-        close() {}
+        close() {
+            // Intentionally empty - test stub
+        }
     }
 
     const originalWarn = console.warn;
@@ -342,7 +346,9 @@ test("StreamingHelper.streamSSE calls onError and onComplete on error", async ()
                 this.listeners["error"]();
             }
         }
-        close() {}
+        close() {
+            // Intentionally empty - test stub
+        }
     }
 
     globalThis.EventSource = ErrorEventSource;

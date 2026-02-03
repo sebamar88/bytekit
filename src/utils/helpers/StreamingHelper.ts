@@ -14,6 +14,47 @@ export interface StreamResponse<T> {
 
 export class StreamingHelper {
     /**
+     * Process remaining buffer content
+     */
+    private static processRemainingBuffer<T>(
+        buffer: string,
+        data: T[],
+        onChunk?: (chunk: string) => void
+    ): void {
+        if (buffer.trim()) {
+            try {
+                const item = JSON.parse(buffer) as T;
+                data.push(item);
+                onChunk?.(buffer);
+            } catch {
+                console.warn("Failed to parse final buffer:", buffer);
+            }
+        }
+    }
+
+    /**
+     * Process complete lines from stream
+     */
+    private static processLines<T>(
+        lines: string[],
+        data: T[],
+        onChunk?: (chunk: string) => void
+    ): void {
+        for (let i = 0; i < lines.length - 1; i++) {
+            const line = lines[i].trim();
+            if (line) {
+                try {
+                    const item = JSON.parse(line) as T;
+                    data.push(item);
+                    onChunk?.(line);
+                } catch {
+                    console.warn("Failed to parse line:", line);
+                }
+            }
+        }
+    }
+
+    /**
      * Stream JSON lines from an endpoint
      * Each line should be a valid JSON object
      */
@@ -65,15 +106,7 @@ export class StreamingHelper {
 
                 if (done) {
                     // Process any remaining data in buffer
-                    if (buffer.trim()) {
-                        try {
-                            const item = JSON.parse(buffer) as T;
-                            data.push(item);
-                            onChunk?.(buffer);
-                        } catch {
-                            console.warn("Failed to parse final buffer:", buffer);
-                        }
-                    }
+                    this.processRemainingBuffer(buffer, data, onChunk);
                     complete = true;
                     break;
                 }
@@ -82,18 +115,7 @@ export class StreamingHelper {
                 const lines = buffer.split("\n");
 
                 // Process complete lines
-                for (let i = 0; i < lines.length - 1; i++) {
-                    const line = lines[i].trim();
-                    if (line) {
-                        try {
-                            const item = JSON.parse(line) as T;
-                            data.push(item);
-                            onChunk?.(line);
-                        } catch {
-                            console.warn("Failed to parse line:", line);
-                        }
-                    }
-                }
+                this.processLines(lines, data, onChunk);
 
                 // Keep incomplete line in buffer
                 buffer = lines[lines.length - 1];
@@ -118,11 +140,7 @@ export class StreamingHelper {
         subscribe: (callback: (data: T) => void) => () => void;
         close: () => void;
     } {
-        const {
-            onError,
-            onComplete,
-            eventType = "message",
-        } = options;
+        const { onError, onComplete, eventType = "message" } = options;
 
         let eventSource: EventSource | null = null;
         const subscribers: Set<(data: T) => void> = new Set();
@@ -146,7 +164,8 @@ export class StreamingHelper {
                     close();
                 });
             } catch (error) {
-                const err = error instanceof Error ? error : new Error(String(error));
+                const err =
+                    error instanceof Error ? error : new Error(String(error));
                 onError?.(err);
             }
         };
@@ -175,7 +194,9 @@ export class StreamingHelper {
      */
     static async downloadStream(
         endpoint: string,
-        options: StreamOptions & { onProgress?: (progress: number) => void } = {}
+        options: StreamOptions & {
+            onProgress?: (progress: number) => void;
+        } = {}
     ): Promise<Blob> {
         const {
             timeout: _timeout = 30000, // Renamed to _timeout as it's not directly used after this destructuring
@@ -198,7 +219,9 @@ export class StreamingHelper {
             clearTimeout(timeoutId);
 
             if (!response.ok) {
-                throw new Error(`Download failed with status ${response.status}`);
+                throw new Error(
+                    `Download failed with status ${response.status}`
+                );
             }
 
             const contentLength = response.headers.get("content-length");
@@ -228,7 +251,8 @@ export class StreamingHelper {
             onComplete?.();
             return new Blob(chunks as BlobPart[]);
         } catch (error) {
-            const err = error instanceof Error ? error : new Error(String(error));
+            const err =
+                error instanceof Error ? error : new Error(String(error));
             onError?.(err);
             throw err;
         }
