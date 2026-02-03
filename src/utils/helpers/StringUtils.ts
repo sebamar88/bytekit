@@ -281,9 +281,15 @@ export const StringUtils = {
             .toLowerCase()
             .split(/[^a-zA-Z0-9]+/)
             .filter(Boolean);
-        
+
         if (words.length === 0) return "";
-        return words[0] + words.slice(1).map(w => w.charAt(0).toUpperCase() + w.slice(1)).join("");
+        return (
+            words[0] +
+            words
+                .slice(1)
+                .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+                .join("")
+        );
     },
 
     pascalCase: (value: string | null | undefined) => {
@@ -300,8 +306,10 @@ export const StringUtils = {
             .toLowerCase()
             .split(/[^a-zA-Z0-9]+/)
             .filter(Boolean);
-        
-        return words.map(w => w.charAt(0).toUpperCase() + w.slice(1)).join("");
+
+        return words
+            .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+            .join("");
     },
 
     kebabCase: (value: string | null | undefined) => {
