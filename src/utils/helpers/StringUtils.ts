@@ -276,9 +276,14 @@ export const StringUtils = {
             .replace(/([a-z])([A-Z])/g, "$1-$2")
             .replace(/([A-Z])([A-Z][a-z])/g, "$1-$2");
 
-        return withSeparators
+        // Split by non-alphanumeric chars and capitalize
+        const words = withSeparators
             .toLowerCase()
-            .replace(/[^a-zA-Z0-9]+(.)/g, (_, chr) => chr.toUpperCase());
+            .split(/[^a-zA-Z0-9]+/)
+            .filter(Boolean);
+        
+        if (words.length === 0) return "";
+        return words[0] + words.slice(1).map(w => w.charAt(0).toUpperCase() + w.slice(1)).join("");
     },
 
     pascalCase: (value: string | null | undefined) => {
@@ -290,10 +295,13 @@ export const StringUtils = {
             .replace(/([a-z])([A-Z])/g, "$1-$2")
             .replace(/([A-Z])([A-Z][a-z])/g, "$1-$2");
 
-        return withSeparators
+        // Split by non-alphanumeric chars and capitalize all
+        const words = withSeparators
             .toLowerCase()
-            .replace(/[^a-zA-Z0-9]+(.)/g, (_, chr) => chr.toUpperCase())
-            .replace(/^[a-z]/, (chr) => chr.toUpperCase());
+            .split(/[^a-zA-Z0-9]+/)
+            .filter(Boolean);
+        
+        return words.map(w => w.charAt(0).toUpperCase() + w.slice(1)).join("");
     },
 
     kebabCase: (value: string | null | undefined) => {
