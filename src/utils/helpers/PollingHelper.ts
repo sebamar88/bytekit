@@ -295,7 +295,15 @@ export class PollingHelper<T = unknown> {
             typeof this.options.jitter === "number" ? this.options.jitter : 10;
         const jitterAmount = interval * (jitterPercent / 100);
         // Add random jitter: -jitterAmount to +jitterAmount
-        return interval + (Math.random() * jitterAmount * 2 - jitterAmount);
+        let randomValue: number;
+        if (typeof crypto !== "undefined" && crypto.getRandomValues) {
+            const array = new Uint32Array(1);
+            crypto.getRandomValues(array);
+            randomValue = array[0] / (0xffffffff + 1);
+        } else {
+            randomValue = Math.random();
+        }
+        return interval + (randomValue * jitterAmount * 2 - jitterAmount);
     }
 
     /**
@@ -319,9 +327,7 @@ export class PollingHelper<T = unknown> {
     /**
      * Calculate performance metrics
      */
-    private calculateMetrics(
-        responseTimes: number[]
-    ):
+    private calculateMetrics(responseTimes: number[]):
         | {
               minResponseTime: number;
               maxResponseTime: number;

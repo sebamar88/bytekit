@@ -120,9 +120,13 @@ export class RetryPolicy {
             try {
                 return await fn();
             } catch (error) {
-                lastError = error instanceof Error ? error : new Error(String(error));
+                lastError =
+                    error instanceof Error ? error : new Error(String(error));
 
-                if (attempt === this.maxAttempts || !this.shouldRetry(lastError, attempt)) {
+                if (
+                    attempt === this.maxAttempts ||
+                    !this.shouldRetry(lastError, attempt)
+                ) {
                     throw lastError;
                 }
 
@@ -137,7 +141,15 @@ export class RetryPolicy {
     private calculateDelay(attempt: number): number {
         const exponentialDelay =
             this.initialDelayMs * Math.pow(this.backoffMultiplier, attempt - 1);
-        const jitter = Math.random() * 0.1 * exponentialDelay;
+        let randomValue: number;
+        if (typeof crypto !== "undefined" && crypto.getRandomValues) {
+            const array = new Uint32Array(1);
+            crypto.getRandomValues(array);
+            randomValue = array[0] / (0xffffffff + 1);
+        } else {
+            randomValue = Math.random();
+        }
+        const jitter = randomValue * 0.1 * exponentialDelay;
         return Math.min(exponentialDelay + jitter, this.maxDelayMs);
     }
 

@@ -2,6 +2,7 @@ import { ApiClient, ApiError } from "./ApiClient.js";
 import type { RequestOptions } from "./ApiClient.js";
 import { EventEmitter } from "#helpers/EventEmitter.js";
 import { CacheManager } from "#helpers/CacheManager.js";
+import { CryptoUtils } from "#helpers/CryptoUtils.js";
 import {
     RequestState,
     RequestContext,
@@ -715,7 +716,8 @@ export class QueryClient {
     }
 
     private generateRequestId(): string {
-        return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+        // Use CryptoUtils from the library for cryptographically secure UUID generation
+        return CryptoUtils.generateUUID();
     }
 
     private async refetchStaleQueries(): Promise<void> {

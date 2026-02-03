@@ -21,7 +21,13 @@ export class UrlBuilder {
      */
     path(...segments: string[]): this {
         const cleanSegments = segments
-            .map((s) => s.replaceAll(/^\/+|\/+$/g, ""))
+            .map((s) => {
+                // Remove leading and trailing slashes safely without ReDoS
+                let cleaned = s;
+                while (cleaned.startsWith("/")) cleaned = cleaned.slice(1);
+                while (cleaned.endsWith("/")) cleaned = cleaned.slice(0, -1);
+                return cleaned;
+            })
             .filter(Boolean);
 
         if (cleanSegments.length === 0) {

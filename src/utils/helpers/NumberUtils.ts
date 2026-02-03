@@ -220,7 +220,13 @@ export class NumberUtils {
      * NumberUtils.random(1, 100); // Random number between 1 and 100
      */
     static random(min: number, max: number): number {
-        return Math.floor(Math.random() * (max - min + 1)) + min;
+        const range = max - min + 1;
+        if (typeof crypto !== "undefined" && crypto.getRandomValues) {
+            const array = new Uint32Array(1);
+            crypto.getRandomValues(array);
+            return min + (array[0] % range);
+        }
+        return Math.floor(Math.random() * range) + min;
     }
 
     /**
@@ -229,7 +235,15 @@ export class NumberUtils {
      * NumberUtils.randomFloat(0, 1); // Random float between 0 and 1
      */
     static randomFloat(min: number, max: number, decimals: number = 2): number {
-        const value = Math.random() * (max - min) + min;
+        let random: number;
+        if (typeof crypto !== "undefined" && crypto.getRandomValues) {
+            const array = new Uint32Array(1);
+            crypto.getRandomValues(array);
+            random = array[0] / (0xffffffff + 1); // Normalize to 0-1
+        } else {
+            random = Math.random();
+        }
+        const value = random * (max - min) + min;
         return this.round(value, decimals);
     }
 

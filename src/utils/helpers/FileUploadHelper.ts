@@ -1,3 +1,5 @@
+import { CryptoUtils } from "./CryptoUtils.js";
+
 export interface UploadProgress {
     loaded: number;
     total: number;
@@ -160,7 +162,7 @@ export class FileUploadHelper {
      * Generate a unique upload ID
      */
     private static generateUploadId(): string {
-        return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+        return CryptoUtils.generateUUID();
     }
 
     /**

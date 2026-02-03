@@ -1,4 +1,3 @@
-const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const UUID_V4_REGEX =
     /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const INTERNATIONAL_PHONE_REGEX = /^\+[1-9]\d{7,14}$/;
@@ -61,8 +60,26 @@ export interface StrongPasswordOptions {
 }
 
 export const Validator = {
-    isEmail: (value: string | null | undefined) =>
-        typeof value === "string" && EMAIL_REGEX.test(value),
+    isEmail: (value: string | null | undefined) => {
+        if (typeof value !== "string" || !value) return false;
+
+        // Safe email validation without ReDoS vulnerability
+        const trimmed = value.trim();
+        if (trimmed !== value || trimmed.length === 0) return false;
+
+        const atIndex = trimmed.indexOf("@");
+        if (atIndex <= 0 || atIndex === trimmed.length - 1) return false;
+        if (trimmed.indexOf("@", atIndex + 1) !== -1) return false; // Multiple @
+
+        const domain = trimmed.slice(atIndex + 1);
+        const dotIndex = domain.indexOf(".");
+        if (dotIndex <= 0 || dotIndex === domain.length - 1) return false;
+
+        // Check for whitespace
+        if (trimmed.includes(" ")) return false;
+
+        return true;
+    },
 
     isEmpty: (value: unknown) =>
         value === null ||
