@@ -16,3 +16,11 @@ _bmad-output
 .github/prompts
 .specify
 .agent
+
+# Test coverage
+coverage
+.nyc_output
+*.lcov
+
+# Test reports
+test-report.junit.xml
