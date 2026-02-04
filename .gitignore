@@ -13,3 +13,6 @@ _bmad-output
 .agent
 .claude
 .github/agents
+.github/prompts
+.specify
+.agent
