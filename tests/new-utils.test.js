@@ -319,10 +319,10 @@ test("PollingHelper tracks metrics", async () => {
 });
 
 test("PollingHelper respects retryOnError option", async () => {
-    let attempts = 0;
+    let _attempts = 0;
     const poller = new PollingHelper(
         async () => {
-            attempts++;
+            _attempts++;
             throw new Error("Test error");
         },
         {

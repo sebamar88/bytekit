@@ -339,7 +339,6 @@ export class ApiClient {
         }
 
         // Extract only needed properties for request
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const {
             pagination: _pagination,
             sort: _sort,

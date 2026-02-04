@@ -119,7 +119,7 @@ test("ApiClient rejects with timeout errors when exceeding deadline", async () =
 
 test("ApiClient applies request/response interceptors", async () => {
     let capturedUrl = "";
-    const fetchImpl = async (url, init) => {
+    const fetchImpl = async (url, _init) => {
         capturedUrl = url;
         return new Response(JSON.stringify({ ok: true }), {
             status: 200,

@@ -6,10 +6,10 @@ import {
 } from "../dist/utils/helpers/PollingHelper.js";
 
 test("PollingHelper succeeds when stopCondition is met", async () => {
-    let attempts = 0;
+    let _attempts = 0;
     const poller = new PollingHelper(
         async () => {
-            attempts++;
+            _attempts++;
             return { status: "done" };
         },
         {
