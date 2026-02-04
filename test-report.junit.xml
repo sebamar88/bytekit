@@ -1,0 +1,796 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites 	<testsuite name="ApiClient Coverage" time="1.004517" disabled="0" errors="0" tests="4" failures="0" skipped="0" hostname="Seba-Pc">
+		<testcase name="should handle request timeout correctly" time="0.677900" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\api-client-coverage.test.js"/>
+		<testcase name="should merge default headers with request headers" time="0.001277" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\api-client-coverage.test.js"/>
+		<testcase name="should handle network errors (fetch throws)" time="0.323682" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\api-client-coverage.test.js"/>
+		<testcase name="should handle non-JSON responses gracefully" time="0.000728" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\api-client-coverage.test.js"/>
+	</testsuite>
+	<testcase name="ApiClient should convert Headers object to plain object before passing to fetch" time="0.022599" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\api-client-headers.test.js"/>
+	<testcase name="ApiClient should preserve Authorization header in POST requests" time="0.000814" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\api-client-headers.test.js"/>
+	<testcase name="ApiClient should not override Content-Type if already set" time="0.000435" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\api-client-headers.test.js"/>
+	<testcase name="ApiClient should auto-set Content-Type only if not present" time="0.000370" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\api-client-headers.test.js"/>
+	<testcase name="ApiClient should merge request headers with default headers" time="0.000425" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\api-client-headers.test.js"/>
+	<testcase name="ApiClient should allow overriding default headers in request" time="0.000343" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\api-client-headers.test.js"/>
+	<testcase name="ApiClient builds URLs with search params and returns JSON bodies" time="0.056077" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\api-client.test.js"/>
+	<testcase name="ApiClient serializes JSON bodies and merges headers" time="0.001172" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\api-client.test.js"/>
+	<testcase name="ApiClient throws ApiError with localized message on HTTP errors" time="0.001094" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\api-client.test.js"/>
+	<testcase name="ApiClient rejects with timeout errors when exceeding deadline" time="0.413890" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\api-client.test.js"/>
+	<testcase name="ApiClient applies request/response interceptors" time="0.005735" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\api-client.test.js"/>
+	<testcase name="ApiClient validates responses when schema provided" time="0.001076" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\api-client.test.js"/>
+	<testcase name="ApiClient returns undefined for 204 responses" time="0.000378" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\api-client.test.js"/>
+	<testcase name="ApiClient parses text responses when content-type is not json" time="0.000446" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\api-client.test.js"/>
+	<testcase name="ApiClient.getList returns paginated response with correct structure" time="0.012810" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\api-client.test.js"/>
+	<testcase name="ApiClient.getList merges pagination params with existing searchParams" time="0.000763" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\api-client.test.js"/>
+	<testcase name="ArrayUtils.chunk splits array into chunks" time="0.001597" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\array-utils.test.js"/>
+	<testcase name="ArrayUtils.chunk throws on invalid size" time="0.000349" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\array-utils.test.js"/>
+	<testcase name="ArrayUtils.flatten flattens nested arrays" time="0.000176" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\array-utils.test.js"/>
+	<testcase name="ArrayUtils.flatten with depth 0 filters non-arrays" time="0.000091" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\array-utils.test.js"/>
+	<testcase name="ArrayUtils.unique removes duplicates" time="0.000111" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\array-utils.test.js"/>
+	<testcase name="ArrayUtils.unique with custom key function" time="0.000117" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\array-utils.test.js"/>
+	<testcase name="ArrayUtils.deduplicate is alias for unique" time="0.000144" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\array-utils.test.js"/>
+	<testcase name="ArrayUtils.compact removes falsy values" time="0.000100" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\array-utils.test.js"/>
+	<testcase name="ArrayUtils.flat flattens one level" time="0.000125" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\array-utils.test.js"/>
+	<testcase name="ArrayUtils.first returns first element" time="0.000262" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\array-utils.test.js"/>
+	<testcase name="ArrayUtils.last returns last element" time="0.000151" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\array-utils.test.js"/>
+	<testcase name="ArrayUtils.at supports positive indices" time="0.000167" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\array-utils.test.js"/>
+	<testcase name="ArrayUtils.at supports negative indices" time="0.000106" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\array-utils.test.js"/>
+	<testcase name="ArrayUtils.shuffle returns shuffled array" time="0.026721" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\array-utils.test.js"/>
+	<testcase name="ArrayUtils.random returns random element" time="0.000250" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\array-utils.test.js"/>
+	<testcase name="ArrayUtils.random returns undefined for empty array" time="0.000097" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\array-utils.test.js"/>
+	<testcase name="ArrayUtils.randomN returns N random elements" time="0.000512" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\array-utils.test.js"/>
+	<testcase name="ArrayUtils.randomN handles edge cases" time="0.000093" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\array-utils.test.js"/>
+	<testcase name="ArrayUtils.reverse reverses array" time="0.000168" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\array-utils.test.js"/>
+	<testcase name="ArrayUtils.rotate rotates array" time="0.000125" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\array-utils.test.js"/>
+	<testcase name="ArrayUtils.rotate handles empty array" time="0.000047" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\array-utils.test.js"/>
+	<testcase name="ArrayUtils.zip zips arrays together" time="0.000117" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\array-utils.test.js"/>
+	<testcase name="ArrayUtils.zip handles arrays of different lengths" time="0.000061" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\array-utils.test.js"/>
+	<testcase name="ArrayUtils.zip handles empty input" time="0.000061" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\array-utils.test.js"/>
+	<testcase name="ArrayUtils.unzip unzips array of tuples" time="0.000105" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\array-utils.test.js"/>
+	<testcase name="ArrayUtils.unzip handles empty array" time="0.000039" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\array-utils.test.js"/>
+	<testcase name="ArrayUtils.difference finds difference" time="0.000068" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\array-utils.test.js"/>
+	<testcase name="ArrayUtils.intersection finds intersection" time="0.000059" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\array-utils.test.js"/>
+	<testcase name="ArrayUtils.union finds union" time="0.000059" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\array-utils.test.js"/>
+	<testcase name="ArrayUtils.includesAll checks if includes all" time="0.000081" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\array-utils.test.js"/>
+	<testcase name="ArrayUtils.includesAny checks if includes any" time="0.000052" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\array-utils.test.js"/>
+	<testcase name="ArrayUtils.sum calculates sum" time="0.000069" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\array-utils.test.js"/>
+	<testcase name="ArrayUtils.average calculates average" time="0.000065" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\array-utils.test.js"/>
+	<testcase name="ArrayUtils.min finds minimum" time="0.000046" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\array-utils.test.js"/>
+	<testcase name="ArrayUtils.max finds maximum" time="0.000063" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\array-utils.test.js"/>
+	<testcase name="ArrayUtils.range generates range" time="0.000100" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\array-utils.test.js"/>
+	<testcase name="ArrayUtils.range handles negative step" time="0.000100" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\array-utils.test.js"/>
+	<testcase name="ArrayUtils.range handles zero step" time="0.000054" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\array-utils.test.js"/>
+	<testcase name="ArrayUtils.repeat repeats array" time="0.000191" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\array-utils.test.js"/>
+	<testcase name="ArrayUtils.fill fills array with value" time="0.000194" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\array-utils.test.js"/>
+	<testcase name="ArrayUtils.transpose transposes 2D array" time="0.000202" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\array-utils.test.js"/>
+	<testcase name="ArrayUtils.transpose handles empty array" time="0.000104" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\array-utils.test.js"/>
+	<testcase name="ArrayUtils.findIndex finds index" time="0.000109" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\array-utils.test.js"/>
+	<testcase name="ArrayUtils.findLastIndex finds last index" time="0.000121" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\array-utils.test.js"/>
+	<testcase name="ArrayUtils.partition partitions array" time="0.000244" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\array-utils.test.js"/>
+	<testcase name="BatchRequest executes requests in parallel" time="0.014808" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\batch-request.test.js"/>
+	<testcase name="BatchRequest executes requests sequentially" time="0.118052" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\batch-request.test.js"/>
+	<testcase name="BatchRequest handles errors with fallback" time="0.000634" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\batch-request.test.js"/>
+	<testcase name="BatchRequest aborts on error when configured" time="0.000328" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\batch-request.test.js"/>
+	<testcase name="BatchRequest executeAsObject returns labeled results" time="0.009830" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\batch-request.test.js"/>
+	<testcase name="BatchRequest executeSequentialAsObject returns labeled results" time="0.000429" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\batch-request.test.js"/>
+	<testcase name="BatchRequest size returns number of requests" time="0.000175" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\batch-request.test.js"/>
+	<testcase name="BatchRequest clear removes all requests" time="0.000165" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\batch-request.test.js"/>
+	<testcase name="BatchRequest clone creates independent copy" time="0.000180" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\batch-request.test.js"/>
+	<testcase name="BatchRequest timeout rejects on timeout" time="0.056676" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\batch-request.test.js"/>
+	<testcase name="BatchRequest handles mixed success and timeout" time="0.069915" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\batch-request.test.js"/>
+	<testcase name="createBatchRequest factory function works" time="0.000432" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\batch-request.test.js"/>
+	<testcase name="BatchRequest handles empty batch" time="0.000245" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\batch-request.test.js"/>
+	<testcase name="CacheManager memory cache basic operations" time="0.043801" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\cache-manager.test.js"/>
+	<testcase name="CacheManager respects MemoryCache TTL" time="0.026683" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\cache-manager.test.js"/>
+	<testcase name="CacheManager tracks statistics correctly" time="0.000277" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\cache-manager.test.js"/>
+	<testcase name="CacheManager LocalStorage support" time="0.000382" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\cache-manager.test.js"/>
+	<testcase name="CacheManager localStorage operations tolerate errors" time="0.000191" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\cache-manager.test.js"/>
+	<testcase name="CacheManager clears only prefixed localStorage keys" time="0.000104" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\cache-manager.test.js"/>
+	<testcase name="CacheManager restores from LocalStorage to memory" time="0.000124" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\cache-manager.test.js"/>
+	<testcase name="CacheManager.getOrCompute computes and caches" time="0.000182" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\cache-manager.test.js"/>
+	<testcase name="CacheManager delete and has operations" time="0.000113" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\cache-manager.test.js"/>
+	<testcase name="CacheManager handles zero maxMemorySize" time="0.000124" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\cache-manager.test.js"/>
+	<testcase name="CacheManager.clearPattern clears everything currently" time="0.001907" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\cache-manager.test.js"/>
+	<testcase name="createCacheManager factory works" time="0.000102" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\cache-manager.test.js"/>
+	<testcase name="scaffolds API and hooks for a resource" time="0.000569" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\cli.test.js">
+		<skipped type="skipped" message="true"/>
+	</testcase>
+	<testcase name="runCli shows help for empty args" time="0.000094" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\cli.test.js">
+		<skipped type="skipped" message="true"/>
+	</testcase>
+	<testcase name="runCli types generates output file" time="0.000071" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\cli.test.js">
+		<skipped type="skipped" message="true"/>
+	</testcase>
+	<testsuite name="ColorUtils" time="0.028206" disabled="0" errors="0" tests="26" failures="0" skipped="0" hostname="Seba-Pc">
+		<testsuite name="hexToRgb" time="0.002897" disabled="0" errors="0" tests="5" failures="0" skipped="0" hostname="Seba-Pc">
+			<testcase name="should convert 6-digit hex to RGB" time="0.001289" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\color-utils.test.js"/>
+			<testcase name="should convert 3-digit hex to RGB" time="0.000285" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\color-utils.test.js"/>
+			<testcase name="should handle hex without #" time="0.000144" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\color-utils.test.js"/>
+			<testcase name="should return null for invalid hex" time="0.000129" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\color-utils.test.js"/>
+			<testcase name="should handle 8-digit hex by ignoring alpha" time="0.000100" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\color-utils.test.js"/>
+		</testsuite>
+		<testsuite name="rgbToHex" time="0.000770" disabled="0" errors="0" tests="3" failures="0" skipped="0" hostname="Seba-Pc">
+			<testcase name="should convert RGB values to hex" time="0.000156" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\color-utils.test.js"/>
+			<testcase name="should convert RGB object to hex" time="0.000139" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\color-utils.test.js"/>
+			<testcase name="should clamp values outside 0-255" time="0.000234" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\color-utils.test.js"/>
+		</testsuite>
+		<testsuite name="rgbToHsl / hslToRgb" time="0.000628" disabled="0" errors="0" tests="3" failures="0" skipped="0" hostname="Seba-Pc">
+			<testcase name="should convert RGB to HSL" time="0.000228" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\color-utils.test.js"/>
+			<testcase name="should convert HSL to RGB" time="0.000199" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\color-utils.test.js"/>
+			<testcase name="should handle grayscale" time="0.000083" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\color-utils.test.js"/>
+		</testsuite>
+		<testsuite name="lighten / darken" time="0.000335" disabled="0" errors="0" tests="2" failures="0" skipped="0" hostname="Seba-Pc">
+			<testcase name="should lighten a color" time="0.000155" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\color-utils.test.js"/>
+			<testcase name="should darken a color" time="0.000115" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\color-utils.test.js"/>
+		</testsuite>
+		<testsuite name="complement" time="0.000151" disabled="0" errors="0" tests="1" failures="0" skipped="0" hostname="Seba-Pc">
+			<testcase name="should return complementary color" time="0.000105" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\color-utils.test.js"/>
+		</testsuite>
+		<testsuite name="invert" time="0.000233" disabled="0" errors="0" tests="2" failures="0" skipped="0" hostname="Seba-Pc">
+			<testcase name="should invert black to white" time="0.000105" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\color-utils.test.js"/>
+			<testcase name="should invert white to black" time="0.000073" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\color-utils.test.js"/>
+		</testsuite>
+		<testsuite name="mix" time="0.000249" disabled="0" errors="0" tests="3" failures="0" skipped="0" hostname="Seba-Pc">
+			<testcase name="should mix two colors equally" time="0.000100" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\color-utils.test.js"/>
+			<testcase name="should return first color at 0 weight" time="0.000040" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\color-utils.test.js"/>
+			<testcase name="should return second color at 100 weight" time="0.000047" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\color-utils.test.js"/>
+		</testsuite>
+		<testsuite name="luminance" time="0.000376" disabled="0" errors="0" tests="3" failures="0" skipped="0" hostname="Seba-Pc">
+			<testcase name="should return 0 for black" time="0.000103" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\color-utils.test.js"/>
+			<testcase name="should return 1 for white" time="0.000101" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\color-utils.test.js"/>
+			<testcase name="should return value between 0 and 1 for other colors" time="0.000079" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\color-utils.test.js"/>
+		</testsuite>
+		<testsuite name="contrast" time="0.000259" disabled="0" errors="0" tests="2" failures="0" skipped="0" hostname="Seba-Pc">
+			<testcase name="should return maximum contrast for black and white" time="0.000139" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\color-utils.test.js"/>
+			<testcase name="should return 1 for same colors" time="0.000062" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\color-utils.test.js"/>
+		</testsuite>
+		<testsuite name="isLight / isDark" time="0.000247" disabled="0" errors="0" tests="2" failures="0" skipped="0" hostname="Seba-Pc">
+			<testcase name="should identify white as light" time="0.000080" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\color-utils.test.js"/>
+			<testcase name="should identify black as dark" time="0.000092" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\color-utils.test.js"/>
+		</testsuite>
+		<testsuite name="textColor" time="0.000217" disabled="0" errors="0" tests="2" failures="0" skipped="0" hostname="Seba-Pc">
+			<testcase name="should return black text for light backgrounds" time="0.000100" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\color-utils.test.js"/>
+			<testcase name="should return white text for dark backgrounds" time="0.000058" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\color-utils.test.js"/>
+		</testsuite>
+		<testsuite name="WCAG compliance" time="0.000288" disabled="0" errors="0" tests="2" failures="0" skipped="0" hostname="Seba-Pc">
+			<testcase name="should pass AA for black on white" time="0.000118" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\color-utils.test.js"/>
+			<testcase name="should pass AAA for black on white" time="0.000108" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\color-utils.test.js"/>
+		</testsuite>
+		<testsuite name="random" time="0.002203" disabled="0" errors="0" tests="1" failures="0" skipped="0" hostname="Seba-Pc">
+			<testcase name="should generate valid hex color" time="0.002145" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\color-utils.test.js"/>
+		</testsuite>
+		<testsuite name="palette" time="0.001023" disabled="0" errors="0" tests="2" failures="0" skipped="0" hostname="Seba-Pc">
+			<testcase name="should generate specified number of colors" time="0.000224" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\color-utils.test.js"/>
+			<testcase name="should include base color" time="0.000678" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\color-utils.test.js"/>
+		</testsuite>
+		<testsuite name="gradient" time="0.000565" disabled="0" errors="0" tests="3" failures="0" skipped="0" hostname="Seba-Pc">
+			<testcase name="should generate gradient with correct number of steps" time="0.000158" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\color-utils.test.js"/>
+			<testcase name="should start with first color" time="0.000188" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\color-utils.test.js"/>
+			<testcase name="should end with second color" time="0.000109" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\color-utils.test.js"/>
+		</testsuite>
+		<testsuite name="parse" time="0.012620" disabled="0" errors="0" tests="5" failures="0" skipped="0" hostname="Seba-Pc">
+			<testcase name="should parse hex color" time="0.000165" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\color-utils.test.js"/>
+			<testcase name="should parse rgb format" time="0.000285" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\color-utils.test.js"/>
+			<testcase name="should parse hsl format" time="0.000188" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\color-utils.test.js"/>
+			<testcase name="should parse named colors" time="0.010738" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\color-utils.test.js"/>
+			<testcase name="should return null for unknown colors" time="0.000173" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\color-utils.test.js"/>
+		</testsuite>
+		<testsuite name="isValidHex" time="0.000323" disabled="0" errors="0" tests="4" failures="0" skipped="0" hostname="Seba-Pc">
+			<testcase name="should validate 3-digit hex" time="0.000135" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\color-utils.test.js"/>
+			<testcase name="should validate 6-digit hex" time="0.000041" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\color-utils.test.js"/>
+			<testcase name="should validate 8-digit hex (with alpha)" time="0.000031" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\color-utils.test.js"/>
+			<testcase name="should reject invalid hex" time="0.000031" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\color-utils.test.js"/>
+		</testsuite>
+		<testsuite name="hexToRgba / rgbaToHex" time="0.002032" disabled="0" errors="0" tests="4" failures="0" skipped="0" hostname="Seba-Pc">
+			<testcase name="should parse 8-digit hex with alpha" time="0.000244" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\color-utils.test.js"/>
+			<testcase name="should handle 4-digit shorthand" time="0.000239" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\color-utils.test.js"/>
+			<testcase name="should return null for invalid hex length" time="0.000148" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\color-utils.test.js"/>
+			<testcase name="should convert RGBA to hex" time="0.001258" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\color-utils.test.js"/>
+		</testsuite>
+		<testsuite name="hslToHex / hexToHsl" time="0.000242" disabled="0" errors="0" tests="2" failures="0" skipped="0" hostname="Seba-Pc">
+			<testcase name="should convert HSL object to hex" time="0.000111" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\color-utils.test.js"/>
+			<testcase name="should return null for invalid hex in hexToHsl" time="0.000073" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\color-utils.test.js"/>
+		</testsuite>
+		<testsuite name="saturate / desaturate / grayscale" time="0.000233" disabled="0" errors="0" tests="2" failures="0" skipped="0" hostname="Seba-Pc">
+			<testcase name="should increase and decrease saturation" time="0.000105" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\color-utils.test.js"/>
+			<testcase name="should convert to grayscale" time="0.000060" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\color-utils.test.js"/>
+		</testsuite>
+		<testsuite name="alpha / adjustHue" time="0.000154" disabled="0" errors="0" tests="2" failures="0" skipped="0" hostname="Seba-Pc">
+			<testcase name="should set alpha channel" time="0.000064" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\color-utils.test.js"/>
+			<testcase name="should adjust hue" time="0.000053" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\color-utils.test.js"/>
+		</testsuite>
+		<testsuite name="randomWithLightness" time="0.000133" disabled="0" errors="0" tests="1" failures="0" skipped="0" hostname="Seba-Pc">
+			<testcase name="should generate color with specified lightness" time="0.000104" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\color-utils.test.js"/>
+		</testsuite>
+		<testsuite name="additional palettes" time="0.000256" disabled="0" errors="0" tests="3" failures="0" skipped="0" hostname="Seba-Pc">
+			<testcase name="should create complementary palette" time="0.000116" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\color-utils.test.js"/>
+			<testcase name="should create triadic palette" time="0.000046" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\color-utils.test.js"/>
+			<testcase name="should create analogous palette" time="0.000047" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\color-utils.test.js"/>
+		</testsuite>
+		<testsuite name="shades and tints" time="0.000148" disabled="0" errors="0" tests="2" failures="0" skipped="0" hostname="Seba-Pc">
+			<testcase name="should generate shades" time="0.000069" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\color-utils.test.js"/>
+			<testcase name="should generate tints" time="0.000044" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\color-utils.test.js"/>
+		</testsuite>
+		<testsuite name="toCssRgb / toCssHsl" time="0.000447" disabled="0" errors="0" tests="3" failures="0" skipped="0" hostname="Seba-Pc">
+			<testcase name="should format css rgb" time="0.000071" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\color-utils.test.js"/>
+			<testcase name="should format css hsl" time="0.000215" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\color-utils.test.js"/>
+			<testcase name="should return null for invalid color" time="0.000056" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\color-utils.test.js"/>
+		</testsuite>
+		<testsuite name="parse rgba/hsla" time="0.000147" disabled="0" errors="0" tests="2" failures="0" skipped="0" hostname="Seba-Pc">
+			<testcase name="should parse rgba format" time="0.000062" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\color-utils.test.js"/>
+			<testcase name="should parse hsla format" time="0.000043" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\color-utils.test.js"/>
+		</testsuite>
+	</testsuite>
+	<testcase name="CompressionUtils compress/decompress roundtrip" time="0.001829" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\compression-utils.test.js"/>
+	<testcase name="CompressionUtils base64 encode/decode roundtrip" time="0.000116" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\compression-utils.test.js"/>
+	<testcase name="CompressionUtils base64 url encode/decode roundtrip" time="0.000127" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\compression-utils.test.js"/>
+	<testcase name="CompressionUtils serialize/deserialize compressed JSON" time="0.000767" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\compression-utils.test.js"/>
+	<testcase name="CompressionUtils getCompressionRatio returns non-negative" time="0.000226" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\compression-utils.test.js"/>
+	<testcase name="CompressionUtils minifyJSON trims whitespace" time="0.000189" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\compression-utils.test.js"/>
+	<testcase name="CompressionUtils prettyJSON formats valid JSON and returns input on error" time="0.000320" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\compression-utils.test.js"/>
+	<testcase name="CompressionUtils gzip/gunzip roundtrip" time="0.069147" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\compression-utils.test.js"/>
+	<testcase name="CompressionUtils deflate/inflate roundtrip" time="0.001540" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\compression-utils.test.js"/>
+	<testcase name="CompressionUtils getSize and formatBytes" time="0.000752" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\compression-utils.test.js"/>
+	<testcase name="CompressionUtils base64 uses browser btoa/atob when available" time="0.000189" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\compression-utils.test.js"/>
+	<testcase name="CompressionUtils prettyJSON handles object input" time="0.000118" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\compression-utils.test.js"/>
+	<testcase name="CompressionUtils gzip/deflate fallback without node" time="0.000165" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\compression-utils.test.js"/>
+	<testcase name="CryptoUtils.generateToken generates hex strings of correct length" time="0.003084" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\crypto-utils.test.js"/>
+	<testcase name="CryptoUtils.generateUUID generates valid UUID v4" time="0.000432" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\crypto-utils.test.js"/>
+	<testcase name="CryptoUtils.base64UrlEncode and base64UrlDecode" time="0.000196" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\crypto-utils.test.js"/>
+	<testcase name="CryptoUtils.simpleHash returns hex string" time="0.000130" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\crypto-utils.test.js"/>
+	<testcase name="CryptoUtils.hash supports different algorithms in Node.js" time="0.029346" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\crypto-utils.test.js"/>
+	<testcase name="CryptoUtils.hmac generates signatures" time="0.047439" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\crypto-utils.test.js"/>
+	<testcase name="CryptoUtils.verifyHash works correctly" time="0.030439" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\crypto-utils.test.js"/>
+	<testcase name="CryptoUtils.xorEncrypt and xorDecrypt" time="0.029767" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\crypto-utils.test.js"/>
+	<testcase name="CryptoUtils.randomBytes generates Uint8Array" time="0.000320" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\crypto-utils.test.js"/>
+	<testcase name="CryptoUtils.constantTimeCompare prevents basic inequality" time="0.000279" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\crypto-utils.test.js"/>
+	<testcase name="CryptoUtils base64 uses browser btoa/atob when available" time="0.000300" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\crypto-utils.test.js"/>
+	<testcase name="CryptoUtils throws error when crypto is missing" time="0.001415" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\crypto-utils.test.js"/>
+	<testcase name="CryptoUtils UUID uses getRandomValues fallback when randomUUID is unavailable" time="0.000247" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\crypto-utils.test.js"/>
+	<testcase name="CryptoUtils hash uses SubtleCrypto when available" time="0.000163" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\crypto-utils.test.js"/>
+	<testcase name="DateUtils.parse and isValid" time="0.000752" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\date-utils-coverage.test.js"/>
+	<testcase name="DateUtils formats: toISODate and format" time="0.016997" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\date-utils-coverage.test.js"/>
+	<testcase name="DateUtils.startOfDay and endOfDay" time="0.000431" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\date-utils-coverage.test.js"/>
+	<testcase name="DateUtils.add duration" time="0.021813" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\date-utils-coverage.test.js"/>
+	<testcase name="DateUtils.diff calculation and rounding" time="0.000728" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\date-utils-coverage.test.js"/>
+	<testcase name="DateUtils comparisons" time="0.000204" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\date-utils-coverage.test.js"/>
+	<testcase name="DateUtils error handling" time="0.000468" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\date-utils-coverage.test.js"/>
+	<testcase name="DateUtils.parse accepts ISO strings and timestamps" time="0.000769" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\date-utils.test.js"/>
+	<testcase name="DateUtils.add combines multiple duration units" time="0.001694" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\date-utils.test.js"/>
+	<testcase name="DateUtils.diff respects unit, rounding and absolute options" time="0.000217" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\date-utils.test.js"/>
+	<testcase name="DateUtils.isSameDay ignores time components" time="0.000157" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\date-utils.test.js"/>
+	<testcase name="createStopwatch returns elapsed time and logs on stop when autoLog is enabled" time="0.002279" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\debug.test.js"/>
+	<testcase name="createStopwatch log includes context and returns duration" time="0.000713" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\debug.test.js"/>
+	<testcase name="withTiming returns result and logs duration" time="0.000194" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\debug.test.js"/>
+	<testcase name="measureSync returns result and logs duration" time="0.000116" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\debug.test.js"/>
+	<testcase name="measureAsync returns result and duration and logs with namespace" time="0.000439" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\debug.test.js"/>
+	<testcase name="captureDebug returns result and duration without logger" time="0.000274" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\debug.test.js"/>
+	<testcase name="DiffUtils.deepEqual compares various types" time="0.001419" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\diff-utils.test.js"/>
+	<testcase name="DiffUtils.diff detects added, removed and changed keys" time="0.000523" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\diff-utils.test.js"/>
+	<testcase name="DiffUtils.createPatch and applyPatch" time="0.000159" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\diff-utils.test.js"/>
+	<testcase name="DiffUtils.reversePatch undoes changes" time="0.000131" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\diff-utils.test.js"/>
+	<testcase name="DiffUtils.deepDiff handles nested objects" time="0.000172" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\diff-utils.test.js"/>
+	<testcase name="DiffUtils.deepDiff handles non-object values at root" time="0.000068" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\diff-utils.test.js"/>
+	<testcase name="DiffUtils.merge with different strategies" time="0.000151" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\diff-utils.test.js"/>
+	<testcase name="DiffUtils.getSummary returns human readable summary" time="0.000089" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\diff-utils.test.js"/>
+	<testcase name="Testing private nested value helpers (via any cast)" time="0.000132" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\diff-utils.test.js"/>
+	<testcase name="EnvManager.get reads from process.env in Node" time="0.000752" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\env-manager.test.js"/>
+	<testcase name="EnvManager.require throws when missing" time="0.000372" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\env-manager.test.js"/>
+	<testcase name="EnvManager.isProd checks NODE_ENV and MODE flags" time="0.000215" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\env-manager.test.js"/>
+	<testcase name="EnvManager.get uses import.meta.env in browser mode" time="0.000191" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\env-manager.test.js"/>
+	<testcase name="Custom error classes work correctly" time="0.001402" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\error-boundary.test.js"/>
+	<testcase name="ErrorBoundary.handle calls handlers and logs" time="0.000394" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\error-boundary.test.js"/>
+	<testcase name="ErrorBoundary.execute with retry logic (success on retry)" time="0.010072" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\error-boundary.test.js"/>
+	<testcase name="ErrorBoundary.execute fails after max retries" time="0.011274" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\error-boundary.test.js"/>
+	<testcase name="ErrorBoundary.executeSync handles errors" time="0.000302" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\error-boundary.test.js"/>
+	<testcase name="ErrorBoundary.wrap wraps functions" time="0.000203" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\error-boundary.test.js"/>
+	<testcase name="ErrorBoundary history management" time="0.000118" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\error-boundary.test.js"/>
+	<testcase name="ErrorBoundary.createErrorReport returns valid report" time="0.000965" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\error-boundary.test.js"/>
+	<testcase name="ErrorBoundary handles errors thrown by onError and handlers" time="0.000243" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\error-boundary.test.js"/>
+	<testcase name="ErrorBoundary removeHandler and clearHandlers" time="0.000197" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\error-boundary.test.js"/>
+	<testcase name="ErrorBoundary normalizes errors into AppError subclasses" time="6.001574" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\error-boundary.test.js"/>
+	<testcase name="Global ErrorBoundary helpers return singleton and reset" time="0.000196" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\error-boundary.test.js"/>
+	<testcase name="EventEmitter basic on and emit" time="0.001571" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\event-emitter.test.js"/>
+	<testcase name="EventEmitter once listeners are removed after call" time="0.000281" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\event-emitter.test.js"/>
+	<testcase name="EventEmitter off removes regular and once listeners" time="0.000144" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\event-emitter.test.js"/>
+	<testcase name="EventEmitter removeAllListeners" time="0.000139" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\event-emitter.test.js"/>
+	<testcase name="EventEmitter captureRejections handles async errors" time="0.000761" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\event-emitter.test.js"/>
+	<testcase name="EventEmitter emitSync handles synchronous errors" time="0.000187" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\event-emitter.test.js"/>
+	<testcase name="EventEmitter maxListeners warning" time="0.000220" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\event-emitter.test.js"/>
+	<testcase name="EventEmitter getListeners and eventNames" time="0.000162" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\event-emitter.test.js"/>
+	<testcase name="createEventEmitter factory works" time="0.000129" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\event-emitter.test.js"/>
+	<testcase name="EventEmitter propagates errors when captureRejections is false" time="0.000511" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\event-emitter.test.js"/>
+	<testcase name="EventEmitter ignores errors in error handlers" time="0.000232" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\event-emitter.test.js"/>
+	<testcase name="FileUploadHelper.validateFile validates file size" time="0.000802" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\file-upload.test.js"/>
+	<testcase name="FileUploadHelper.validateFile validates file type" time="0.000135" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\file-upload.test.js"/>
+	<testcase name="FileUploadHelper.validateFile validates file extension" time="0.000155" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\file-upload.test.js"/>
+	<testcase name="FileUploadHelper.validateFile passes for valid file" time="0.000131" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\file-upload.test.js"/>
+	<testcase name="FileUploadHelper.uploadFile handles small files (direct upload)" time="0.047563" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\file-upload.test.js"/>
+	<testcase name="FileUploadHelper.uploadFile handles large files (chunked upload)" time="0.000726" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\file-upload.test.js"/>
+	<testcase name="FileUploadHelper.uploadFile handles retries on failure" time="2.001296" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\file-upload.test.js"/>
+	<testcase name="FileUploadHelper.uploadFile returns error after all retries fail" time="0.000364" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\file-upload.test.js"/>
+	<testcase name="FileUploadHelper.uploadFile handles network exceptions" time="0.000289" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\file-upload.test.js"/>
+	<testcase name="FormUtils initializes with correct state" time="0.002335" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\form-utils.test.js"/>
+	<testcase name="FormUtils.setValue updates value and marks dirty" time="0.000162" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\form-utils.test.js"/>
+	<testcase name="FormUtils.setValues updates multiple values" time="0.000147" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\form-utils.test.js"/>
+	<testcase name="FormUtils.touchField marks field as touched" time="0.000204" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\form-utils.test.js"/>
+	<testcase name="FormUtils.reset clears all state" time="0.000187" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\form-utils.test.js"/>
+	<testcase name="FormUtils validates required field" time="0.000304" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\form-utils.test.js"/>
+	<testcase name="FormUtils validates email format" time="0.000132" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\form-utils.test.js"/>
+	<testcase name="FormUtils validates minLength" time="0.000130" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\form-utils.test.js"/>
+	<testcase name="FormUtils validates maxLength" time="0.000155" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\form-utils.test.js"/>
+	<testcase name="FormUtils validates number min/max" time="0.000241" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\form-utils.test.js"/>
+	<testcase name="FormUtils validates pattern" time="0.000241" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\form-utils.test.js"/>
+	<testcase name="FormUtils validates with custom validator" time="0.000211" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\form-utils.test.js"/>
+	<testcase name="FormUtils validates with async custom validator" time="0.000140" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\form-utils.test.js"/>
+	<testcase name="FormUtils.validate checks all fields" time="0.000182" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\form-utils.test.js"/>
+	<testcase name="FormUtils.validate passes with valid data" time="0.000144" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\form-utils.test.js"/>
+	<testcase name="FormUtils.submit calls onSubmit callback" time="0.000146" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\form-utils.test.js"/>
+	<testcase name="FormUtils.submit calls onError callback on validation failure" time="0.000124" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\form-utils.test.js"/>
+	<testcase name="FormUtils.getErrors returns all errors" time="0.000425" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\form-utils.test.js"/>
+	<testcase name="FormUtils.clearErrors removes all errors" time="0.000141" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\form-utils.test.js"/>
+	<testcase name="FormUtils.createBinding returns field binding" time="0.000101" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\form-utils.test.js"/>
+	<testcase name="FormUtils.createBindings returns all field bindings" time="0.000075" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\form-utils.test.js"/>
+	<testcase name="FormUtils.serialize returns form data" time="0.000054" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\form-utils.test.js"/>
+	<testcase name="FormUtils.deserialize loads form data" time="0.000048" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\form-utils.test.js"/>
+	<testcase name="FormUtils validates on change when enabled" time="0.000055" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\form-utils.test.js"/>
+	<testcase name="FormUtils validates on blur when enabled" time="0.000036" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\form-utils.test.js"/>
+	<testcase name="Validators.required validates required fields" time="0.000054" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\form-utils.test.js"/>
+	<testcase name="Validators.email validates email format" time="0.000035" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\form-utils.test.js"/>
+	<testcase name="Validators.url validates URL format" time="0.000072" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\form-utils.test.js"/>
+	<testcase name="Validators.pattern validates regex patterns" time="0.000086" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\form-utils.test.js"/>
+	<testcase name="Validators.match validates field matching" time="0.000045" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\form-utils.test.js"/>
+	<testcase name="createForm factory creates FormUtils instance" time="0.000070" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\form-utils.test.js"/>
+	<testcase name="HTTP_STATUS constants are defined" time="0.001320" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\http-status-helper.test.js"/>
+	<testcase name="isSuccess identifies 2xx status codes" time="0.000121" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\http-status-helper.test.js"/>
+	<testcase name="isRedirect identifies 3xx status codes" time="0.000134" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\http-status-helper.test.js"/>
+	<testcase name="isClientError identifies 4xx status codes" time="0.000087" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\http-status-helper.test.js"/>
+	<testcase name="isServerError identifies 5xx status codes" time="0.000086" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\http-status-helper.test.js"/>
+	<testcase name="isError identifies 4xx and 5xx status codes" time="0.000098" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\http-status-helper.test.js"/>
+	<testcase name="getStatusMessage returns correct messages" time="0.000210" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\http-status-helper.test.js"/>
+	<testcase name="getStatusCategory returns correct categories" time="0.000107" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\http-status-helper.test.js"/>
+	<testcase name="isRetryable identifies retryable status codes" time="0.000115" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\http-status-helper.test.js"/>
+	<testcase name="isCacheable identifies cacheable status codes" time="0.000165" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\http-status-helper.test.js"/>
+	<testcase name="Logger respects log levels and priority" time="0.001479" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\logger.test.js"/>
+	<testcase name="Logger.silent() suppresses all logs" time="0.000204" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\logger.test.js"/>
+	<testcase name="Logger.child creates nested namespaces" time="0.000165" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\logger.test.js"/>
+	<testcase name="consoleTransportNode formats correctly" time="0.000297" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\logger.test.js"/>
+	<testcase name="consoleTransportBrowser formats correctly (mocked environment)" time="0.000296" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\logger.test.js"/>
+	<testcase name="Logger handles transport failures" time="0.051926" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\logger.test.js"/>
+	<testcase name="createLogger factory works" time="0.000316" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\logger.test.js"/>
+	<testcase name="Logger.setLevel updates logging behavior" time="0.000168" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\logger.test.js"/>
+	<testcase name="Logger.error forwards error object to transport" time="0.000255" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\logger.test.js"/>
+	<testcase name="EventEmitter registers and emits events" time="0.001860" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\new-utils.test.js"/>
+	<testcase name="EventEmitter supports once listeners" time="0.000298" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\new-utils.test.js"/>
+	<testcase name="EventEmitter removes listeners" time="0.000123" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\new-utils.test.js"/>
+	<testcase name="EventEmitter emits synchronously" time="0.000153" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\new-utils.test.js"/>
+	<testcase name="EventEmitter tracks listener count" time="0.000143" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\new-utils.test.js"/>
+	<testcase name="EventEmitter factory function works" time="0.000158" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\new-utils.test.js"/>
+	<testcase name="DiffUtils detects changed fields" time="0.000193" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\new-utils.test.js"/>
+	<testcase name="DiffUtils detects added fields" time="0.000099" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\new-utils.test.js"/>
+	<testcase name="DiffUtils detects removed fields" time="0.000106" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\new-utils.test.js"/>
+	<testcase name="DiffUtils creates patches" time="0.000251" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\new-utils.test.js"/>
+	<testcase name="DiffUtils applies patches" time="0.000146" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\new-utils.test.js"/>
+	<testcase name="DiffUtils deep equals objects" time="0.000114" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\new-utils.test.js"/>
+	<testcase name="PollingHelper polls until condition is met" time="0.028812" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\new-utils.test.js"/>
+	<testcase name="PollingHelper respects max attempts" time="0.021029" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\new-utils.test.js"/>
+	<testcase name="PollingHelper applies backoff" time="0.010485" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\new-utils.test.js"/>
+	<testcase name="PollingHelper factory function works" time="0.000341" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\new-utils.test.js"/>
+	<testcase name="PollingHelper abort controller works" time="0.101987" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\new-utils.test.js"/>
+	<testcase name="PollingHelper applies jitter" time="0.197399" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\new-utils.test.js"/>
+	<testcase name="PollingHelper respects attempt timeout" time="0.061853" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\new-utils.test.js"/>
+	<testcase name="PollingHelper validates options" time="0.000420" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\new-utils.test.js"/>
+	<testcase name="PollingHelper tracks metrics" time="0.080638" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\new-utils.test.js"/>
+	<testcase name="PollingHelper respects retryOnError option" time="0.000235" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\new-utils.test.js"/>
+	<testcase name="PollingHelper retries on error by default" time="0.021226" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\new-utils.test.js"/>
+	<testcase name="PollingHelper respects maxDuration timeout" time="0.314643" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\new-utils.test.js"/>
+	<testcase name="PollingHelper calls onAttempt callback" time="0.000389" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\new-utils.test.js"/>
+	<testcase name="PollingHelper calls onSuccess callback" time="0.000156" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\new-utils.test.js"/>
+	<testcase name="PollingHelper calls onError callback" time="0.000246" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\new-utils.test.js"/>
+	<testcase name="PollingHelper handles non-Error exceptions" time="0.000137" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\new-utils.test.js"/>
+	<testcase name="PollingHelper static poll method works" time="0.011900" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\new-utils.test.js"/>
+	<testcase name="PollingHelper static pollWithBackoff method works" time="0.012456" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\new-utils.test.js"/>
+	<testcase name="PollingHelper static pollWithLinearBackoff method works" time="0.010784" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\new-utils.test.js"/>
+	<testcase name="PollingHelper validates maxBackoffInterval" time="0.000242" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\new-utils.test.js"/>
+	<testcase name="PollingHelper validates attemptTimeout" time="0.000121" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\new-utils.test.js"/>
+	<testcase name="PollingHelper validates exponentialBase" time="0.000111" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\new-utils.test.js"/>
+	<testcase name="PollingHelper validates maxDuration" time="0.000112" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\new-utils.test.js"/>
+	<testcase name="PollingHelper applies jitter with boolean true" time="0.094598" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\new-utils.test.js"/>
+	<testcase name="PollingHelper returns metrics undefined when no successful attempts" time="0.011303" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\new-utils.test.js"/>
+	<testcase name="PollingHelper calls onError when max attempts exceeded" time="0.010927" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\new-utils.test.js"/>
+	<testcase name="CryptoUtils generates tokens" time="0.000402" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\new-utils.test.js"/>
+	<testcase name="CryptoUtils generates UUIDs" time="0.000573" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\new-utils.test.js"/>
+	<testcase name="CryptoUtils base64 encodes and decodes" time="0.000116" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\new-utils.test.js"/>
+	<testcase name="CryptoUtils URL-safe base64 encodes" time="0.000058" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\new-utils.test.js"/>
+	<testcase name="CryptoUtils hashes strings" time="0.001731" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\new-utils.test.js"/>
+	<testcase name="CryptoUtils verifies hashes" time="0.000332" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\new-utils.test.js"/>
+	<testcase name="CryptoUtils constant-time compares strings" time="0.000138" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\new-utils.test.js"/>
+	<testcase name="PaginationHelper paginates with offset mode" time="0.000345" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\new-utils.test.js"/>
+	<testcase name="PaginationHelper navigates pages" time="0.000258" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\new-utils.test.js"/>
+	<testcase name="PaginationHelper tracks state" time="0.000137" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\new-utils.test.js"/>
+	<testcase name="PaginationHelper factory function works" time="0.000074" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\new-utils.test.js"/>
+	<testcase name="CacheManager stores and retrieves values" time="0.000331" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\new-utils.test.js"/>
+	<testcase name="CacheManager respects TTL" time="0.100393" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\new-utils.test.js"/>
+	<testcase name="CacheManager tracks statistics" time="0.000505" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\new-utils.test.js"/>
+	<testcase name="CacheManager get or compute pattern" time="0.000220" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\new-utils.test.js"/>
+	<testcase name="CacheManager factory function works" time="0.000183" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\new-utils.test.js"/>
+	<testcase name="CompressionUtils compresses and decompresses" time="0.000336" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\new-utils.test.js"/>
+	<testcase name="CompressionUtils base64 encodes and decodes" time="0.000087" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\new-utils.test.js"/>
+	<testcase name="CompressionUtils minifies JSON" time="0.000147" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\new-utils.test.js"/>
+	<testcase name="CompressionUtils pretty prints JSON" time="0.000075" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\new-utils.test.js"/>
+	<testcase name="CompressionUtils calculates compression ratio" time="0.000062" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\new-utils.test.js"/>
+	<testcase name="CompressionUtils formats bytes" time="0.000119" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\new-utils.test.js"/>
+	<testcase name="NumberUtils.format and currency" time="0.014824" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\number-utils-coverage.test.js"/>
+	<testcase name="NumberUtils.percentage" time="0.000226" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\number-utils-coverage.test.js"/>
+	<testcase name="NumberUtils.ordinal" time="0.000131" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\number-utils-coverage.test.js"/>
+	<testcase name="Math helpers: clamp, round, floor, ceil" time="0.000108" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\number-utils-coverage.test.js"/>
+	<testcase name="NumberUtils.range" time="0.000840" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\number-utils-coverage.test.js"/>
+	<testcase name="NumberUtils.random" time="0.004338" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\number-utils-coverage.test.js"/>
+	<testcase name="Boolean checks" time="0.001094" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\number-utils-coverage.test.js"/>
+	<testcase name="NumberUtils.toWords (English)" time="0.005388" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\number-utils-coverage.test.js"/>
+	<testcase name="NumberUtils.toWords (Spanish)" time="0.000186" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\number-utils-coverage.test.js"/>
+	<testcase name="NumberUtils.formatBytes" time="0.000227" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\number-utils-coverage.test.js"/>
+	<testcase name="NumberUtils.parse with separators" time="0.001212" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\number-utils-coverage.test.js"/>
+	<testcase name="NumberUtils.pad" time="0.000086" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\number-utils-coverage.test.js"/>
+	<testcase name="Statistics helpers" time="0.006756" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\number-utils-coverage.test.js"/>
+	<testsuite name="NumberUtils" time="0.062347" disabled="0" errors="0" tests="15" failures="0" skipped="0" hostname="Seba-Pc">
+		<testsuite name="format" time="0.021043" disabled="0" errors="0" tests="2" failures="0" skipped="0" hostname="Seba-Pc">
+			<testcase name="should format numbers with locale" time="0.019248" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\number-utils.test.js"/>
+			<testcase name="should handle zero" time="0.000337" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\number-utils.test.js"/>
+		</testsuite>
+		<testsuite name="currency" time="0.001012" disabled="0" errors="0" tests="2" failures="0" skipped="0" hostname="Seba-Pc">
+			<testcase name="should format currency with USD" time="0.000638" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\number-utils.test.js"/>
+			<testcase name="should format with different currencies" time="0.000216" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\number-utils.test.js"/>
+		</testsuite>
+		<testsuite name="percentage" time="0.000479" disabled="0" errors="0" tests="2" failures="0" skipped="0" hostname="Seba-Pc">
+			<testcase name="should format decimal as percentage" time="0.000196" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\number-utils.test.js"/>
+			<testcase name="should handle isPercentage option" time="0.000155" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\number-utils.test.js"/>
+		</testsuite>
+		<testsuite name="ordinal" time="0.000771" disabled="0" errors="0" tests="7" failures="0" skipped="0" hostname="Seba-Pc">
+			<testcase name="should return correct ordinal for 1" time="0.000220" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\number-utils.test.js"/>
+			<testcase name="should return correct ordinal for 2" time="0.000061" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\number-utils.test.js"/>
+			<testcase name="should return correct ordinal for 3" time="0.000052" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\number-utils.test.js"/>
+			<testcase name="should return correct ordinal for 4" time="0.000088" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\number-utils.test.js"/>
+			<testcase name="should return correct ordinal for 11" time="0.000071" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\number-utils.test.js"/>
+			<testcase name="should return correct ordinal for 21" time="0.000037" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\number-utils.test.js"/>
+			<testcase name="should return Spanish ordinal" time="0.000028" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\number-utils.test.js"/>
+		</testsuite>
+		<testsuite name="clamp" time="0.000197" disabled="0" errors="0" tests="3" failures="0" skipped="0" hostname="Seba-Pc">
+			<testcase name="should clamp high values" time="0.000059" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\number-utils.test.js"/>
+			<testcase name="should clamp low values" time="0.000034" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\number-utils.test.js"/>
+			<testcase name="should not clamp values in range" time="0.000045" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\number-utils.test.js"/>
+		</testsuite>
+		<testsuite name="round" time="0.000189" disabled="0" errors="0" tests="3" failures="0" skipped="0" hostname="Seba-Pc">
+			<testcase name="should round to specified decimals" time="0.000070" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\number-utils.test.js"/>
+			<testcase name="should round to integer by default" time="0.000033" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\number-utils.test.js"/>
+			<testcase name="should handle negative decimals" time="0.000032" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\number-utils.test.js"/>
+		</testsuite>
+		<testsuite name="range" time="0.001063" disabled="0" errors="0" tests="4" failures="0" skipped="0" hostname="Seba-Pc">
+			<testcase name="should generate ascending range" time="0.000560" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\number-utils.test.js"/>
+			<testcase name="should generate range with step" time="0.000054" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\number-utils.test.js"/>
+			<testcase name="should generate descending range" time="0.000039" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\number-utils.test.js"/>
+			<testcase name="should throw on zero step" time="0.000304" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\number-utils.test.js"/>
+		</testsuite>
+		<testsuite name="random" time="0.003050" disabled="0" errors="0" tests="1" failures="0" skipped="0" hostname="Seba-Pc">
+			<testcase name="should generate number within range" time="0.002983" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\number-utils.test.js"/>
+		</testsuite>
+		<testsuite name="isEven/isOdd" time="0.000280" disabled="0" errors="0" tests="2" failures="0" skipped="0" hostname="Seba-Pc">
+			<testcase name="should identify even numbers" time="0.000085" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\number-utils.test.js"/>
+			<testcase name="should identify odd numbers" time="0.000103" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\number-utils.test.js"/>
+		</testsuite>
+		<testsuite name="isBetween" time="0.018526" disabled="0" errors="0" tests="3" failures="0" skipped="0" hostname="Seba-Pc">
+			<testcase name="should return true for values in range" time="0.000083" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\number-utils.test.js"/>
+			<testcase name="should return true for boundary values" time="0.017960" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\number-utils.test.js"/>
+			<testcase name="should return false for values outside range" time="0.000303" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\number-utils.test.js"/>
+		</testsuite>
+		<testsuite name="toWords" time="0.001212" disabled="0" errors="0" tests="6" failures="0" skipped="0" hostname="Seba-Pc">
+			<testcase name="should convert zero" time="0.000160" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\number-utils.test.js"/>
+			<testcase name="should convert single digits" time="0.000266" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\number-utils.test.js"/>
+			<testcase name="should convert two digits" time="0.000137" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\number-utils.test.js"/>
+			<testcase name="should convert hundreds" time="0.000116" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\number-utils.test.js"/>
+			<testcase name="should convert thousands" time="0.000121" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\number-utils.test.js"/>
+			<testcase name="should handle Spanish locale" time="0.000146" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\number-utils.test.js"/>
+		</testsuite>
+		<testsuite name="formatBytes" time="0.008709" disabled="0" errors="0" tests="3" failures="0" skipped="0" hostname="Seba-Pc">
+			<testcase name="should format bytes" time="0.000510" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\number-utils.test.js"/>
+			<testcase name="should format KB" time="0.000232" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\number-utils.test.js"/>
+			<testcase name="should format MB" time="0.007775" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\number-utils.test.js"/>
+		</testsuite>
+		<testsuite name="pad" time="0.002216" disabled="0" errors="0" tests="1" failures="0" skipped="0" hostname="Seba-Pc">
+			<testcase name="should pad numbers with zeros" time="0.002147" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\number-utils.test.js"/>
+		</testsuite>
+		<testsuite name="statistics" time="0.001629" disabled="0" errors="0" tests="8" failures="0" skipped="0" hostname="Seba-Pc">
+			<testcase name="should calculate sum" time="0.000130" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\number-utils.test.js"/>
+			<testcase name="should calculate average" time="0.000055" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\number-utils.test.js"/>
+			<testcase name="should calculate median" time="0.000106" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\number-utils.test.js"/>
+			<testcase name="should calculate median for even count" time="0.000598" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\number-utils.test.js"/>
+			<testcase name="should calculate mode" time="0.000152" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\number-utils.test.js"/>
+			<testcase name="should calculate min" time="0.000144" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\number-utils.test.js"/>
+			<testcase name="should calculate max" time="0.000164" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\number-utils.test.js"/>
+			<testcase name="should handle empty arrays" time="0.000071" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\number-utils.test.js"/>
+		</testsuite>
+		<testsuite name="percentile" time="0.001088" disabled="0" errors="0" tests="2" failures="0" skipped="0" hostname="Seba-Pc">
+			<testcase name="should calculate 50th percentile (median)" time="0.000916" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\number-utils.test.js"/>
+			<testcase name="should calculate 90th percentile" time="0.000099" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\number-utils.test.js"/>
+		</testsuite>
+	</testsuite>
+	<testcase name="ObjectUtils.isEmpty for various types" time="0.001497" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\object-utils-coverage.test.js"/>
+	<testcase name="ObjectUtils.deepClone handles nested structures and Dates" time="0.001395" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\object-utils-coverage.test.js"/>
+	<testcase name="ObjectUtils.deepMerge combines structures" time="0.000174" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\object-utils-coverage.test.js"/>
+	<testcase name="ObjectUtils.pick and omit" time="0.000202" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\object-utils-coverage.test.js"/>
+	<testcase name="ObjectUtils.get and set with paths" time="0.000181" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\object-utils-coverage.test.js"/>
+	<testcase name="ObjectUtils.flatten and unflatten" time="0.000180" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\object-utils-coverage.test.js"/>
+	<testcase name="ObjectUtils.filter and mapValues" time="0.000144" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\object-utils-coverage.test.js"/>
+	<testcase name="ObjectUtils.hasKeys and hasAnyKey" time="0.000097" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\object-utils-coverage.test.js"/>
+	<testcase name="ObjectUtils.invert" time="0.000084" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\object-utils-coverage.test.js"/>
+	<testcase name="ObjectUtils.groupBy and indexBy" time="0.000160" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\object-utils-coverage.test.js"/>
+	<testcase name="ObjectUtils.deepEqual" time="0.000245" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\object-utils-coverage.test.js"/>
+	<testcase name="ObjectUtils.isEmpty detects empty values" time="0.000811" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\object-utils.test.js"/>
+	<testcase name="ObjectUtils.deepClone creates independent copy" time="0.000166" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\object-utils.test.js"/>
+	<testcase name="ObjectUtils.merge combines objects" time="0.000533" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\object-utils.test.js"/>
+	<testcase name="ObjectUtils.deepMerge recursively merges objects" time="0.000151" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\object-utils.test.js"/>
+	<testcase name="ObjectUtils.pick selects specific keys" time="0.000518" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\object-utils.test.js"/>
+	<testcase name="ObjectUtils.omit removes specific keys" time="0.000133" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\object-utils.test.js"/>
+	<testcase name="ObjectUtils.get retrieves nested values" time="0.000121" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\object-utils.test.js"/>
+	<testcase name="ObjectUtils.set assigns nested values" time="0.000100" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\object-utils.test.js"/>
+	<testcase name="ObjectUtils.flatten converts nested to flat" time="0.000144" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\object-utils.test.js"/>
+	<testcase name="ObjectUtils.unflatten converts flat to nested" time="0.000231" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\object-utils.test.js"/>
+	<testcase name="ObjectUtils.filter selects entries by predicate" time="0.000183" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\object-utils.test.js"/>
+	<testcase name="ObjectUtils.mapValues transforms values" time="0.000128" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\object-utils.test.js"/>
+	<testcase name="ObjectUtils.hasKeys checks for all keys" time="0.000086" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\object-utils.test.js"/>
+	<testcase name="ObjectUtils.hasAnyKey checks for any key" time="0.000089" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\object-utils.test.js"/>
+	<testcase name="ObjectUtils.invert swaps keys and values" time="0.000191" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\object-utils.test.js"/>
+	<testcase name="ObjectUtils.groupBy groups array by key" time="0.000170" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\object-utils.test.js"/>
+	<testcase name="ObjectUtils.indexBy indexes array by key" time="0.000095" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\object-utils.test.js"/>
+	<testcase name="ObjectUtils.deepEqual compares objects" time="0.000147" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\object-utils.test.js"/>
+	<testcase name="ObjectUtils.size returns number of keys" time="0.000100" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\object-utils.test.js"/>
+	<testcase name="ObjectUtils.entries converts to key-value pairs" time="0.000090" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\object-utils.test.js"/>
+	<testcase name="ObjectUtils.fromEntries converts from key-value pairs" time="0.000082" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\object-utils.test.js"/>
+	<testcase name="ObjectUtils.fromKeys creates object from keys" time="0.000088" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\object-utils.test.js"/>
+	<testcase name="PaginationHelper offset mode basic operations" time="0.001607" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\pagination-helper.test.js"/>
+	<testcase name="PaginationHelper cursor mode basic operations" time="0.000352" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\pagination-helper.test.js"/>
+	<testcase name="PaginationHelper throws when using wrong mode methods" time="0.000445" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\pagination-helper.test.js"/>
+	<testcase name="PaginationHelper.goToPage bounds checking" time="0.000136" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\pagination-helper.test.js"/>
+	<testcase name="PaginationHelper.goToCursor navigates correctly" time="0.000148" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\pagination-helper.test.js"/>
+	<testcase name="PaginationHelper.setPageSize resets state" time="0.000145" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\pagination-helper.test.js"/>
+	<testcase name="PaginationHelper.setItems updates data and resets state" time="0.000181" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\pagination-helper.test.js"/>
+	<testcase name="PaginationHelper.getState and getCursorState return full state" time="0.000236" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\pagination-helper.test.js"/>
+	<testcase name="PaginationHelper.goToCursor handles invalid cursors" time="0.000626" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\pagination-helper.test.js"/>
+	<testcase name="PaginationHelper.decodeCursor handles malformed data" time="0.000251" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\pagination-helper.test.js"/>
+	<testcase name="PollingHelper succeeds when stopCondition is met" time="0.001335" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\polling-helper.test.js"/>
+	<testcase name="PollingHelper stops on error when retryOnError is false" time="0.000313" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\polling-helper.test.js"/>
+	<testcase name="PollingHelper respects attempt timeout" time="0.005813" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\polling-helper.test.js"/>
+	<testcase name="PollingHelper abort stops polling" time="0.010113" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\polling-helper.test.js"/>
+	<testcase name="PollingHelper validates options" time="0.000485" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\polling-helper.test.js"/>
+	<testcase name="createPoller returns a PollingHelper instance" time="0.000180" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\polling-helper.test.js"/>
+	<testcase name="Profiler records duration for labeled blocks" time="0.001271" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\profiler.test.js"/>
+	<testcase name="Profiler ignores end calls without matching label" time="0.000521" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\profiler.test.js"/>
+	<testcase name="Profiler uses most recent matching label" time="0.000110" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\profiler.test.js"/>
+	<testcase name="RateLimiter (Token Bucket) limits requests" time="0.001671" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\rate-limiter.test.js"/>
+	<testcase name="RateLimiter (Token Bucket) refills over time" time="0.149997" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\rate-limiter.test.js"/>
+	<testcase name="RateLimiter.getStats returns correct information" time="0.000691" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\rate-limiter.test.js"/>
+	<testcase name="SlidingWindowRateLimiter limits accurately" time="0.000962" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\rate-limiter.test.js"/>
+	<testcase name="RateLimiters can be reset" time="0.000344" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\rate-limiter.test.js"/>
+	<testcase name="RateLimiter.waitForAllowance blocks until allowed" time="1.002087" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\rate-limiter.test.js"/>
+	<testcase name="SlidingWindowRateLimiter.getStats" time="0.000442" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\rate-limiter.test.js"/>
+	<testcase name="RateLimiter.getStats returns defaults for unseen URL" time="0.000180" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\rate-limiter.test.js"/>
+	<testcase name="RateLimiter.resetAll clears buckets" time="0.000250" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\rate-limiter.test.js"/>
+	<testcase name="SlidingWindowRateLimiter.waitForAllowance waits for window" time="1.000519" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\rate-limiter.test.js"/>
+	<testcase name="RequestCache stores and retrieves data" time="0.001176" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\request-cache.test.js"/>
+	<testcase name="RequestCache returns null for expired entries" time="0.149656" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\request-cache.test.js"/>
+	<testcase name="RequestCache supports stale-while-revalidate" time="0.220601" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\request-cache.test.js"/>
+	<testcase name="RequestCache invalidates entries" time="0.000522" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\request-cache.test.js"/>
+	<testcase name="RequestCache invalidates by pattern" time="0.000377" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\request-cache.test.js"/>
+	<testcase name="RequestCache tracks statistics" time="0.000163" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\request-cache.test.js"/>
+	<testcase name="RequestCache prunes expired entries" time="0.122430" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\request-cache.test.js"/>
+	<testcase name="RequestCache generates keys with options" time="0.000401" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\request-cache.test.js"/>
+	<testcase name="RequestCache get increments misses for absent keys" time="0.000439" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\request-cache.test.js"/>
+	<testcase name="RequestCache clear resets stats and size" time="0.000436" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\request-cache.test.js"/>
+	<testcase name="RequestCache getSize returns approximate bytes" time="0.000286" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\request-cache.test.js"/>
+	<testcase name="RequestCache isStale returns false before expiration" time="0.000129" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\request-cache.test.js"/>
+	<testcase name="RequestDeduplicator executes request once for multiple calls" time="0.001161" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\request-deduplicator.test.js"/>
+	<testcase name="RequestDeduplicator executes different requests separately" time="0.000179" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\request-deduplicator.test.js"/>
+	<testcase name="RequestDeduplicator shares errors" time="0.000192" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\request-deduplicator.test.js"/>
+	<testcase name="RequestDeduplicator tracks statistics" time="0.000168" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\request-deduplicator.test.js"/>
+	<testcase name="RequestDeduplicator clears in-flight requests" time="0.100680" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\request-deduplicator.test.js"/>
+	<testcase name="RequestDeduplicator supports custom key generator" time="0.000571" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\request-deduplicator.test.js"/>
+	<testcase name="RequestDeduplicator can reset statistics" time="0.000218" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\request-deduplicator.test.js"/>
+	<testcase name="RequestDeduplicator clear resets in-flight and stats" time="0.020877" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\request-deduplicator.test.js"/>
+	<testcase name="RequestDeduplicator default key generator sorts options" time="0.000391" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\request-deduplicator.test.js"/>
+	<testcase name="ResponseValidator validates object structure" time="0.001171" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\response-validator.test.js"/>
+	<testcase name="ResponseValidator detects missing required fields" time="0.000199" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\response-validator.test.js"/>
+	<testcase name="ResponseValidator validates array items" time="0.000172" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\response-validator.test.js"/>
+	<testcase name="ResponseValidator validates string patterns" time="0.000147" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\response-validator.test.js"/>
+	<testcase name="ResponseValidator validates number ranges" time="0.000133" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\response-validator.test.js"/>
+	<testcase name="ResponseValidator supports custom validation" time="0.000186" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\response-validator.test.js"/>
+	<testcase name="ResponseValidator validates string length and enum" time="0.000113" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\response-validator.test.js"/>
+	<testcase name="ResponseValidator validates pattern when provided as string" time="0.000149" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\response-validator.test.js"/>
+	<testcase name="ResponseValidator validates boolean enum values" time="0.000182" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\response-validator.test.js"/>
+	<testcase name="ResponseValidator validates number enum values" time="0.000266" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\response-validator.test.js"/>
+	<testcase name="ResponseValidator reports nested array paths" time="0.000150" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\response-validator.test.js"/>
+	<testcase name="ResponseValidator respects required at root" time="0.000097" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\response-validator.test.js"/>
+	<testcase name="ResponseValidator reports type mismatch" time="0.000083" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\response-validator.test.js"/>
+	<testcase name="RetryPolicy retries on failure and succeeds" time="0.033344" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\retry-policy.test.js"/>
+	<testcase name="RetryPolicy throws after max attempts" time="0.010799" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\retry-policy.test.js"/>
+	<testcase name="CircuitBreaker opens after failure threshold" time="0.000482" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\retry-policy.test.js"/>
+	<testcase name="CircuitBreaker closes after successful recovery" time="0.100484" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\retry-policy.test.js"/>
+	<testcase name="Signal basic get/set" time="0.001486" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\signal.test.js"/>
+	<testcase name="Computed signal updates when dependency changes" time="0.000251" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\signal.test.js"/>
+	<testcase name="Effect runs on dependency change" time="0.000164" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\signal.test.js"/>
+	<testcase name="Effect cleanup function is called" time="0.000174" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\signal.test.js"/>
+	<testcase name="Batch defers notifications" time="0.000174" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\signal.test.js"/>
+	<testcase name="Untracked avoids automatic dependency tracking" time="0.000147" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\signal.test.js"/>
+	<testcase name="Computed signal is read-only" time="0.000426" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\signal.test.js"/>
+	<testcase name="Computed signal refresh forces recomputation" time="0.000145" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\signal.test.js"/>
+	<testcase name="Nested computeds update correctly" time="0.000497" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\signal.test.js"/>
+	<testcase name="Signal subscribers count for debugging" time="0.000207" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\signal.test.js"/>
+	<testcase name="StorageManager persists and retrieves JSON payloads" time="0.001185" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\storage-manager.test.js"/>
+	<testcase name="StorageManager respects TTL and cleans expired entries" time="0.016071" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\storage-manager.test.js"/>
+	<testcase name="StorageManager remove deletes a key" time="0.000221" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\storage-manager.test.js"/>
+	<testcase name="StorageManager clear removes all keys" time="0.000121" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\storage-manager.test.js"/>
+	<testcase name="StorageManager returns null for invalid JSON" time="0.000117" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\storage-manager.test.js"/>
+	<testcase name="StreamingHelper.streamJsonLines processes JSON chunks correctly" time="0.035032" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\streaming-helper.test.js"/>
+	<testcase name="StreamingHelper.streamJsonLines handles fetch errors" time="0.000376" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\streaming-helper.test.js"/>
+	<testcase name="StreamingHelper.downloadStream tracks progress" time="0.039460" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\streaming-helper.test.js"/>
+	<testcase name="StreamingHelper.streamSSE sets up connection" time="0.051098" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\streaming-helper.test.js"/>
+	<testcase name="StreamingHelper.streamJsonLines handles empty body" time="0.000434" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\streaming-helper.test.js"/>
+	<testcase name="StreamingHelper.streamJsonLines calls onComplete and parses final buffer" time="0.010845" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\streaming-helper.test.js"/>
+	<testcase name="StreamingHelper.streamJsonLines logs warning on invalid line" time="0.009826" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\streaming-helper.test.js"/>
+	<testcase name="StreamingHelper.downloadStream throws on non-ok response" time="0.000680" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\streaming-helper.test.js"/>
+	<testcase name="StreamingHelper.downloadStream calls onComplete" time="0.011009" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\streaming-helper.test.js"/>
+	<testcase name="StreamingHelper.downloadStream handles empty body" time="0.000371" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\streaming-helper.test.js"/>
+	<testcase name="StreamingHelper.streamSSE warns on parse error" time="0.029823" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\streaming-helper.test.js"/>
+	<testcase name="StreamingHelper.streamSSE calls onError and onComplete on error" time="0.030500" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\streaming-helper.test.js"/>
+	<testsuite name="StringUtils - Case Conversion" time="0.006965" disabled="0" errors="0" tests="5" failures="0" skipped="0" hostname="Seba-Pc">
+		<testsuite name="camelCase" time="0.002610" disabled="0" errors="0" tests="7" failures="0" skipped="0" hostname="Seba-Pc">
+			<testcase name="should convert space-separated words to camelCase" time="0.001258" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\string-utils-case-conversion.test.js"/>
+			<testcase name="should convert hyphenated words to camelCase" time="0.000143" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\string-utils-case-conversion.test.js"/>
+			<testcase name="should convert snake_case to camelCase" time="0.000099" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\string-utils-case-conversion.test.js"/>
+			<testcase name="should convert PascalCase to camelCase" time="0.000109" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\string-utils-case-conversion.test.js"/>
+			<testcase name="should handle numbers in strings" time="0.000087" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\string-utils-case-conversion.test.js"/>
+			<testcase name="should handle empty strings" time="0.000083" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\string-utils-case-conversion.test.js"/>
+			<testcase name="should handle multiple separators" time="0.000138" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\string-utils-case-conversion.test.js"/>
+		</testsuite>
+		<testsuite name="pascalCase" time="0.001720" disabled="0" errors="0" tests="7" failures="0" skipped="0" hostname="Seba-Pc">
+			<testcase name="should convert space-separated words to PascalCase" time="0.000253" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\string-utils-case-conversion.test.js"/>
+			<testcase name="should convert hyphenated words to PascalCase" time="0.000243" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\string-utils-case-conversion.test.js"/>
+			<testcase name="should convert snake_case to PascalCase" time="0.000732" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\string-utils-case-conversion.test.js"/>
+			<testcase name="should convert camelCase to PascalCase" time="0.000104" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\string-utils-case-conversion.test.js"/>
+			<testcase name="should handle numbers in strings" time="0.000057" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\string-utils-case-conversion.test.js"/>
+			<testcase name="should handle empty strings" time="0.000042" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\string-utils-case-conversion.test.js"/>
+			<testcase name="should handle UPPERCASE input" time="0.000051" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\string-utils-case-conversion.test.js"/>
+		</testsuite>
+		<testsuite name="kebabCase" time="0.001051" disabled="0" errors="0" tests="6" failures="0" skipped="0" hostname="Seba-Pc">
+			<testcase name="should convert camelCase to kebab-case" time="0.000255" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\string-utils-case-conversion.test.js"/>
+			<testcase name="should convert PascalCase to kebab-case" time="0.000082" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\string-utils-case-conversion.test.js"/>
+			<testcase name="should convert space-separated words to kebab-case" time="0.000052" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\string-utils-case-conversion.test.js"/>
+			<testcase name="should convert snake_case to kebab-case" time="0.000100" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\string-utils-case-conversion.test.js"/>
+			<testcase name="should handle empty strings" time="0.000059" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\string-utils-case-conversion.test.js"/>
+			<testcase name="should handle numbers" time="0.000305" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\string-utils-case-conversion.test.js"/>
+		</testsuite>
+		<testsuite name="snakeCase" time="0.000733" disabled="0" errors="0" tests="6" failures="0" skipped="0" hostname="Seba-Pc">
+			<testcase name="should convert camelCase to snake_case" time="0.000143" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\string-utils-case-conversion.test.js"/>
+			<testcase name="should convert PascalCase to snake_case" time="0.000047" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\string-utils-case-conversion.test.js"/>
+			<testcase name="should convert space-separated words to snake_case" time="0.000042" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\string-utils-case-conversion.test.js"/>
+			<testcase name="should convert kebab-case to snake_case" time="0.000203" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\string-utils-case-conversion.test.js"/>
+			<testcase name="should handle empty strings" time="0.000082" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\string-utils-case-conversion.test.js"/>
+			<testcase name="should handle numbers" time="0.000056" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\string-utils-case-conversion.test.js"/>
+		</testsuite>
+		<testsuite name="Case conversion integration" time="0.000332" disabled="0" errors="0" tests="2" failures="0" skipped="0" hostname="Seba-Pc">
+			<testcase name="should convert through multiple case styles" time="0.000150" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\string-utils-case-conversion.test.js"/>
+			<testcase name="should be reversible (round-trip conversion)" time="0.000112" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\string-utils-case-conversion.test.js"/>
+		</testsuite>
+	</testsuite>
+	<testcase name="StringUtils.removeDiacritics" time="0.001516" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\string-utils-coverage.test.js"/>
+	<testcase name="StringUtils.slugify with various options" time="0.000379" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\string-utils-coverage.test.js"/>
+	<testcase name="StringUtils.compactWhitespace" time="0.000120" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\string-utils-coverage.test.js"/>
+	<testcase name="StringUtils.capitalize and capitalizeWords" time="0.000287" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\string-utils-coverage.test.js"/>
+	<testcase name="StringUtils.truncate with options" time="0.000140" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\string-utils-coverage.test.js"/>
+	<testcase name="StringUtils.mask" time="0.000184" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\string-utils-coverage.test.js"/>
+	<testcase name="StringUtils.interpolate with nested paths" time="0.000233" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\string-utils-coverage.test.js"/>
+	<testcase name="StringUtils.interpolate edge cases" time="0.000424" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\string-utils-coverage.test.js"/>
+	<testcase name="StringUtils.initials" time="0.000145" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\string-utils-coverage.test.js"/>
+	<testcase name="StringUtils.toQueryString complex scenarios" time="0.009789" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\string-utils-coverage.test.js"/>
+	<testcase name="StringUtils.toQueryString with no params" time="0.000159" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\string-utils-coverage.test.js"/>
+	<testcase name="StringUtils.slugify removes diacritics and normalizes separators" time="0.001559" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\string-utils.test.js"/>
+	<testcase name="StringUtils.truncate respects ellipsis and word boundaries" time="0.000152" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\string-utils.test.js"/>
+	<testcase name="StringUtils.mask hides the middle section" time="0.000108" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\string-utils.test.js"/>
+	<testcase name="StringUtils.interpolate replaces placeholders with nesting support" time="0.000221" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\string-utils.test.js"/>
+	<testcase name="StringUtils.toQueryString serializes arrays and nested objects" time="0.010872" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\string-utils.test.js"/>
+	<testcase name="TimeUtils.debounce logic" time="0.062026" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\time-utils-coverage.test.js"/>
+	<testcase name="TimeUtils.debounce with maxWait" time="0.160172" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\time-utils-coverage.test.js"/>
+	<testcase name="TimeUtils.throttle logic" time="0.060690" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\time-utils-coverage.test.js"/>
+	<testcase name="TimeUtils.debounce leading only" time="0.060497" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\time-utils-coverage.test.js"/>
+	<testcase name="TimeUtils.throttle with leading false" time="0.066770" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\time-utils-coverage.test.js"/>
+	<testcase name="TimeUtils.throttle with trailing false" time="0.062917" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\time-utils-coverage.test.js"/>
+	<testcase name="TimeUtils race/all/allSettled helpers" time="0.001015" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\time-utils-coverage.test.js"/>
+	<testcase name="TimeUtils.sleep and delay" time="0.060436" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\time-utils-coverage.test.js"/>
+	<testcase name="TimeUtils.timeout" time="0.042002" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\time-utils-coverage.test.js"/>
+	<testcase name="TimeUtils.retryAsync backoff logic" time="0.031269" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\time-utils-coverage.test.js"/>
+	<testcase name="TimeUtils.createQueue concurrency" time="0.040970" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\time-utils-coverage.test.js"/>
+	<testcase name="TimeUtils measure helpers" time="0.011756" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\time-utils-coverage.test.js"/>
+	<testcase name="TimeUtils duration format and parse" time="0.000430" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\time-utils-coverage.test.js"/>
+	<testsuite name="TimeUtils" time="0.551751" disabled="0" errors="0" tests="15" failures="0" skipped="0" hostname="Seba-Pc">
+		<testcase name="sleep should wait for specified time" time="0.052800" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\time-utils.test.js"/>
+		<testcase name="delay should execute function after delay" time="0.050874" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\time-utils.test.js"/>
+		<testcase name="timeout should resolve if promise finishes in time" time="0.000186" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\time-utils.test.js"/>
+		<testcase name="timeout should reject if promise takes too long" time="0.050623" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\time-utils.test.js"/>
+		<testcase name="retryAsync should succeed if function succeeds" time="0.000226" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\time-utils.test.js"/>
+		<testcase name="retryAsync should retry on failure and eventually succeed" time="0.030471" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\time-utils.test.js"/>
+		<testcase name="retryAsync should throw after max attempts" time="0.003819" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\time-utils.test.js"/>
+		<testcase name="measureAsync should return result and duration" time="0.051261" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\time-utils.test.js"/>
+		<testcase name="measureSync should return result and duration" time="0.002432" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\time-utils.test.js"/>
+		<testcase name="formatDuration should format correctly" time="0.000142" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\time-utils.test.js"/>
+		<testcase name="parseDuration should parse correctly" time="0.000196" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\time-utils.test.js"/>
+		<testcase name="parseDuration should throw on invalid format" time="0.000097" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\time-utils.test.js"/>
+		<testcase name="createQueue should process tasks with concurrency" time="0.106120" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\time-utils.test.js"/>
+		<testcase name="debounce should delay execution" time="0.100481" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\time-utils.test.js"/>
+		<testcase name="throttle should limit execution frequency" time="0.100430" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\time-utils.test.js"/>
+	</testsuite>
+	<testcase name="generateTypesFromEndpoint writes types for arrays and optional fields" time="0.015143" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\type-generator.test.js"/>
+	<testcase name="UrlBuilder.path handles segments correctly" time="0.001347" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\url-builder-coverage.test.js"/>
+	<testcase name="UrlBuilder.query handles various types" time="0.000272" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\url-builder-coverage.test.js"/>
+	<testcase name="UrlBuilder.queryArray handles repeats" time="0.000233" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\url-builder-coverage.test.js"/>
+	<testcase name="UrlBuilder.hash" time="0.000109" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\url-builder-coverage.test.js"/>
+	<testcase name="UrlBuilder methods: toURL and getSearch" time="0.000134" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\url-builder-coverage.test.js"/>
+	<testcase name="UrlBuilder.clone creates independent copy" time="0.000100" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\url-builder-coverage.test.js"/>
+	<testcase name="createUrlBuilder factory works" time="0.000069" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\url-builder-coverage.test.js"/>
+	<testcase name="UrlBuilder.path with empty segments does nothing" time="0.000076" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\url-builder-coverage.test.js"/>
+	<testcase name="UrlBuilder builds basic URL" time="0.000738" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\url-builder.test.js"/>
+	<testcase name="UrlBuilder adds path segments" time="0.000191" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\url-builder.test.js"/>
+	<testcase name="UrlBuilder chains multiple path segments" time="0.000125" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\url-builder.test.js"/>
+	<testcase name="UrlBuilder handles path segments with slashes" time="0.000109" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\url-builder.test.js"/>
+	<testcase name="UrlBuilder adds query parameters" time="0.000233" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\url-builder.test.js"/>
+	<testcase name="UrlBuilder chains multiple query calls" time="0.000126" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\url-builder.test.js"/>
+	<testcase name="UrlBuilder ignores undefined and null query values" time="0.000097" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\url-builder.test.js"/>
+	<testcase name="UrlBuilder adds array query parameters" time="0.000145" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\url-builder.test.js"/>
+	<testcase name="UrlBuilder adds hash/fragment" time="0.000102" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\url-builder.test.js"/>
+	<testcase name="UrlBuilder converts boolean and number query params" time="0.000171" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\url-builder.test.js"/>
+	<testcase name="UrlBuilder getPathname returns pathname only" time="0.000102" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\url-builder.test.js"/>
+	<testcase name="UrlBuilder getSearch returns query string" time="0.000147" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\url-builder.test.js"/>
+	<testcase name="UrlBuilder getHash returns fragment" time="0.000077" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\url-builder.test.js"/>
+	<testcase name="UrlBuilder clone creates independent copy" time="0.000145" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\url-builder.test.js"/>
+	<testcase name="UrlBuilder toURL returns URL object" time="0.000243" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\url-builder.test.js"/>
+	<testcase name="createUrlBuilder factory function works" time="0.000147" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\url-builder.test.js"/>
+	<testcase name="UrlBuilder handles complex URL building" time="0.000147" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\url-builder.test.js"/>
+	<testcase name="Validator.isEmpty handles various types" time="0.001316" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\validator-coverage.test.js"/>
+	<testcase name="Validator.minLength and maxLength" time="0.000138" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\validator-coverage.test.js"/>
+	<testcase name="Validator.isUrl validates URLs" time="0.000135" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\validator-coverage.test.js"/>
+	<testcase name="Validator.isPhone formats" time="0.000296" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\validator-coverage.test.js"/>
+	<testcase name="Validator.isLocalPhone for different locales" time="0.000349" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\validator-coverage.test.js"/>
+	<testcase name="Validator.isCbu validates checksums" time="0.000169" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\validator-coverage.test.js"/>
+	<testcase name="Validator.isCuit validates checksums" time="0.000213" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\validator-coverage.test.js"/>
+	<testcase name="Validator.isStrongPassword options" time="0.000179" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\validator-coverage.test.js"/>
+	<testcase name="Validator.isDateRange validates ranges" time="0.000192" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\validator-coverage.test.js"/>
+	<testcase name="Validator.isOneTimeCode validates digits" time="0.000214" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\validator-coverage.test.js"/>
+	<testcase name="Validator.isEmail validates typical addresses" time="0.000635" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\validator.test.js"/>
+	<testcase name="Validator.isStrongPassword enforces custom requirements" time="0.000172" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\validator.test.js"/>
+	<testcase name="Validator.isLocalPhone matches locale-aware patterns" time="0.000233" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\validator.test.js"/>
+	<testcase name="Validator.isCuit validates checksum correctly" time="0.000362" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\validator.test.js"/>
+	<testcase name="Validator.isDateRange and isOneTimeCode behave as expected" time="0.000210" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\validator.test.js"/>
+	<testcase name="Validator.isEmpty and length helpers" time="0.000173" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\validator.test.js"/>
+	<testcase name="Validator.matches and isUrl" time="0.000416" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\validator.test.js"/>
+	<testcase name="Validator phone helpers" time="0.000189" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\validator.test.js"/>
+	<testcase name="Validator UUID, DNI, and local phone fallback" time="0.000373" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\validator.test.js"/>
+	<testcase name="Validator CBU validation" time="0.000208" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\validator.test.js"/>
+	<testcase name="WebSocketHelper connects and sends heartbeat" time="0.082235" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\websocket-helper.test.js"/>
+	<testcase name="WebSocketHelper receives messages and notifies subscribers" time="0.010370" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\websocket-helper.test.js"/>
+	<testcase name="WebSocketHelper.request handles send and response" time="0.030185" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\websocket-helper.test.js"/>
+	<testcase name="WebSocketHelper handles reconnection" time="0.111061" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\websocket-helper.test.js"/>
+	<testcase name="WebSocketHelper stops reconnecting after max attempts" time="0.126405" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\websocket-helper.test.js"/>
+	<testcase name="WebSocketHelper throws if sending while disconnected" time="0.000764" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\websocket-helper.test.js"/>
+	<testcase name="WebSocketHelper handles invalid message JSON" time="0.011856" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\websocket-helper.test.js"/>
+	<testcase name="WebSocketHelper unsubscribe stops receiving messages" time="0.015258" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\websocket-helper.test.js"/>
+	<testcase name="WebSocketHelper request times out when no response" time="0.033125" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\websocket-helper.test.js"/>
+	<testcase name="WebSocketHelper notifies error when handler throws" time="0.012139" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\websocket-helper.test.js"/>
+	<testcase name="WebSocketHelper connect rejects on constructor error" time="0.000333" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\websocket-helper.test.js"/>
+	<testcase name="WebSocketHelper request supports custom responseType" time="0.019986" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\websocket-helper.test.js"/>
+	<testcase name="WebSocketHelper notifyError ignores handler exceptions" time="0.019507" classname="test" file="C:\Users\sebam\Desktop\Development\utils\tests\websocket-helper.test.js"/>
+	<!-- tests 678 -->
+	<!-- suites 51 -->
+	<!-- pass 675 -->
+	<!-- fail 0 -->
+	<!-- cancelled 0 -->
+	<!-- skipped 3 -->
+	<!-- todo 0 -->
+	<!-- duration_ms 6385.1956 -->
+</testsuites>

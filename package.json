@@ -182,6 +182,7 @@
         "test": "npm run lint && npm run build && node --test tests/*.test.js",
         "test:watch": "vitest",
         "test:ui": "vitest --ui",
+        "test:junit": "npm run build && node --test --test-reporter=spec --test-reporter-destination=stdout --test-reporter=junit --test-reporter-destination=test-report.junit.xml tests/*.test.js",
         "test:coverage": "npm run build && node --experimental-test-coverage --test --test-coverage-include=dist/utils/**/*.js --test-coverage-include=dist/index.js tests/*.test.js",
         "test:coverage:watch": "vitest --coverage",
         "test:node": "npm run build && node --test tests/*.test.js",
