@@ -160,9 +160,7 @@ export class Computed<T> extends Signal<T> {
  * @param callback Effect callback, can return cleanup function
  * @returns Cleanup function
  */
-export function effect(
-    callback: () => void | (() => void)
-): () => void {
+export function effect(callback: () => void | (() => void)): () => void {
     let cleanup: (() => void) | void;
     let isDisposed = false;
 

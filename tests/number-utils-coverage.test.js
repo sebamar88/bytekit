@@ -13,7 +13,9 @@ test("NumberUtils.format and currency", () => {
 });
 
 test("NumberUtils.percentage", () => {
-    assert.ok(NumberUtils.percentage(0.456, { locale: "en-US" }).includes("45.6%"));
+    assert.ok(
+        NumberUtils.percentage(0.456, { locale: "en-US" }).includes("45.6%")
+    );
 });
 
 test("NumberUtils.ordinal", () => {

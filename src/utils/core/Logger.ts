@@ -2,7 +2,7 @@
 export type LogLevel = "silent" | "error" | "warn" | "info" | "debug";
 
 export interface LogEntry<
-    TContext extends Record<string, unknown> = Record<string, unknown>
+    TContext extends Record<string, unknown> = Record<string, unknown>,
 > {
     level: LogLevel;
     message: string;
@@ -74,8 +74,8 @@ export const consoleTransportNode = ({
             level === "error"
                 ? console.error
                 : level === "warn"
-                ? console.warn
-                : console.log;
+                  ? console.warn
+                  : console.log;
 
         method(...payload);
     };
@@ -111,8 +111,8 @@ export const consoleTransportBrowser = ({
             level === "error"
                 ? console.error
                 : level === "warn"
-                ? console.warn
-                : console.log;
+                  ? console.warn
+                  : console.log;
 
         method(...payload);
     };
@@ -122,7 +122,7 @@ export const consoleTransportBrowser = ({
 // Logger Class
 // ------------------------------------
 export class Logger<
-    TContext extends Record<string, unknown> = Record<string, unknown>
+    TContext extends Record<string, unknown> = Record<string, unknown>,
 > {
     private readonly namespace?: string;
     private readonly transports: LogTransport[];

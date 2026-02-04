@@ -24,7 +24,7 @@ test("DateUtils.startOfDay and endOfDay", () => {
     const start = DateUtils.startOfDay(d);
     assert.equal(start.getHours(), 0);
     assert.equal(start.getMinutes(), 0);
-    
+
     const end = DateUtils.endOfDay(d);
     assert.equal(end.getHours(), 23);
     assert.equal(end.getMilliseconds(), 999);
@@ -40,27 +40,42 @@ test("DateUtils.add duration", () => {
 test("DateUtils.diff calculation and rounding", () => {
     const d1 = new Date(2023, 0, 1, 12, 0);
     const d2 = new Date(2023, 0, 1, 13, 45);
-    
+
     // Default is milliseconds
     assert.equal(DateUtils.diff(d1, d2), 3600000 + 45 * 60000);
-    
+
     // Minutes
     assert.equal(DateUtils.diff(d1, d2, { unit: "minutes" }), 105);
     assert.equal(DateUtils.diff(d2, d1, { unit: "minutes" }), -105);
-    assert.equal(DateUtils.diff(d2, d1, { unit: "minutes", absolute: true }), 105);
-    
+    assert.equal(
+        DateUtils.diff(d2, d1, { unit: "minutes", absolute: true }),
+        105
+    );
+
     // Rounding modes
     const d3 = new Date(d1.getTime() + 90 * 1000); // 1.5 minutes
-    assert.equal(DateUtils.diff(d1, d3, { unit: "minutes", rounding: "floor" }), 1);
-    assert.equal(DateUtils.diff(d1, d3, { unit: "minutes", rounding: "ceil" }), 2);
-    assert.equal(DateUtils.diff(d1, d3, { unit: "minutes", rounding: "round" }), 2);
-    assert.equal(DateUtils.diff(d1, d3, { unit: "minutes", rounding: "trunc" }), 1);
+    assert.equal(
+        DateUtils.diff(d1, d3, { unit: "minutes", rounding: "floor" }),
+        1
+    );
+    assert.equal(
+        DateUtils.diff(d1, d3, { unit: "minutes", rounding: "ceil" }),
+        2
+    );
+    assert.equal(
+        DateUtils.diff(d1, d3, { unit: "minutes", rounding: "round" }),
+        2
+    );
+    assert.equal(
+        DateUtils.diff(d1, d3, { unit: "minutes", rounding: "trunc" }),
+        1
+    );
 });
 
 test("DateUtils comparisons", () => {
     const d1 = new Date(2023, 0, 1);
     const d2 = new Date(2023, 0, 2);
-    
+
     assert.equal(DateUtils.isBefore(d1, d2), true);
     assert.equal(DateUtils.isAfter(d2, d1), true);
     assert.equal(DateUtils.isSameDay(d1, new Date(2023, 0, 1, 10)), true);

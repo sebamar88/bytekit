@@ -64,7 +64,7 @@ export class PaginationHelper<T = unknown> {
         }
 
         const cursorIndex = this.currentCursor
-            ? this.cursorMap.get(this.currentCursor) ?? 0
+            ? (this.cursorMap.get(this.currentCursor) ?? 0)
             : 0;
         const start = cursorIndex;
         const end = start + this.pageSize;
@@ -94,7 +94,7 @@ export class PaginationHelper<T = unknown> {
         }
 
         const currentIndex = this.currentCursor
-            ? this.cursorMap.get(this.currentCursor) ?? 0
+            ? (this.cursorMap.get(this.currentCursor) ?? 0)
             : 0;
         const nextIndex = currentIndex + this.pageSize;
 
@@ -129,7 +129,7 @@ export class PaginationHelper<T = unknown> {
         }
 
         const currentIndex = this.currentCursor
-            ? this.cursorMap.get(this.currentCursor) ?? 0
+            ? (this.cursorMap.get(this.currentCursor) ?? 0)
             : 0;
         const previousIndex = Math.max(0, currentIndex - this.pageSize);
 
@@ -185,7 +185,7 @@ export class PaginationHelper<T = unknown> {
         }
 
         const currentIndex = this.currentCursor
-            ? this.cursorMap.get(this.currentCursor) ?? 0
+            ? (this.cursorMap.get(this.currentCursor) ?? 0)
             : 0;
         return currentIndex + this.pageSize < this.items.length;
     }
@@ -199,7 +199,7 @@ export class PaginationHelper<T = unknown> {
         }
 
         const currentIndex = this.currentCursor
-            ? this.cursorMap.get(this.currentCursor) ?? 0
+            ? (this.cursorMap.get(this.currentCursor) ?? 0)
             : 0;
         return currentIndex > 0;
     }
@@ -244,7 +244,7 @@ export class PaginationHelper<T = unknown> {
      */
     getCursorState(): CursorPaginationState {
         const currentIndex = this.currentCursor
-            ? this.cursorMap.get(this.currentCursor) ?? 0
+            ? (this.cursorMap.get(this.currentCursor) ?? 0)
             : 0;
         const nextIndex = currentIndex + this.pageSize;
         const previousIndex = Math.max(0, currentIndex - this.pageSize);

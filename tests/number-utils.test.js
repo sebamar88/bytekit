@@ -106,7 +106,10 @@ describe("NumberUtils", () => {
         });
 
         it("should generate range with step", () => {
-            assert.deepStrictEqual(NumberUtils.range(0, 10, 2), [0, 2, 4, 6, 8, 10]);
+            assert.deepStrictEqual(
+                NumberUtils.range(0, 10, 2),
+                [0, 2, 4, 6, 8, 10]
+            );
         });
 
         it("should generate descending range", () => {
@@ -254,7 +257,10 @@ describe("NumberUtils", () => {
         });
 
         it("should calculate 90th percentile", () => {
-            const result = NumberUtils.percentile([1, 2, 3, 4, 5, 6, 7, 8, 9, 10], 90);
+            const result = NumberUtils.percentile(
+                [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+                90
+            );
             assert.ok(result >= 9 && result <= 10);
         });
     });

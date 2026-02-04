@@ -1,6 +1,9 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { UrlBuilder, createUrlBuilder } from "../dist/utils/helpers/UrlBuilder.js";
+import {
+    UrlBuilder,
+    createUrlBuilder,
+} from "../dist/utils/helpers/UrlBuilder.js";
 
 // ============================================================================
 // UrlBuilder Tests
@@ -15,8 +18,17 @@ test("UrlBuilder.path handles segments correctly", () => {
 
 test("UrlBuilder.query handles various types", () => {
     const builder = new UrlBuilder("https://api.com");
-    builder.query({ page: 1, active: true, name: "John", none: null, ghost: undefined });
-    assert.equal(builder.build(), "https://api.com/?page=1&active=true&name=John");
+    builder.query({
+        page: 1,
+        active: true,
+        name: "John",
+        none: null,
+        ghost: undefined,
+    });
+    assert.equal(
+        builder.build(),
+        "https://api.com/?page=1&active=true&name=John"
+    );
 });
 
 test("UrlBuilder.queryArray handles repeats", () => {
@@ -37,7 +49,7 @@ test("UrlBuilder.hash", () => {
 test("UrlBuilder methods: toURL and getSearch", () => {
     const builder = new UrlBuilder("https://api.com/path");
     builder.query({ q: "test" });
-    
+
     assert.ok(builder.toURL() instanceof URL);
     assert.equal(builder.getSearch(), "?q=test");
 });
@@ -45,9 +57,9 @@ test("UrlBuilder methods: toURL and getSearch", () => {
 test("UrlBuilder.clone creates independent copy", () => {
     const original = new UrlBuilder("https://api.com").query({ a: 1 });
     const cloned = original.clone();
-    
+
     cloned.query({ b: 2 });
-    
+
     assert.equal(original.build(), "https://api.com/?a=1");
     assert.equal(cloned.build(), "https://api.com/?a=1&b=2");
 });

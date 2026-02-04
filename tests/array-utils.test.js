@@ -13,16 +13,25 @@ test("ArrayUtils.chunk splits array into chunks", () => {
 });
 
 test("ArrayUtils.chunk throws on invalid size", () => {
-    assert.throws(() => ArrayUtils.chunk([1, 2, 3], 0), /Chunk size must be greater than 0/);
-    assert.throws(() => ArrayUtils.chunk([1, 2, 3], -1), /Chunk size must be greater than 0/);
+    assert.throws(
+        () => ArrayUtils.chunk([1, 2, 3], 0),
+        /Chunk size must be greater than 0/
+    );
+    assert.throws(
+        () => ArrayUtils.chunk([1, 2, 3], -1),
+        /Chunk size must be greater than 0/
+    );
 });
 
 test("ArrayUtils.flatten flattens nested arrays", () => {
     // Note: Implementation has a bug where depth=0 filters arrays
     // So [[5,6]] at depth=1 becomes [] instead of [5,6]
-    const arr1 = [[1, 2], [3, 4]];
+    const arr1 = [
+        [1, 2],
+        [3, 4],
+    ];
     assert.deepEqual(ArrayUtils.flatten(arr1, 1), [1, 2, 3, 4]);
-    
+
     const arr2 = [[[1, 2]], [[3, 4]]];
     assert.deepEqual(ArrayUtils.flatten(arr2, 2), [1, 2, 3, 4]);
 });
@@ -56,7 +65,13 @@ test("ArrayUtils.compact removes falsy values", () => {
 test("ArrayUtils.flat flattens one level", () => {
     // flat() calls flatten(arr, 1)
     assert.deepEqual(ArrayUtils.flat([1, [2, 3], [4, 5]]), [1, 2, 3, 4, 5]);
-    assert.deepEqual(ArrayUtils.flat([[1, 2], [3, 4]]), [1, 2, 3, 4]);
+    assert.deepEqual(
+        ArrayUtils.flat([
+            [1, 2],
+            [3, 4],
+        ]),
+        [1, 2, 3, 4]
+    );
 });
 
 test("ArrayUtils.first returns first element", () => {

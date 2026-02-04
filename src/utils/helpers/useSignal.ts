@@ -1,10 +1,10 @@
 /**
  * React hooks for Signal integration
  * Provides useSignal, useComputed, and useSignalEffect
- * 
+ *
  * NOTE: This file requires React 16.8+ as a peer dependency
  * Install with: npm install react
- * 
+ *
  * Uncomment the code below when React is available
  */
 

@@ -3,7 +3,9 @@ export class EnvManager {
 
     get(name: string): string | undefined {
         if (this.isBrowser) {
-            const meta = import.meta as unknown as { env: Record<string, string> };
+            const meta = import.meta as unknown as {
+                env: Record<string, string>;
+            };
             return meta.env?.[name];
         }
         return process?.env?.[name];

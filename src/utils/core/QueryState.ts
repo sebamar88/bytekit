@@ -38,7 +38,10 @@ export interface RequestContext {
 export interface RequestLifecycleCallbacks<T = unknown> {
     onStart?: (context: RequestContext) => void | Promise<void>;
     onSuccess?: (data: T, context: RequestContext) => void | Promise<void>;
-    onError?: (error: ApiError, context: RequestContext) => void | Promise<void>;
+    onError?: (
+        error: ApiError,
+        context: RequestContext
+    ) => void | Promise<void>;
     onSettled?: (
         data: T | undefined,
         error: ApiError | undefined,

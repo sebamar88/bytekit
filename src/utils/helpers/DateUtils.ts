@@ -110,8 +110,11 @@ export const DateUtils = {
     diff(a: DateInput, b: DateInput, options: DiffOptions = {}) {
         const start = requireDate(a);
         const end = requireDate(b);
-        const { unit = "milliseconds", absolute = false, rounding = "floor" } =
-            options;
+        const {
+            unit = "milliseconds",
+            absolute = false,
+            rounding = "floor",
+        } = options;
         const diffMs = end.getTime() - start.getTime();
         const value = diffMs / MS_PER_UNIT[unit];
         const rounded = ROUNDING_FUNCTIONS[rounding](value);

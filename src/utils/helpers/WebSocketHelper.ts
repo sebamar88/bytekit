@@ -19,7 +19,8 @@ export class WebSocketHelper {
     private ws: WebSocket | null = null;
     private url: string;
     private options: Required<WebSocketOptions>;
-    private messageHandlers: Map<string, Set<WebSocketEventHandler>> = new Map();
+    private messageHandlers: Map<string, Set<WebSocketEventHandler>> =
+        new Map();
     private errorHandlers: Set<WebSocketErrorHandler> = new Set();
     private reconnectAttempts = 0;
     private heartbeatTimer?: NodeJS.Timeout;
@@ -67,7 +68,9 @@ export class WebSocketHelper {
                     }
                 };
             } catch (error) {
-                reject(error instanceof Error ? error : new Error(String(error)));
+                reject(
+                    error instanceof Error ? error : new Error(String(error))
+                );
             }
         });
     }
@@ -92,7 +95,10 @@ export class WebSocketHelper {
     /**
      * Subscribe to a message type
      */
-    on<T = unknown>(type: string, handler: WebSocketEventHandler<T>): () => void {
+    on<T = unknown>(
+        type: string,
+        handler: WebSocketEventHandler<T>
+    ): () => void {
         if (!this.messageHandlers.has(type)) {
             this.messageHandlers.set(type, new Set());
         }
@@ -241,7 +247,6 @@ export class WebSocketHelper {
             try {
                 handler(error);
             } catch (e) {
-
                 console.error("Error in error handler:", e);
             }
         });
