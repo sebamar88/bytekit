@@ -12,6 +12,11 @@ if (testFiles.length === 0) {
 const args = ["--test", ...testFiles];
 const proc = spawn("node", args, { stdio: "inherit" });
 
+proc.on("error", (error) => {
+    console.error("Failed to start test process:", error);
+    process.exit(1);
+});
+
 proc.on("exit", (code) => {
-    process.exit(code);
+    process.exit(code ?? 1);
 });
