@@ -125,7 +125,7 @@ jobs:
 
                       **Coverage:** ${coverage}%
 
-                      ${coverage >= 80 ? '✅ Great coverage!' : coverage >= 60 ? '⚠️ Coverage could be improved' : '❌ Low coverage - please add more tests'}
+                      ${coverage >= 80 ? '✅ Great coverage!!' : coverage >= 60 ? '⚠️ Coverage could be improved' : '❌ Low coverage - please add more tests'}
                       `;
 
                       github.rest.issues.createComment({
