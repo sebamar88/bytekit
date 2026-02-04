@@ -96,11 +96,14 @@ jobs:
                   echo "Coverage: $COVERAGE%"
 
             - name: Create coverage badge
-              if: ${{ secrets.GIST_SECRET && secrets.GIST_ID }}
+              if: ${{ env.GIST_SECRET != '' && env.GIST_ID != '' }}
               uses: schneegans/dynamic-badges-action@v1.7.0
+              env:
+                  GIST_SECRET: ${{ secrets.GIST_SECRET }}
+                  GIST_ID: ${{ secrets.GIST_ID }}
               with:
-                  auth: ${{ secrets.GIST_SECRET }}
-                  gistID: ${{ secrets.GIST_ID }}
+                  auth: ${{ env.GIST_SECRET }}
+                  gistID: ${{ env.GIST_ID }}
                   filename: bytekit-coverage.json
                   label: Coverage
                   message: ${{ steps.coverage.outputs.coverage }}%
