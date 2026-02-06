@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import { glob } from "glob";
 import { spawn } from "child_process";
+import path from "path";
 
 const testFiles = await glob("tests/*.test.js");
 
@@ -8,6 +9,9 @@ if (testFiles.length === 0) {
     console.error("No test files found");
     process.exit(1);
 }
+
+// Normalize paths for cross-platform compatibility (especially Windows)
+const normalizedFiles = testFiles.map((file) => path.normalize(file));
 
 const args = [
     "--reporter=lcov",
@@ -23,7 +27,7 @@ const args = [
     "--all",
     "node",
     "--test",
-    ...testFiles,
+    ...normalizedFiles,
 ];
 
 const proc = spawn("npx", ["c8", ...args], { stdio: "inherit" });
