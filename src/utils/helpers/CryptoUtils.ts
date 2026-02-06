@@ -75,7 +75,9 @@ export class CryptoUtils {
             // Encode to UTF-8 bytes first to handle Unicode characters
             const encoder = new TextEncoder();
             const bytes = encoder.encode(str);
-            const binaryString = Array.from(bytes, (byte) => String.fromCharCode(byte)).join('');
+            const binaryString = Array.from(bytes, (byte) =>
+                String.fromCharCode(byte)
+            ).join("");
             return globalThis.btoa(binaryString);
         }
         // Node.js fallback
