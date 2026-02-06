@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import { glob } from "glob";
 import { spawn } from "child_process";
+import path from "path";
 
 const testFiles = await glob("tests/*.test.js");
 
@@ -9,7 +10,9 @@ if (testFiles.length === 0) {
     process.exit(1);
 }
 
-const args = ["--test", ...testFiles];
+// Normalize paths for cross-platform compatibility (especially Windows)
+const normalizedFiles = testFiles.map((file) => path.normalize(file));
+const args = ["--test", ...normalizedFiles];
 const proc = spawn("node", args, { stdio: "inherit" });
 
 proc.on("error", (error) => {

@@ -6,6 +6,10 @@ on:
     pull_request:
         branches: [main, develop]
 
+permissions:
+    contents: read
+    pull-requests: write
+
 jobs:
     coverage:
         runs-on: ubuntu-latest
@@ -36,7 +40,7 @@ jobs:
             - name: Extract coverage percentage
               id: coverage
               run: |
-                  COVERAGE=$(grep -oP 'all files\s+\|\s+\K[\d.]+' coverage.txt | head -1 || echo "0")
+                  COVERAGE=$(grep "^All files" coverage.txt | awk '{print $4}' || echo "0")
                   echo "coverage=$COVERAGE" >> $GITHUB_OUTPUT
                   echo "📊 Coverage: $COVERAGE%"
 

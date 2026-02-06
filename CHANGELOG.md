@@ -15,6 +15,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - Updated documentation to reflect native fetch usage
     - No API changes required - fully backward compatible for consumers
 
+## [1.0.21] - 2026-02-06
+
+### Added
+
+- **Profiler**: Namespace support for isolated performance measurements
+    - Constructor now accepts optional `namespace` parameter
+    - Results are organized by namespace when provided
+    - Maintains backward compatibility - flat results when no namespace is used
+    - Added 3 comprehensive tests for namespace functionality
+
+### Improved
+
+- **Test Coverage**: Increased from 90.17% to 96.08% (statements)
+    - Logger.ts: Branches improved from 60% to 76.08%
+    - FormUtils.ts: Statements improved from 93.96% to 96.60%
+    - CompressionUtils.ts: Added 8 tests for edge cases and error handling
+    - CryptoUtils.ts: Added 10 tests for enhanced cryptographic operations coverage
+    - Added ~39 new tests across multiple modules
+- **Coverage Configuration**: Excluded CLI code from coverage metrics
+    - CLI (development tool) now excluded from coverage reports
+    - Focus on library core functionality coverage
+
 ## [1.0.14] - 2026-02-03
 
 ### Fixed

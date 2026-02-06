@@ -72,7 +72,13 @@ export class CryptoUtils {
      */
     static base64Encode(str: string): string {
         if (typeof globalThis !== "undefined" && globalThis.btoa) {
-            return globalThis.btoa(str);
+            // Encode to UTF-8 bytes first to handle Unicode characters
+            const encoder = new TextEncoder();
+            const bytes = encoder.encode(str);
+            const binaryString = Array.from(bytes, (byte) =>
+                String.fromCharCode(byte)
+            ).join("");
+            return globalThis.btoa(binaryString);
         }
         // Node.js fallback
         return Buffer.from(str, "utf-8").toString("base64");
@@ -83,7 +89,14 @@ export class CryptoUtils {
      */
     static base64Decode(str: string): string {
         if (typeof globalThis !== "undefined" && globalThis.atob) {
-            return globalThis.atob(str);
+            // Decode from binary string to UTF-8 to handle Unicode characters
+            const binaryString = globalThis.atob(str);
+            const bytes = new Uint8Array(binaryString.length);
+            for (let i = 0; i < binaryString.length; i++) {
+                bytes[i] = binaryString.charCodeAt(i);
+            }
+            const decoder = new TextDecoder();
+            return decoder.decode(bytes);
         }
         // Node.js fallback
         return Buffer.from(str, "base64").toString("utf-8");

@@ -17,6 +17,7 @@ export interface FieldRule<T = unknown> {
     pattern?: RegExp | string;
     email?: boolean | string;
     url?: boolean | string;
+    match?: string;
     custom?: ValidatorFn<T> | ValidatorFn<T>[];
     asyncCustom?: AsyncValidatorFn<T> | AsyncValidatorFn<T>[];
 }
@@ -351,6 +352,13 @@ export class FormUtils<
             }
         }
 
+        // Match validation
+        if (rule.match) {
+            const otherValue = this.state.values[rule.match as keyof T];
+            const result = Validators.match(value, otherValue);
+            if (result !== true) errors.push(result as string);
+        }
+
         // Custom validators
         if (rule.custom) {
             const validators = Array.isArray(rule.custom)
@@ -471,10 +479,29 @@ export class FormUtils<
     }
 
     /**
+     * Clear field error (alias for clearFieldError)
+     */
+    clearError<K extends keyof T>(field: K): void {
+        this.clearFieldError(field);
+    }
+
+    /**
      * Clear all errors
      */
     clearErrors(): void {
         this.state.errors = {};
+    }
+
+    /**
+     * Get complete field state
+     */
+    getFieldState<K extends keyof T>(field: K) {
+        return {
+            value: this.getValue(field),
+            touched: this.isTouched(field),
+            dirty: this.isDirty(field),
+            error: this.getFieldError(field),
+        };
     }
 
     /**
