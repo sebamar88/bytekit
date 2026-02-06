@@ -162,3 +162,114 @@ test("Logger.error forwards error object to transport", () => {
 
     assert.equal(receivedError, err);
 });
+
+test("Logger with timestamp in browser transport", () => {
+    globalThis.window = {};
+    globalThis.document = {};
+
+    const originalLog = console.log;
+    let output = "";
+    console.log = (msg) => {
+        output = msg;
+    };
+
+    const transport = consoleTransportBrowser({ includeTimestamp: true });
+    transport({
+        level: "debug",
+        message: "test",
+        timestamp: new Date("2026-01-01T00:00:00Z"),
+    });
+
+    assert.match(output, /2026-01-01/);
+    assert.match(output, /%cDEBUG/);
+
+    console.log = originalLog;
+    delete globalThis.window;
+    delete globalThis.document;
+});
+
+test("Logger with context and error in node transport", () => {
+    const originalError = console.error;
+    let args = [];
+    console.error = (...capturedArgs) => {
+        args = capturedArgs;
+    };
+
+    const transport = consoleTransportNode({ includeTimestamp: true });
+    const error = new Error("test error");
+    transport({
+        level: "error",
+        message: "failure",
+        namespace: "app",
+        timestamp: new Date(),
+        context: { code: 500 },
+        error,
+    });
+
+    assert.ok(args[0].includes("ERROR"));
+    assert.ok(args[0].includes("[app]"));
+    assert.ok(args[0].includes("failure"));
+    assert.deepEqual(args[1], { code: 500 });
+    assert.equal(args[2], error);
+
+    console.error = originalError;
+});
+
+test("Logger warn level uses console.warn", () => {
+    const originalWarn = console.warn;
+    let warnCalled = false;
+    console.warn = () => {
+        warnCalled = true;
+    };
+
+    const transport = consoleTransportNode();
+    transport({
+        level: "warn",
+        message: "warning",
+        timestamp: new Date(),
+    });
+
+    assert.ok(warnCalled);
+    console.warn = originalWarn;
+});
+
+test("Logger without namespace", () => {
+    let output = "";
+    const originalLog = console.log;
+    console.log = (msg) => {
+        output = msg;
+    };
+
+    const transport = consoleTransportNode({ includeTimestamp: false });
+    transport({
+        level: "info",
+        message: "no namespace",
+        timestamp: new Date(),
+    });
+
+    assert.ok(output.includes("INFO"));
+    assert.ok(output.includes("no namespace"));
+    assert.ok(!output.includes("["));
+
+    console.log = originalLog;
+});
+
+test("Logger with empty context is not logged", () => {
+    let args = [];
+    const originalLog = console.log;
+    console.log = (...capturedArgs) => {
+        args = capturedArgs;
+    };
+
+    const transport = consoleTransportNode();
+    transport({
+        level: "info",
+        message: "test",
+        timestamp: new Date(),
+        context: {},
+    });
+
+    assert.equal(args.length, 1); // Solo el mensaje, no el context vacío
+
+    console.log = originalLog;
+});

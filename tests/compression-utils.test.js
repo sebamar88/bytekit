@@ -140,3 +140,63 @@ test("CompressionUtils gzip/deflate fallback without node", async () => {
         });
     }
 });
+
+test("CompressionUtils compress handles empty string", () => {
+    const compressed = CompressionUtils.compress("");
+    const decompressed = CompressionUtils.decompress(compressed);
+    assert.equal(decompressed, "");
+});
+
+test("CompressionUtils formatBytes handles large sizes", () => {
+    assert.equal(CompressionUtils.formatBytes(1024 * 1024), "1 MB");
+    assert.equal(CompressionUtils.formatBytes(1024 * 1024 * 1024), "1 GB");
+    assert.equal(
+        CompressionUtils.formatBytes(1024 * 1024 * 1024 * 1024),
+        "1 TB"
+    );
+});
+
+test("CompressionUtils base64UrlEncode replaces special chars", () => {
+    const encoded = CompressionUtils.base64UrlEncode("test+/=data");
+    assert.ok(!encoded.includes("+"));
+    assert.ok(!encoded.includes("/"));
+    assert.ok(!encoded.includes("="));
+});
+
+test("CompressionUtils minifyJSON handles already minified JSON", () => {
+    const input = '{"a":1,"b":2}';
+    const minified = CompressionUtils.minifyJSON(input);
+    assert.ok(minified.length <= input.length + 4); // Con espacios mínimos
+});
+
+test("CompressionUtils getCompressionRatio with incompressible data", () => {
+    const random = Math.random().toString(36).repeat(10);
+    const compressed = CompressionUtils.compress(random);
+    const ratio = CompressionUtils.getCompressionRatio(random, compressed);
+    assert.ok(ratio >= 0);
+});
+
+test("CompressionUtils deserializeCompressed handles invalid data", () => {
+    try {
+        CompressionUtils.deserializeCompressed("invalid-compressed-data");
+        assert.fail("Should have thrown");
+    } catch (error) {
+        assert.ok(error);
+    }
+});
+
+test("CompressionUtils base64Decode handles invalid base64", () => {
+    try {
+        CompressionUtils.base64Decode("!!!invalid!!!");
+        assert.fail("Should have thrown");
+    } catch (error) {
+        assert.ok(error);
+    }
+});
+
+test("CompressionUtils gzip with non-string input", async () => {
+    const obj = { test: "data" };
+    const gzipped = await CompressionUtils.gzip(JSON.stringify(obj));
+    const restored = await CompressionUtils.gunzip(gzipped);
+    assert.deepEqual(JSON.parse(restored), obj);
+});

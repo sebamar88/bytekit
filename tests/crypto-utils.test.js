@@ -227,3 +227,69 @@ test("CryptoUtils hash uses SubtleCrypto when available", async () => {
         });
     }
 });
+
+test("CryptoUtils.generateToken with default length", () => {
+    const token = CryptoUtils.generateToken();
+    assert.equal(token.length, 64); // 32 bytes = 64 hex
+});
+
+test("CryptoUtils.hash with default algorithm", async () => {
+    const hash = await CryptoUtils.hash("test");
+    assert.ok(hash.length > 0);
+    assert.match(hash, /^[0-9a-f]+$/);
+});
+
+test("CryptoUtils.hmac with default algorithm", async () => {
+    const hmac = await CryptoUtils.hmac("message", "secret");
+    assert.ok(hmac.length > 0);
+    assert.match(hmac, /^[0-9a-f]+$/);
+});
+
+test("CryptoUtils.xorEncrypt handles empty strings", () => {
+    const encrypted = CryptoUtils.xorEncrypt("", "key");
+    const decrypted = CryptoUtils.xorDecrypt(encrypted, "key");
+    assert.equal(decrypted, "");
+});
+
+test("CryptoUtils.constantTimeCompare with empty strings", () => {
+    assert.equal(CryptoUtils.constantTimeCompare("", ""), true);
+    assert.equal(CryptoUtils.constantTimeCompare("", "a"), false);
+});
+
+test("CryptoUtils.base64Encode handles special characters", () => {
+    const original = "Hello 世界 🌍";
+    const encoded = CryptoUtils.base64Encode(original);
+    const decoded = CryptoUtils.base64Decode(encoded);
+    assert.equal(decoded, original);
+});
+
+test("CryptoUtils.simpleHash produces different hashes for different inputs", () => {
+    const hash1 = CryptoUtils.simpleHash("input1");
+    const hash2 = CryptoUtils.simpleHash("input2");
+    const hash3 = CryptoUtils.simpleHash("input1");
+
+    assert.notEqual(hash1, hash2);
+    assert.equal(hash1, hash3); // Deterministic
+});
+
+test("CryptoUtils.verifyHash handles invalid hash format", async () => {
+    const result = await CryptoUtils.verifyHash("data", "invalid-hash");
+    assert.equal(result, false);
+});
+
+test("CryptoUtils.randomBytes generates different values", () => {
+    const bytes1 = CryptoUtils.randomBytes(16);
+    const bytes2 = CryptoUtils.randomBytes(16);
+
+    assert.notDeepEqual(bytes1, bytes2);
+});
+
+test("CryptoUtils.xorEncrypt with long key", () => {
+    const original = "short";
+    const key = "very-long-encryption-key-that-exceeds-message-length";
+
+    const encrypted = CryptoUtils.xorEncrypt(original, key);
+    const decrypted = CryptoUtils.xorDecrypt(encrypted, key);
+
+    assert.equal(decrypted, original);
+});
