@@ -1,342 +1,234 @@
-# Performance Monitoring: Profiler vs withTiming
+# Profiler
 
 > **Categoría:** Core | **[⬅️ Volver al índice](Home)**
 
-## 📊 Choosing the Right Tool
+#### Clase `Profiler`
 
-Bytekit provides two complementary approaches for performance monitoring:
+La clase `Profiler` es una solución sencilla para medir tiempos de ejecución mediante etiquetas. Puedes iniciar y finalizar secciones de código y, al finalizar, obtener un resumen de todas las mediciones realizadas.
 
-- **`withTiming`**: Quick, scoped timing for single operations
-- **`Profiler`**: Stateful profiler for complex, nested operations
+**Nota sobre `namespace`:** El namespace permite agrupar y aislar mediciones en espacios lógicos separados. Esto es útil cuando trabajas con múltiples componentes o módulos que necesitan mantener sus propias métricas de rendimiento sin interferir con otras. Al crear un `Profiler` con namespace, sus mediciones se almacenan bajo ese namespace, facilitando la lectura y el análisis posterior.
 
-## When to Use `withTiming`
+### Características
 
-**Prefer `withTiming` when you need:**
+- **Mediciones etiquetadas**: `start(label)` inicia una medición con la etiqueta indicada y devuelve una función que puedes invocar para detenerla. También puedes llamar a `end(label)` para terminar la última medición con esa etiqueta.
+- **Alta precisión**: utiliza `performance.now()` para calcular la diferencia de tiempo con precisión de milisegundos y microsegundos.
+- **Resumen agregado**: `summary()` devuelve un array de objetos con la etiqueta, el número de ejecuciones, la duración total y la media. Ideal para imprimir con `console.table`.
+- **Agrupación de mediciones**: si repites una etiqueta, el profiler acumula las duraciones para darte estadísticas útiles (suma total y promedio).
 
-✅ **Simple, self-contained measurements** - Single async operation timing  
-✅ **Automatic cleanup** - No manual start/end tracking required  
-✅ **Integrated logging** - Built-in logger support for immediate output  
-✅ **Minimal boilerplate** - Wrap and measure in one call  
-✅ **Isolated operations** - No complex call hierarchies to track
-
-### Ideal Scenarios for `withTiming`:
-
-1. **API call monitoring**
-2. **Database query timing**
-3. **File I/O operations**
-4. **Cache operations**
-5. **External service requests**
-6. **One-off performance checks**
-
----
-
-## When to Use `Profiler`
-
-**Prefer `Profiler` when you need:**
-
-✅ **Multiple measurements** across different code sections  
-✅ **Nested operation tracking** - Parent/child operation hierarchies  
-✅ **Aggregated statistics** - Collect all timings and analyze together  
-✅ **Manual control** - Explicit start/end calls for flexibility  
-✅ **Complex workflows** - Multi-step processes with interdependencies
-
-### Ideal Scenarios for `Profiler`:
-
-1. **Request/response pipelines** (parsing → validation → processing → formatting)
-2. **Batch operations** with multiple phases
-3. **Nested function calls** requiring granular timing
-4. **Performance regression testing**
-5. **System-wide performance audits**
-
----
-
-## API Reference
-
-### Profiler
+### Uso básico
 
 ```ts
-class Profiler {
-    start(label: string): void;
-    end(label: string): void;
-    summary(): Record<string, number>;
-}
+import { Profiler } from "bytekit";
+
+// crea una instancia del profiler sin namespace
+const profiler = new Profiler();
+
+// o con namespace para aislar mediciones
+const profileComponentA = new Profiler("component-a");
+
+// mide una operación etiquetada
+const finish = profiler.start("carga de datos");
+// … código a medir …
+finish();
+
+// también puedes iniciar y finalizar con end()
+profiler.start("renderizado");
+// … código …
+profiler.end("renderizado");
+
+// al final obtén el resumen
+console.table(profiler.summary());
 ```
 
-### withTiming
+### Namespace en Profiler
+
+El parámetro `namespace` en el constructor es opcional y actúa como identificador para agrupar mediciones:
 
 ```ts
-async function withTiming<T>(
-    label: string,
-    fn: () => Promise<T> | T,
-    options?: StopwatchOptions
-): Promise<T>;
+// sin namespace, las mediciones se almacenan con la clave "_default"
+const globalProfiler = new Profiler();
 
-interface StopwatchOptions {
-    label?: string;
-    logger?: Logger;
-    precision?: number; // decimals in logs (default: 2)
-    autoLog?: boolean; // auto-log on stop
-    namespace?: string; // logger child namespace
-}
+// con namespace, las mediciones se asocian a ese espacio
+const apiProfiler = new Profiler("api");
+const dbProfiler = new Profiler("database");
+
+// cada profiler mantiene sus propias mediciones independientes
+apiProfiler.start("fetch");
+await fetchData();
+apiProfiler.end("fetch");
+
+dbProfiler.start("query");
+await queryDB();
+dbProfiler.end("query");
+
+// al obtener el resumen, ves las mediciones organizadas por namespace
+console.log(apiProfiler.summary()); // mediciones del namespace "api"
+console.log(dbProfiler.summary()); // mediciones del namespace "database"
 ```
 
----
+## Utilidades de temporización (`debug.ts`)
 
-## Examples
+Además de `Profiler`, Bytekit proporciona funciones para medir tiempos de manera granular y con integración opcional con el logger.
 
-### Example 1: `withTiming` for Async Database Query
+### `createStopwatch(options)`
 
-**Scenario:** Measure a single asynchronous database operation with automatic logging.
+Crea un cronómetro que registra el tiempo transcurrido desde su creación y ofrece métodos para detenerlo y registrar el resultado. Devuelve un objeto con:
 
-```typescript
-import { withTiming } from "bytekit/debug";
-import { createLogger } from "bytekit/logger";
+- `elapsed()` – devuelve el tiempo transcurrido en milisegundos hasta el momento de la llamada.
+- `stop()` – devuelve la duración total y detiene el cronómetro, evitando mediciones posteriores.
+- `log(context?)` – si pasas un `logger` y `namespace` en las opciones, registra la duración automáticamente utilizando el logger.
 
-const logger = createLogger({ level: "debug" });
+Opciones (`StopwatchOptions`) incluyen:
 
-async function fetchUserData(userId: string) {
-    return await withTiming(
-        "Database Query: fetchUserById",
-        async () => {
-            const response = await fetch(
-                `https://api.example.com/users/${userId}`
-            );
-            return await response.json();
-        },
-        { logger, precision: 3 }
-    );
-}
+- `label`: etiqueta para el log.
+- `logger`: instancia de `Logger` para registrar la medición.
+- `precision`: número de decimales a mostrar (por defecto 2).
+- `autoLog`: si es `true`, la medición se registrará al detenerse.
+- `namespace`: cadena que se añadirá al namespace del logger para agrupar las mediciones. Si el logger tiene esta capacidad, crea un logger hijo con ese namespace para registros separados.
 
-// Usage
-const userData = await fetchUserData("123");
-// Logs: "Database Query: fetchUserById took 245.123ms"
+**Nota sobre namespace en logs:** El parámetro `namespace` interactúa con el logger para crear un contexto jerárquico. Si proporcionas tanto `logger` como `namespace`, el stopwatch usa `logger.child(namespace)` para crear un logger hijo, lo que permite que los logs de esa medición aparezcan bajo un namespace específico en la salida del logger.
+
+Ejemplo:
+
+```ts
+const stopwatch = createStopwatch({
+    label: "procesamiento",
+    logger,
+    namespace: "app:heavy-task",
+});
+doWork();
+stopwatch.stop(); // devuelve la duración
+stopwatch.log({ id: 123 }); // registra con contexto adicional bajo el namespace "app:heavy-task"
 ```
 
-**Why `withTiming` here?**
+### `withTiming(label, fn, options)`
 
-- ✅ Single async operation
-- ✅ Automatic timing and logging
-- ✅ No need to track start/end manually
-- ✅ Clean, readable code
+Ejecuta la función `fn` y devuelve su resultado, midiendo el tiempo de ejecución. Si proporcionas un `logger`, registra la duración de manera automática. La función admite tanto funciones sincrónicas como asíncronas. La precisión y el namespace pueden configurarse mediante las opciones.
 
----
+El parámetro `namespace` en `withTiming` actúa de forma similar a `createStopwatch`: si proporcionas `namespace` junto con `logger`, se crea un logger hijo para que los logs de esa medición aparezcan organizados bajo ese namespace.
 
-### Example 2: `Profiler` for Complex Multi-Step Processing
+```ts
+const result = await withTiming("consulta API", () => fetchUser(userId), {
+    logger,
+    namespace: "app:api", // los logs aparecerán bajo el namespace "app:api"
+    precision: 1,
+});
 
-**Scenario:** Track multiple nested operations in a data processing pipeline.
-
-```typescript
-import { Profiler } from "bytekit/profiler";
-
-async function processUserDataPipeline(rawData: string) {
-    const profiler = new Profiler();
-
-    // Step 1: Parse data
-    profiler.start("parsing");
-    const parsed = JSON.parse(rawData);
-    profiler.end("parsing");
-
-    // Step 2: Validate
-    profiler.start("validation");
-    const isValid = await validateData(parsed);
-    profiler.end("validation");
-
-    if (isValid) {
-        // Step 3: Transform
-        profiler.start("transformation");
-        const transformed = await transformData(parsed);
-        profiler.end("transformation");
-
-        // Step 4: Persist
-        profiler.start("database-write");
-        await saveToDatabase(transformed);
-        profiler.end("database-write");
-    }
-
-    // Get complete performance summary
-    const stats = profiler.summary();
-    console.log("Pipeline Performance:", stats);
-    // {
-    //   parsing: 12.4,
-    //   validation: 45.8,
-    //   transformation: 123.6,
-    //   "database-write": 234.2
-    // }
-
-    return stats;
-}
+// También sin namespace, para logs genéricos
+const data = await withTiming("carga datos", () => fetchData(), { logger });
 ```
 
-**Why `Profiler` here?**
+### `measureSync` y `measureAsync`
 
-- ✅ Multiple independent measurements
-- ✅ Conditional execution paths (if/else)
-- ✅ Aggregated summary needed
-- ✅ Manual control over timing points
+Devuelven un objeto con el resultado de la función y la duración en milisegundos. `measureSync` sirve para funciones sincrónicas, mientras que `measureAsync` sirve para promesas o funciones `async`.
 
----
-
-### Example 3: `withTiming` for API Request with Error Handling
-
-**Scenario:** Measure API call duration including error cases.
-
-```typescript
-import { withTiming } from "bytekit/debug";
-import { createLogger } from "bytekit/logger";
-
-const logger = createLogger({ level: "info" });
-
-async function callExternalAPI(endpoint: string, payload: object) {
-    try {
-        const result = await withTiming(
-            `API Call: ${endpoint}`,
-            async () => {
-                const response = await fetch(endpoint, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(payload),
-                });
-
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}`);
-                }
-
-                return await response.json();
-            },
-            { logger, namespace: "external-api" }
-        );
-
-        return { success: true, data: result };
-    } catch (error) {
-        logger.error("API call failed", { error, endpoint });
-        return { success: false, error };
-    }
-}
-
-// Usage
-await callExternalAPI("https://api.example.com/process", { userId: 123 });
-// Logs: "[external-api] API Call: https://api.example.com/process took 523.45ms"
+```ts
+const { result, ms } = measureSync("suma rápida", () => 1 + 1);
+const { result: users, ms: duration } = await measureAsync(
+    "carga usuarios",
+    () => fetchUsers()
+);
 ```
 
-**Why `withTiming` here?**
+### `captureDebug`
 
-- ✅ Single async operation scope
-- ✅ Automatic timing regardless of success/failure
-- ✅ Logger integration for structured output
-- ✅ Namespace support for log organization
+Función auxiliar que ejecuta `fn`, mide el tiempo y devuelve `{ result, ms }` sin realizar logs. Útil para medir en pruebas o cuando no se quiere contaminar los logs.
 
----
+## Ejemplo completo
 
-### Example 4: Combining Both Approaches
+El siguiente fragmento combina las utilidades anteriores para medir tanto tareas sincrónicas como asíncronas, utilizando namespaces para organizar las mediciones y registrar automáticamente con un logger:
 
-**Scenario:** Use `Profiler` for high-level workflow and `withTiming` for specific async steps.
+```ts
+import { createLogger } from "bytekit";
+import { createStopwatch, withTiming, measureAsync, Profiler } from "bytekit";
 
-```typescript
-import { Profiler } from "bytekit/profiler";
-import { withTiming } from "bytekit/debug";
-import { createLogger } from "bytekit/logger";
+// crea un logger con namespace y nivel
+const logger = createLogger({ namespace: "app:perf", level: "info" });
 
-const logger = createLogger({ level: "debug" });
+// profiler global para componentes
+const componentProfiler = new Profiler("components");
 
-async function complexDataIngestion(files: string[]) {
-    const profiler = new Profiler();
+// profiler específico para APIs
+const apiProfiler = new Profiler("api");
 
-    profiler.start("overall-ingestion");
+// mide una operación sincrónica con stopwatch
+const watch = createStopwatch({
+    label: "cálculo",
+    logger,
+    namespace: "app:math",
+    autoLog: true,
+});
+realizaCalculoIntensivo();
+watch.stop(); // auto-log activado bajo el namespace "app:math"
 
-    // Use withTiming for individual file processing
-    const results = [];
-    for (const file of files) {
-        const data = await withTiming(
-            `Process file: ${file}`,
-            async () => {
-                const content = await readFile(file);
-                return await parseAndValidate(content);
-            },
-            { logger }
-        );
-        results.push(data);
-    }
+// mide una llamada asíncrona con namespace de API
+await withTiming("fetch usuarios", () => fetchUsers(), {
+    logger,
+    namespace: "app:api",
+});
 
-    // Use Profiler for aggregate operations
-    profiler.start("batch-storage");
-    await storeBatch(results);
-    profiler.end("batch-storage");
+// usa un profiler específico para APIs
+apiProfiler.start("fetch productos");
+const productos = await fetchProductos();
+apiProfiler.end("fetch productos");
 
-    profiler.end("overall-ingestion");
+// mide en el profiler de componentes
+componentProfiler.start("renderizado");
+renderComponent();
+componentProfiler.end("renderizado");
 
-    const stats = profiler.summary();
-    logger.info("Ingestion complete", { stats, filesProcessed: files.length });
+// mide y obtiene resultado + duración sin log automático
+const { result, durationMs } = await measureAsync(
+    "sleep",
+    () => new Promise((r) => setTimeout(() => r("ok"), 500))
+);
 
-    return { results, performance: stats };
-}
+// resume mediciones por namespace
+console.table(apiProfiler.summary()); // mediciones del namespace "api"
+console.table(componentProfiler.summary()); // mediciones del namespace "components"
 ```
 
-**Why combine them?**
+En el ejemplo:
 
-- ✅ `withTiming` for granular per-file logging
-- ✅ `Profiler` for overall workflow metrics
-- ✅ Best of both: automatic + manual control
+- El cronómetro se detiene y registra automáticamente bajo el namespace `app:math`.
+- `withTiming` genera un log con la etiqueta y duración bajo el namespace `app:api`.
+- Los profilers `apiProfiler` y `componentProfiler` acumulan mediciones por namespace para análisis separado.
+- El namespace permite organizar y filtrar logs por categoría funcional, facilitando el debugging y el análisis de rendimiento.
 
----
+## Buenas prácticas y consejos
 
-## Comparison Table
-
-| Feature                | `withTiming`      | `Profiler`           |
-| ---------------------- | ----------------- | -------------------- |
-| **Boilerplate**        | Minimal           | Moderate             |
-| **Automatic Cleanup**  | ✅ Yes            | ❌ Manual            |
-| **Logger Integration** | ✅ Built-in       | ❌ Manual            |
-| **Nested Timing**      | ❌ No             | ✅ Yes               |
-| **Aggregated Stats**   | ❌ Single value   | ✅ Full summary      |
-| **Error Safety**       | ✅ finally block  | ⚠️ Manual            |
-| **Best For**           | Single operations | Multi-step workflows |
-
----
-
-## Performance Tips
-
-### ✅ Do:
-
-- Use `withTiming` for most async operations (API, DB, I/O)
-- Use `Profiler` when you need cross-cutting performance analysis
-- Combine both in complex systems (high-level + granular)
-- Set appropriate `precision` to reduce log noise
-
-### ❌ Don't:
-
-- Use `Profiler` for simple single operations (overkill)
-- Forget to call `end()` in `Profiler` (memory leak)
-- Use `withTiming` for nested call hierarchies (loses context)
-
----
-
-## Installation
-
-```bash
-npm install bytekit
-```
+- Usa `Profiler` con namespace cuando necesites medir múltiples secciones de código en diferentes módulos o componentes con etiquetas repetidas.
+- El namespace de `Profiler` (en constructor) aisla completamente las mediciones; cada instancia mantiene su propio conjunto de resultados.
+- El namespace en `createStopwatch` y `withTiming` se usa para crear un logger hijo, útil para organizar logs en la salida sin afectar las mediciones.
+- Prefiere `createStopwatch` y `withTiming` para mediciones puntuales que necesitan ser registradas en logs con contexto jerárquico.
+- Combina namespace en profiler y namespace en logger para obtener visibilidad completa: un profiler por componente y logs organizados por categoría funcional.
+- Pasa una instancia de `Logger` con `namespace` para que las mediciones aparezcan integradas en el mismo espacio de nombres y nivel de log.
+- Ajusta el parámetro `precision` según la magnitud esperada de tus tareas; para tareas largas bastan 0 o 1 decimales.
+- Evita activar `autoLog` si vas a llamar a `stop()` repetidas veces; el cronómetro se invalida después de detenerse.
+- En entornos Node y navegador, las utilidades usan `performance.now()` o `Date.now()` dependiendo de la disponibilidad, asegurando alta resolución sin necesidad de dependencias externas.
 
 ## Importación
 
-```typescript
-// withTiming and debug utilities
-import { withTiming, measureAsync, createStopwatch } from "bytekit/debug";
+Puedes importar todas las utilidades desde la raíz de Bytekit o desde sus submódulos:
 
-// Profiler
+```ts
+import {
+    Profiler,
+    createStopwatch,
+    withTiming,
+    measureSync,
+    measureAsync,
+    captureDebug,
+} from "bytekit";
+```
+
+o bien:
+
+```ts
 import { Profiler } from "bytekit/profiler";
-
-// Logger for withTiming
-import { createLogger } from "bytekit/logger";
+import { createStopwatch, withTiming } from "bytekit/utils/core/debug";
 ```
 
 ---
 
-## Related Documentation
-
-- **[📚 Logger](Logger)** - Structured logging for withTiming integration
-- **[🏠 Wiki Home](Home)**
-- **[📦 Core Modules](Core)**
-
----
-
-**💡 ¿Encontraste un error o tienes una sugerencia?** [Abre un issue](https://github.com/sebamar88/bytekit/issues) o contribuye al proyecto.
+Con estas herramientas tendrás un sistema de medición robusto y flexible para optimizar el rendimiento de tus aplicaciones. Explota la combinación de `Logger` y `Profiler` para obtener visibilidad en tiempo real de los tiempos de ejecución y detectar fácilmente puntos de mejora.
