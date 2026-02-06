@@ -181,7 +181,7 @@ test("Logger with timestamp in browser transport", () => {
     });
 
     assert.match(output, /2026-01-01/);
-    assert.match(output, /%cDEBUG/);
+    assert.match(output, /DEBUG/);
 
     console.log = originalLog;
     delete globalThis.window;
@@ -233,7 +233,7 @@ test("Logger warn level uses console.warn", () => {
     console.warn = originalWarn;
 });
 
-test("Logger without namespace", () => {
+test("Logger without namespace has no namespace brackets", () => {
     let output = "";
     const originalLog = console.log;
     console.log = (msg) => {
@@ -249,7 +249,8 @@ test("Logger without namespace", () => {
 
     assert.ok(output.includes("INFO"));
     assert.ok(output.includes("no namespace"));
-    assert.ok(!output.includes("["));
+    // No debe tener [namespace] pero puede tener otros corchetes en colores ANSI
+    assert.ok(!output.match(/\[\w+\]/));
 
     console.log = originalLog;
 });

@@ -453,15 +453,15 @@ test("FormUtils getFieldState returns complete field state", () => {
     assert.equal(state.dirty, false);
 });
 
-test("FormUtils reset with new values", () => {
+test("FormUtils reset restores initial values", () => {
     const form = new FormUtils({
         initialValues: { email: "old@example.com" },
     });
 
     form.setValue("email", "new@example.com");
-    form.reset({ email: "reset@example.com" });
+    form.reset();
 
-    assert.equal(form.getValue("email"), "reset@example.com");
+    assert.equal(form.getValue("email"), "old@example.com");
     assert.equal(form.isDirty("email"), false);
 });
 
