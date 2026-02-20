@@ -6,27 +6,38 @@
 
 ```ts
 class DateUtils {
-    static parse(date: Date | string | number): Date;
-    static isValid(date: unknown): boolean;
-    static toISODate(date: Date | string): string;
-    static startOfDay(date: Date | string): Date;
-    static endOfDay(date: Date | string): Date;
-    static add(date: Date | string, duration: DateDuration): Date;
-    static diff(
-        from: Date | string,
-        to: Date | string,
-        options?: DiffOptions
-    ): number;
-    static diffInDays(
-        from: Date | string,
-        to: Date | string,
-        options?: DiffOptions
-    ): number;
-    static isSameDay(date1: Date | string, date2: Date | string): boolean;
-    static isBefore(date1: Date | string, date2: Date | string): boolean;
-    static isAfter(date1: Date | string, date2: Date | string): boolean;
-    static format(date: Date | string, locale?: string): string;
+    static parse(value: DateInput): Date | null;
+    static isValid(value: DateInput): boolean;
+    static toISODate(value: DateInput): string;
+    static startOfDay(value: DateInput): Date;
+    static endOfDay(value: DateInput): Date;
+    static add(value: DateInput, duration: AddDurationOptions): Date;
+    static diff(a: DateInput, b: DateInput, options?: DiffOptions): number;
+    static isSameDay(a: DateInput, b: DateInput): boolean;
+    static isBefore(a: DateInput, b: DateInput): boolean;
+    static isAfter(a: DateInput, b: DateInput): boolean;
+    static format(date: DateInput, formatOrLocale?: string): string;
 }
+```
+
+---
+
+### Formateo Personalizado de Fechas
+
+`DateUtils.format` soporta tanto locales como tokens de formato personalizados.
+
+```typescript
+import { DateUtils } from "bytekit";
+
+const date = new Date(2024, 0, 15, 14, 30); // 15 de Enero 2024, 14:30
+
+// Formateo con Tokens (Recomendado para consistencia)
+DateUtils.format(date, "YYYY-MM-DD"); // "2024-01-15"
+DateUtils.format(date, "YYYY-MM-DD HH:mm:ss"); // "2024-01-15 14:30:00"
+
+// Formateo por Locale (Basado en Intl.DateTimeFormat)
+DateUtils.format(date, "es-AR"); // "15 ene 2024"
+DateUtils.format(date, "en-US"); // "Jan 15, 2024"
 ```
 
 ---
@@ -47,9 +58,6 @@ npm install bytekit
 
 ```typescript
 // Importación específica (recomendado)
-import { DateUtils } from "bytekit/dateutils";
-
-// Importación desde el índice principal
 import { DateUtils } from "bytekit";
 ```
 

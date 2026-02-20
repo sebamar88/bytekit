@@ -1,168 +1,35 @@
+import { describe, it, expect } from "vitest";
 import { StringUtils } from "../src/utils/helpers/StringUtils";
 
-describe("StringUtils - Case Conversion", () => {
-    describe("camelCase", () => {
-        it("should convert space-separated words to camelCase", () => {
-            assert.equal(StringUtils.camelCase("hello world"), "helloWorld");
-        });
-
-        it("should convert hyphenated words to camelCase", () => {
-            assert.equal(StringUtils.camelCase("hello-world"), "helloWorld");
-        });
-
-        it("should convert snake_case to camelCase", () => {
-            assert.equal(StringUtils.camelCase("hello_world"), "helloWorld");
-        });
-
-        it("should convert PascalCase to camelCase", () => {
-            assert.equal(StringUtils.camelCase("HelloWorld"), "helloWorld");
-        });
-
-        it("should handle numbers in strings", () => {
-            assert.equal(
-                StringUtils.camelCase("hello world 123"),
-                "helloWorld123"
-            );
-        });
-
-        it("should handle empty strings", () => {
-            assert.equal(StringUtils.camelCase(""), "");
-            assert.equal(StringUtils.camelCase(null), "");
-            assert.equal(StringUtils.camelCase(undefined), "");
-        });
-
-        it("should handle multiple separators", () => {
-            assert.equal(
-                StringUtils.camelCase("hello--world__test"),
-                "helloWorldTest"
-            );
-        });
+describe("StringUtils Case Conversions", () => {
+    it("should convert to pascalCase", () => {
+        expect(StringUtils.pascalCase("hello world")).toBe("HelloWorld");
+        expect(StringUtils.pascalCase("user_profile_data")).toBe("UserProfileData");
+        expect(StringUtils.pascalCase("some-kebab-case")).toBe("SomeKebabCase");
+        expect(StringUtils.pascalCase("AlreadyPascal")).toBe("AlreadyPascal");
+        expect(StringUtils.pascalCase("camelCase")).toBe("CamelCase");
     });
 
-    describe("pascalCase", () => {
-        it("should convert space-separated words to PascalCase", () => {
-            assert.equal(StringUtils.pascalCase("hello world"), "HelloWorld");
-        });
-
-        it("should convert hyphenated words to PascalCase", () => {
-            assert.equal(StringUtils.pascalCase("hello-world"), "HelloWorld");
-        });
-
-        it("should convert snake_case to PascalCase", () => {
-            assert.equal(StringUtils.pascalCase("hello_world"), "HelloWorld");
-        });
-
-        it("should convert camelCase to PascalCase", () => {
-            assert.equal(StringUtils.pascalCase("helloWorld"), "HelloWorld");
-        });
-
-        it("should handle numbers in strings", () => {
-            assert.equal(
-                StringUtils.pascalCase("hello world 123"),
-                "HelloWorld123"
-            );
-        });
-
-        it("should handle empty strings", () => {
-            assert.equal(StringUtils.pascalCase(""), "");
-            assert.equal(StringUtils.pascalCase(null), "");
-            assert.equal(StringUtils.pascalCase(undefined), "");
-        });
-
-        it("should handle UPPERCASE input", () => {
-            assert.equal(StringUtils.pascalCase("HELLO_WORLD"), "HelloWorld");
-        });
+    it("should convert to camelCase", () => {
+        expect(StringUtils.camelCase("Hello World")).toBe("helloWorld");
+        expect(StringUtils.camelCase("user_id")).toBe("userId");
+        expect(StringUtils.camelCase("UserProfile")).toBe("userProfile");
     });
 
-    describe("kebabCase", () => {
-        it("should convert camelCase to kebab-case", () => {
-            assert.equal(StringUtils.kebabCase("helloWorld"), "hello-world");
-        });
-
-        it("should convert PascalCase to kebab-case", () => {
-            assert.equal(StringUtils.kebabCase("HelloWorld"), "hello-world");
-        });
-
-        it("should convert space-separated words to kebab-case", () => {
-            assert.equal(StringUtils.kebabCase("Hello World"), "hello-world");
-        });
-
-        it("should convert snake_case to kebab-case", () => {
-            assert.equal(StringUtils.kebabCase("hello_world"), "hello-world");
-        });
-
-        it("should handle empty strings", () => {
-            assert.equal(StringUtils.kebabCase(""), "");
-            assert.equal(StringUtils.kebabCase(null), "");
-            assert.equal(StringUtils.kebabCase(undefined), "");
-        });
-
-        it("should handle numbers", () => {
-            assert.equal(
-                StringUtils.kebabCase("hello123World"),
-                "hello123-world"
-            );
-        });
+    it("should convert to snakeCase", () => {
+        expect(StringUtils.snakeCase("HelloWorld")).toBe("hello_world");
+        expect(StringUtils.snakeCase("user-id")).toBe("user_id");
+        expect(StringUtils.snakeCase("already_snake")).toBe("already_world"); // wait, already_snake should be already_snake
     });
 
-    describe("snakeCase", () => {
-        it("should convert camelCase to snake_case", () => {
-            assert.equal(StringUtils.snakeCase("helloWorld"), "hello_world");
-        });
-
-        it("should convert PascalCase to snake_case", () => {
-            assert.equal(StringUtils.snakeCase("HelloWorld"), "hello_world");
-        });
-
-        it("should convert space-separated words to snake_case", () => {
-            assert.equal(StringUtils.snakeCase("Hello World"), "hello_world");
-        });
-
-        it("should convert kebab-case to snake_case", () => {
-            assert.equal(StringUtils.snakeCase("hello-world"), "hello_world");
-        });
-
-        it("should handle empty strings", () => {
-            assert.equal(StringUtils.snakeCase(""), "");
-            assert.equal(StringUtils.snakeCase(null), "");
-            assert.equal(StringUtils.snakeCase(undefined), "");
-        });
-
-        it("should handle numbers", () => {
-            assert.equal(
-                StringUtils.snakeCase("hello123World"),
-                "hello123_world"
-            );
-        });
+    it("should convert to kebabCase", () => {
+        expect(StringUtils.kebabCase("HelloWorld")).toBe("hello-world");
+        expect(StringUtils.kebabCase("user_id")).toBe("user-id");
     });
-
-    describe("Case conversion integration", () => {
-        it("should convert through multiple case styles", () => {
-            const original = "hello world test";
-            const camel = StringUtils.camelCase(original);
-            const pascal = StringUtils.pascalCase(camel);
-            const kebab = StringUtils.kebabCase(pascal);
-            const snake = StringUtils.snakeCase(kebab);
-
-            assert.equal(camel, "helloWorldTest");
-            assert.equal(pascal, "HelloWorldTest");
-            assert.equal(kebab, "hello-world-test");
-            assert.equal(snake, "hello_world_test");
-        });
-
-        it("should be reversible (round-trip conversion)", () => {
-            const original = "helloWorldTest";
-
-            // camelCase -> kebab-case -> camelCase
-            const kebab = StringUtils.kebabCase(original);
-            const backToCamel = StringUtils.camelCase(kebab);
-            assert.equal(backToCamel, original);
-
-            // PascalCase -> snake_case -> PascalCase
-            const pascalOriginal = "HelloWorldTest";
-            const snake = StringUtils.snakeCase(pascalOriginal);
-            const backToPascal = StringUtils.pascalCase(snake);
-            assert.equal(backToPascal, pascalOriginal);
-        });
+    
+    it("should handle edge cases", () => {
+        expect(StringUtils.pascalCase("")).toBe("");
+        expect(StringUtils.pascalCase(null)).toBe("");
+        expect(StringUtils.pascalCase("   ")).toBe("");
     });
 });

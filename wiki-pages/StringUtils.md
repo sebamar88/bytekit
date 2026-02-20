@@ -27,10 +27,35 @@ class StringUtils {
         obj: Record<string, unknown>,
         options?: QueryStringOptions
     ): string;
+    
+    // Case Conversions
+    static pascalCase(str: string): string;
+    static camelCase(str: string): string;
+    static snakeCase(str: string): string;
+    static kebabCase(str: string): string;
 }
 ```
 
 ---
+
+### Ejemplo de Conversión de Casos
+
+```typescript
+import { StringUtils } from "bytekit";
+
+// PascalCase (Ideal para nombres de clases o interfaces)
+StringUtils.pascalCase("hello world"); // "HelloWorld"
+StringUtils.pascalCase("user_profile_data"); // "UserProfileData"
+
+// CamelCase
+StringUtils.camelCase("user_id"); // "userId"
+
+// SnakeCase
+StringUtils.snakeCase("UserAge"); // "user_age"
+
+// KebabCase
+StringUtils.kebabCase("UserProfile"); // "user-profile"
+```
 
 ## Enlaces Relacionados
 
@@ -48,9 +73,6 @@ npm install bytekit
 
 ```typescript
 // Importación específica (recomendado)
-import { StringUtils } from "bytekit/stringutils";
-
-// Importación desde el índice principal
 import { StringUtils } from "bytekit";
 ```
 
