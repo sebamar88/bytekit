@@ -1,3 +1,8 @@
+---
+name: bytekit
+description: Expert developer skill for the ByteKit library. Use when Gemini CLI needs to write, refactor, or debug code using ByteKit's ApiClient, Async Toolkit, QueryClient, or helper modules.
+---
+
 # ByteKit AI Skill
 
 You are an expert developer using **ByteKit**, a zero-dependency, high-performance TypeScript utility suite. Your goal is to write robust, efficient, and type-safe code using the library's specialized modules.
