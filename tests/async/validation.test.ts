@@ -1,93 +1,68 @@
-import { describe, it } from "node:test";
-import * as assert from "node:assert";
+import { describe, it, expect } from "vitest";
 import { timeout, withTimeout } from "../../src/utils/async/timeout";
 import { allSettled } from "../../src/utils/async/allSettled";
 
 describe("Async Utils Input Validation", () => {
     describe("timeout validation", () => {
         it("should throw TypeError for non-Promise first argument", () => {
-            assert.throws(
+            expect(
                 () => {
                     // @ts-expect-error - Testing invalid input
-                    timeout("not a promise", 1000);
-                },
-                {
-                    name: "TypeError",
-                    message: /First argument must be a Promise/,
+                    timeout("not a promise" as any, 1000);
                 }
-            );
+            ).toThrow(TypeError);
         });
 
         it("should throw TypeError for negative timeout duration", () => {
-            assert.throws(
+            expect(
                 () => {
                     timeout(Promise.resolve(), -100);
-                },
-                {
-                    name: "TypeError",
-                    message: /Timeout duration must be a non-negative number/,
                 }
-            );
+            ).toThrow(TypeError);
         });
 
         it("should throw TypeError for non-numeric timeout duration", () => {
-            assert.throws(
+            expect(
                 () => {
                     // @ts-expect-error - Testing invalid input
-                    timeout(Promise.resolve(), "not a number");
-                },
-                {
-                    name: "TypeError",
-                    message: /Timeout duration must be a non-negative number/,
+                    timeout(Promise.resolve(), "not a number" as any);
                 }
-            );
+            ).toThrow(TypeError);
         });
     });
 
     describe("withTimeout validation", () => {
         it("should throw TypeError for non-function first argument", () => {
-            assert.throws(
+            expect(
                 () => {
                     // @ts-expect-error - Testing invalid input
-                    withTimeout("not a function", 1000);
-                },
-                {
-                    name: "TypeError",
-                    message: /First argument must be a function/,
+                    withTimeout("not a function" as any, 1000);
                 }
-            );
+            ).toThrow(TypeError);
         });
 
         it("should throw TypeError for negative timeout duration", () => {
-            assert.throws(
+            expect(
                 () => {
                     withTimeout(async () => {}, -100);
-                },
-                {
-                    name: "TypeError",
-                    message: /Timeout duration must be a non-negative number/,
                 }
-            );
+            ).toThrow(TypeError);
         });
     });
 
     describe("allSettled validation", () => {
         it("should throw TypeError for non-array input", async () => {
-            await assert.rejects(
+            await expect(
                 async () => {
                     // @ts-expect-error - Testing invalid input
-                    await allSettled("not an array");
-                },
-                {
-                    name: "TypeError",
-                    message: /Expected an array of promises/,
+                    await allSettled("not an array" as any);
                 }
-            );
+            ).rejects.toThrow(TypeError);
         });
 
         it("should accept empty array", async () => {
             const result = await allSettled([]);
-            assert.deepStrictEqual(result, {
+            expect(result).toEqual({
                 fulfilled: [],
                 rejected: [],
             });

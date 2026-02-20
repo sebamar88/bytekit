@@ -44,8 +44,7 @@ export function race<T>(promises: Array<Promise<T>>): Promise<T> {
         throw new TypeError("Cannot race an empty array of promises");
     }
 
-    // Use native Promise.race for the core behavior
-    // But also track if all promises reject to provide AggregateError
+    // Use a custom implementation to support AggregateError when ALL reject
     return new Promise<T>((resolve, reject) => {
         let rejectionCount = 0;
         const errors: unknown[] = new Array(promises.length);
@@ -74,11 +73,6 @@ export function race<T>(promises: Array<Promise<T>>): Promise<T> {
                                 )
                             );
                         }
-                    }
-                    // If this is the first to settle (and it's a rejection), reject immediately
-                    else if (!settled) {
-                        settled = true;
-                        reject(error);
                     }
                 }
             );

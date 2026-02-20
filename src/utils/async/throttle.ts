@@ -97,10 +97,15 @@ export function throttleAsync<TArgs extends any[], TReturn>(
             );
         }
 
-        // Cancel any existing pending call
-        if (pendingReject !== null) {
-            pendingReject(new Error("Throttled call cancelled"));
-        }
+        // Create a new promise for this call
+        const promise = new Promise<TReturn>((resolve, reject) => {
+            // Reject existing pending call
+            if (pendingResolve !== null) {
+                pendingReject?.(new Error("Throttled call cancelled"));
+            }
+            pendingResolve = resolve;
+            pendingReject = reject;
+        });
 
         // Clear existing timeout
         if (timeoutId !== null) {
@@ -109,12 +114,6 @@ export function throttleAsync<TArgs extends any[], TReturn>(
 
         // Store the arguments for trailing execution
         pendingArgs = args;
-
-        // Create a new promise for this call
-        const promise = new Promise<TReturn>((resolve, reject) => {
-            pendingResolve = resolve;
-            pendingReject = reject;
-        });
 
         // Schedule trailing execution
         const remainingTime = interval - timeSinceLastExecution;

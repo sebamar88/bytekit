@@ -76,6 +76,9 @@ describe("throttleAsync function", () => {
                 // Queue multiple calls
                 const promise2 = throttled(2);
                 const promise3 = throttled(3);
+                
+                // Attach silent catch to prevent unhandled rejection warnings
+                promise2.catch(() => {});
 
                 // Wait for trailing execution
                 await new Promise((resolve) => setTimeout(resolve, 150));
@@ -109,7 +112,9 @@ describe("throttleAsync function", () => {
                 };
                 const throttled = throttleAsync(fn, 50);
 
-                await expect(throttled()).rejects.toThrow("Test error");
+                const promise = throttled();
+                promise.catch(() => {});
+                await expect(promise).rejects.toThrow("Test error");
             });
         });
 
@@ -124,6 +129,7 @@ describe("throttleAsync function", () => {
 
                 // Queue second call
                 const promise = throttled(10);
+                promise.catch(() => {});
 
                 // Cancel before trailing execution
                 throttled.cancel();
@@ -143,6 +149,7 @@ describe("throttleAsync function", () => {
 
                 await throttled(5);
                 const promise = throttled(10);
+                promise.catch(() => {});
                 throttled.cancel();
 
                 await expect(promise).rejects.toThrow(
@@ -156,6 +163,7 @@ describe("throttleAsync function", () => {
 
                 await throttled(5);
                 const promise1 = throttled(10);
+                promise1.catch(() => {});
                 throttled.cancel();
 
                 // Wait for interval to pass
@@ -197,6 +205,7 @@ describe("throttleAsync function", () => {
 
                 // Second call within interval should be rejected
                 const promise = throttled(10);
+                promise.catch(() => {});
 
                 await expect(promise).rejects.toThrow(
                     "Throttled call rejected (trailing disabled)"

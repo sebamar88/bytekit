@@ -10,13 +10,13 @@ export interface SwaggerOptions {
  * Generate TypeScript interfaces from an OpenAPI/Swagger specification
  */
 export async function generateFromSwagger(options: SwaggerOptions): Promise<void> {
-    let { url, output = "src/types/api-docs.ts" } = options;
+    const { url, output = "src/types/api-docs.ts" } = options;
 
     console.log(`\n📖 Attempting to resolve Swagger/OpenAPI spec from ${url}...`);
 
     try {
         let spec: any;
-        let response = await fetch(url);
+        const response = await fetch(url);
         
         if (!response.ok) {
             throw new Error(`HTTP ${response.status}: ${response.statusText}`);
@@ -129,9 +129,10 @@ function mapOpenApiToTs(schema: any): string {
             return "number";
         case "boolean":
             return "boolean";
-        case "array":
+        case "array": {
             const itemType = mapOpenApiToTs(schema.items);
             return `${itemType}[]`;
+        }
         case "object":
             if (schema.additionalProperties) {
                 return `Record<string, ${mapOpenApiToTs(schema.additionalProperties)}>`;

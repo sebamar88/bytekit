@@ -80,6 +80,8 @@ export interface AllSettledResult<T> {
 export interface DebounceOptions {
     /** Execute on the leading edge instead of trailing (default: false) */
     leading?: boolean;
+    /** Execute on the trailing edge after the delay (default: true) */
+    trailing?: boolean;
 }
 
 /**

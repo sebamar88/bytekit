@@ -34,6 +34,10 @@ describe("debounceAsync function", () => {
                 const promise1 = debounced(1);
                 const promise2 = debounced(2);
                 const promise3 = debounced(3);
+                
+                // Attach silent catch to prevent unhandled rejection warnings
+                promise1.catch(() => {});
+                promise2.catch(() => {});
 
                 // Wait for debounce delay
                 await new Promise((resolve) => setTimeout(resolve, 150));
@@ -75,6 +79,7 @@ describe("debounceAsync function", () => {
                 const debounced = debounceAsync(fn, 50);
 
                 const promise = debounced();
+                promise.catch(() => {}); // Handle globally
 
                 await new Promise((resolve) => setTimeout(resolve, 100));
 
@@ -88,6 +93,7 @@ describe("debounceAsync function", () => {
                 const debounced = debounceAsync(fn, 100);
 
                 const promise = debounced(5);
+                promise.catch(() => {}); // Handle globally
 
                 // Cancel before execution
                 debounced.cancel();
@@ -106,6 +112,7 @@ describe("debounceAsync function", () => {
                 const debounced = debounceAsync(fn, 100);
 
                 const promise = debounced(5);
+                promise.catch(() => {}); // Handle globally
                 debounced.cancel();
 
                 await expect(promise).rejects.toThrow(
@@ -118,6 +125,7 @@ describe("debounceAsync function", () => {
                 const debounced = debounceAsync(fn, 50);
 
                 const promise1 = debounced(5);
+                promise1.catch(() => {}); // Handle globally
                 debounced.cancel();
 
                 const promise2 = debounced(10);
@@ -203,6 +211,7 @@ describe("debounceAsync function", () => {
 
                 // Second call within delay should be cancelled
                 const promise2 = debounced(10);
+                promise2.catch(() => {});
 
                 await new Promise((resolve) => setTimeout(resolve, 150));
 

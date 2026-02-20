@@ -16,16 +16,16 @@ describe("race function", () => {
                 expect(result).toBe("fast");
             });
 
-            it("should reject with the first rejected promise when it settles first", async () => {
+            it("should resolve if a success follows a faster rejection", async () => {
                 const error = new Error("fast error");
 
-                await expect(
-                    race([
-                        sleep(100).then(() => "slow"),
-                        Promise.reject(error),
-                        sleep(50).then(() => "medium"),
-                    ])
-                ).rejects.toThrow("fast error");
+                const result = await race([
+                    sleep(100).then(() => "slow"),
+                    Promise.reject(error),
+                    sleep(50).then(() => "medium"),
+                ]);
+                
+                expect(result).toBe("medium");
             });
 
             it("should resolve even if some promises reject later", async () => {
