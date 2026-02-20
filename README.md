@@ -133,7 +133,7 @@ function Users() {
 
 - **[ApiClient](https://github.com/sebamar88/bytekit/wiki/ApiClient)** - Typed HTTP client with retries, localized errors, and custom fetch support
 - **[Logger](https://github.com/sebamar88/bytekit/wiki/Logger)** - Structured logger with levels, namespaces, and transports for Node/browser
-- **[Profiler](https://github.com/sebamar88/bytekit/wiki/Profiler)** - Profiler utilities and helpers
+- **[Profiler](https://github.com/sebamar88/bytekit/wiki/Profiler)** - Performance monitoring utilities including `Profiler` class and `withTiming` wrapper
 - **[RetryPolicy](https://github.com/sebamar88/bytekit/wiki/RetryPolicy)** - RetryPolicy utilities and helpers
 - **[ResponseValidator](https://github.com/sebamar88/bytekit/wiki/ResponseValidator)** - ResponseValidator utilities and helpers
 - **[RequestCache](https://github.com/sebamar88/bytekit/wiki/RequestCache)** - RequestCache utilities and helpers
@@ -143,9 +143,9 @@ function Users() {
 
 #### 🛠️ Helper Modules (12) - Common utilities / Utilidades comunes
 
-- **[DateUtils](https://github.com/sebamar88/bytekit/wiki/DateUtils)** - Safe date parsing, manipulation, and formatting utilities
-- **[StringUtils](https://github.com/sebamar88/bytekit/wiki/StringUtils)** - Text processing utilities: slugify, capitalize, mask, interpolate
-- **[Validator](https://github.com/sebamar88/bytekit/wiki/Validator)** - Validation utilities for emails, phones, passwords, and more
+- **[DateUtils](https://github.com/sebamar88/bytekit/wiki/DateUtils)** - Safe date parsing, manipulation, and formatting (locale or custom tokens like YYYY-MM-DD)
+- **[StringUtils](https://github.com/sebamar88/bytekit/wiki/StringUtils)** - Text processing: slugify, capitalize, mask, interpolate, and case conversions (pascalCase, camelCase, snakeCase, kebabCase)
+- **[Validator](https://github.com/sebamar88/bytekit/wiki/Validator)** - Validation utilities for emails, phones, CUIT/CUIL, CBU, and more
 - **[EnvManager](https://github.com/sebamar88/bytekit/wiki/EnvManager)** - EnvManager utilities and helpers
 - **[StorageUtils](https://github.com/sebamar88/bytekit/wiki/StorageUtils)** - StorageUtils utilities and helpers
 - **[FileUploadHelper](https://github.com/sebamar88/bytekit/wiki/FileUploadHelper)** - FileUploadHelper utilities and helpers

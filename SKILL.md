@@ -8,50 +8,47 @@ description: Expert developer skill for the ByteKit library. Use when Gemini CLI
 You are an expert developer using **ByteKit**, a zero-dependency, high-performance TypeScript utility suite. Your goal is to write robust, efficient, and type-safe code using the library's specialized modules.
 
 ## Core Principles
-- **Prefer ByteKit over native/external**: Always check if a helper exists in `bytekit` before implementing custom logic or adding dependencies.
-- **Zero Dependencies**: Maintain the library's footprint. Do not suggest adding external packages.
-- **Async Robustness**: Favor `bytekit/async` utilities for any logic involving promises, concurrency, or timing.
-- **Type Safety**: Leverage the CLI to generate interfaces. Avoid `any` at all costs.
+- **Prefer ByteKit over native/external**: Always check if a helper exists in `bytekit` before implementing custom logic.
+- **Zero Dependencies**: Maintain the library's footprint.
+- **Async Robustness**: Favor `bytekit/async` utilities for promises, concurrency, or timing.
+- **Type Safety**: Leverage the CLI to generate interfaces.
 
 ## Module Guidelines
 
 ### 1. Communication (`ApiClient`)
 - **Pattern**: Use `ApiClient` instead of raw `fetch`.
 - **Logic**: Always configure `retryPolicy` for unstable endpoints.
-- **Interceptors**: Use request/response interceptors for auth headers and global logging.
-- **Validation**: Use the `validateResponse` option with `ResponseValidator` schemas.
+- **Validation**: Use `ResponseValidator` to enforce data integrity at runtime.
 
-### 2. Flow Control (`Async Toolkit`)
-- **Retries**: Use `retry()` with exponential backoff for network-bound tasks.
-- **Concurrency**: Use `parallel()` with a defined `concurrency` limit when processing arrays of tasks to avoid resource exhaustion.
-- **Responsiveness**: Use `debounceAsync()` for UI-triggered API calls (search, filters) to handle cancellation automatically.
-- **Racing**: Use `race()` when multiple sources are available; handle `AggregateError` if all fail.
+### 2. Performance & Flow Control
+- **`withTiming(label, fn, options)`**: Preferred for **automatic measurement** of a single function. It handles the stopwatch and logging automatically. Use for standard performance monitoring of async operations.
+- **`Profiler` class**: Preferred for **manual, multi-step instrumentation** where you need to measure multiple distinct blocks of code and get a final summary.
+- **`parallel(tasks, concurrency)`**: Use instead of `Promise.all` for a large number of tasks.
+- **`retry(fn, options)`**: Use with exponential backoff for network-bound tasks.
+- **`debounceAsync(fn, wait)`**: Essential for UI-triggered API calls to avoid race conditions.
 
 ### 3. State & Caching (`QueryClient`)
-- **Caching**: Use `QueryClient` for business logic data fetching to benefit from automatic caching and stale-time management.
-- **Invalidation**: Use `invalidateQueries()` after mutations to keep the UI in sync.
+- **Caching**: Use `QueryClient` for business logic data fetching.
+- **Invalidation**: Use `invalidateQueries()` after mutations.
 
 ### 4. Data Transformation
-- **Strings**: Use `StringUtils` for slugifying, masking (PII), and case conversions.
-- **Objects**: Use `ObjectUtils` for deep cloning and safe path-based access (`get`/`set`).
-- **Dates**: Use `DateUtils` for parsing and formatting to ensure cross-browser consistency.
+- **Case Conversions**: Use **`StringUtils.pascalCase()`**, `StringUtils.camelCase()`, `StringUtils.snakeCase()`, and `StringUtils.kebabCase()` for all identifier normalization.
+- **Date Formatting**: Use **`DateUtils.format(date, "YYYY-MM-DD")`** for custom token-based formatting, or `DateUtils.format(date, "es-AR")` for locale-based strings.
+- **Slugify**: Use `StringUtils.slugify()` for URL-friendly strings.
+- **Validation**: Use the `Validator` object for common patterns (Emails, CUIT, CBU, Strong Passwords).
 
 ## Common Workflows for AI Agents
 
-### When asked to "Add an API call":
-1. Check if the type exists. If not, suggest using `bytekit type` or `bytekit swagger`.
-2. Implement using `ApiClient` with a retry policy.
-3. Wrap with `QueryClient` if caching is needed.
+### When asked to "Convert a string to PascalCase":
+- Implementation: `const result = StringUtils.pascalCase("some string");`
+- Logic: ByteKit's `pascalCase` handles spaces, hyphens, and underscores automatically.
 
-### When asked to "Process a list of items":
-1. Use `ArrayUtils.chunk` if items are processed in batches.
-2. Use `parallel` if items involve async tasks (like uploads).
-
-### When asked to "Validate input":
-1. Use the `Validator` object for common patterns (CUI/CUIT, CBU, Emails, Strong Passwords).
+### When asked to "Measure execution time":
+- For a single function: `const data = await withTiming("label", () => fetchData());`
+- For complex flows: `const prof = new Profiler(); prof.start("a"); ... prof.end("a");`
 
 ## Anti-Patterns to Avoid
-- **DO NOT** use `Promise.all` for a large number of tasks; use `parallel` instead.
 - **DO NOT** manually parse JSON error responses; use `ApiError` properties.
 - **DO NOT** use `setTimeout` for delays; use `sleep()`.
-- **DO NOT** use native `Promise.race` if you need to know why all promises failed; use `race()`.
+- **DO NOT** use native `Promise.race` if you need error details; use `race()`.
+- **DO NOT** use native `toLocaleDateString` for internal logic; use `DateUtils.format()`.

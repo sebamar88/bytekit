@@ -11,7 +11,7 @@
 
 - **[ApiClient](ApiClient)** - Typed HTTP client with retries, localized errors, and custom fetch support
 - **[Logger](Logger)** - Structured logger with levels, namespaces, and transports for Node/browser
-- **[Profiler](Profiler)** - Profiler utilities and helpers
+- **[Profiler](Profiler)** - Performance monitoring: `Profiler` class and `withTiming` wrapper
 - **[RetryPolicy](RetryPolicy)** - RetryPolicy utilities and helpers
 - **[ResponseValidator](ResponseValidator)** - ResponseValidator utilities and helpers
 - **[RequestCache](RequestCache)** - RequestCache utilities and helpers
@@ -23,9 +23,9 @@
 **EN:** Utility modules for common tasks like date manipulation, string processing, and validation.  
 **ES:** Módulos de utilidad para tareas comunes como manipulación de fechas, procesamiento de strings y validación.
 
-- **[DateUtils](DateUtils)** - Safe date parsing, manipulation, and formatting utilities
-- **[StringUtils](StringUtils)** - Text processing utilities: slugify, capitalize, mask, interpolate
-- **[Validator](Validator)** - Validation utilities for emails, phones, passwords, and more
+- **[DateUtils](DateUtils)** - Date manipulation and formatting (locale or custom tokens like YYYY-MM-DD)
+- **[StringUtils](StringUtils)** - Text processing: slugify, capitalize, and **Case Conversions** (pascalCase, camelCase, etc.)
+- **[Validator](Validator)** - Validation for emails, phones, CUIT, CBU and more
 - **[EnvManager](EnvManager)** - EnvManager utilities and helpers
 - **[StorageUtils](StorageUtils)** - StorageUtils utilities and helpers
 - **[FileUploadHelper](FileUploadHelper)** - FileUploadHelper utilities and helpers
