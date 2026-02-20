@@ -7,6 +7,7 @@ export interface TypeGeneratorOptions {
     output?: string;
     name?: string;
     headers?: Record<string, string>;
+    body?: string;
 }
 
 /**
@@ -21,6 +22,7 @@ export async function generateTypesFromEndpoint(
         output = "types.ts",
         name = "ApiResponse",
         headers = {},
+        body,
     } = options;
 
     console.log(`\n📡 Fetching ${method} ${endpoint}...`);
@@ -32,6 +34,7 @@ export async function generateTypesFromEndpoint(
                 "Content-Type": "application/json",
                 ...headers,
             },
+            body: body ? body : undefined,
         });
 
         if (!response.ok) {

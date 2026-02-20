@@ -37,6 +37,7 @@ describe("ApiClient Coverage", () => {
             baseUrl: "https://api.example.com",
             timeoutMs: 100,
             fetchImpl: (...args) => mockFetch(...args),
+            retryPolicy: { maxAttempts: 1 }, // Solo 1 intento para el test
         });
 
         await assert.rejects(
@@ -45,6 +46,7 @@ describe("ApiClient Coverage", () => {
             },
             (err) => {
                 return (
+                    err.name === "RetryError" ||
                     err instanceof ApiError ||
                     err.message.includes("timeout") ||
                     err.code === 408
@@ -93,14 +95,15 @@ describe("ApiClient Coverage", () => {
         const client = new ApiClient({
             baseUrl: "https://api.example.com",
             fetchImpl: (...args) => mockFetch(...args),
+            retryPolicy: { maxAttempts: 1 }, // Solo 1 intento para el test
         });
 
         await assert.rejects(
             async () => {
                 await client.get("/network-error");
             },
-            {
-                message: "Network Error",
+            (err) => {
+                return err.name === "RetryError" || err.message === "Network Error";
             }
         );
     });

@@ -1,5 +1,6 @@
 import { Logger } from "#core/Logger.js";
 import { StringUtils } from "#helpers/StringUtils.js";
+import { retry as retryFn } from "../async/retry.js";
 import {
     RetryPolicy,
     CircuitBreaker,
@@ -360,7 +361,12 @@ export class ApiClient {
         path: string,
         requestOptions: Partial<RequestOptions>,
         skipInterceptors?: boolean
-    ): Promise<{ url: string; init: RequestInit; timeout: number }> {
+    ): Promise<{
+        url: string;
+        init: RequestInit;
+        timeout: number;
+        controller: AbortController;
+    }> {
         let url = this.buildUrl(path, requestOptions.searchParams);
         const {
             headers: overrideHeaders,
@@ -373,9 +379,12 @@ export class ApiClient {
         const preparedBody = this.prepareBody(body);
 
         // Only set Content-Type if not already present and there is a body
+        // Ensure we don't set it for binary types or FormData
         if (
             preparedBody &&
             !(body instanceof FormData) &&
+            !(body instanceof Blob) &&
+            !(body instanceof ArrayBuffer) &&
             !headers.has("Content-Type")
         ) {
             headers.set("Content-Type", "application/json");
@@ -407,7 +416,7 @@ export class ApiClient {
             [url, init] = await this.interceptors.request(url, init);
         }
 
-        return { url, init, timeout };
+        return { url, init, timeout, controller };
     }
 
     /**
@@ -494,11 +503,12 @@ export class ApiClient {
                 const { errorLocale, ...rest } = requestOptions;
 
                 // Prepare request configuration
-                const { url, init, timeout } = await this.prepareRequestConfig(
-                    path,
-                    requestOptions,
-                    skipInterceptors
-                );
+                const { url, init, timeout, controller } =
+                    await this.prepareRequestConfig(
+                        path,
+                        requestOptions,
+                        skipInterceptors
+                    );
 
                 // Log request
                 const shouldLogHeaders = logHeaders ?? this.logHeaders;
@@ -517,7 +527,7 @@ export class ApiClient {
                     const response = await this.withTimeout(
                         this.fetchImpl(url, init),
                         timeout,
-                        new AbortController()
+                        controller
                     );
 
                     // Response interceptor
@@ -558,7 +568,18 @@ export class ApiClient {
             return executeRequest();
         }
 
-        return this.retryPolicy.execute(executeRequest);
+        const config = this.retryPolicy.getConfig();
+        return retryFn(executeRequest, {
+            maxAttempts: config.maxAttempts,
+            baseDelay: config.initialDelayMs,
+            maxDelay: config.maxDelayMs,
+            backoff: "exponential",
+            shouldRetry: (err) =>
+                config.shouldRetry?.(
+                    err instanceof Error ? err : new Error(String(err)),
+                    0
+                ) ?? false,
+        });
     }
 
     // -------------------------
@@ -595,6 +616,15 @@ export class ApiClient {
             return false;
         }
 
+        // Si es un body binario u obvio, no son opciones
+        if (
+            obj instanceof FormData ||
+            obj instanceof Blob ||
+            obj instanceof ArrayBuffer
+        ) {
+            return false;
+        }
+
         const knownKeys = [
             "searchParams",
             "errorLocale",
@@ -603,9 +633,8 @@ export class ApiClient {
             "skipRetry",
             "skipInterceptors",
             "logHeaders",
-            // También incluir keys de RequestInit
+            // También incluir keys de RequestInit que NO suelen estar en un body
             "method",
-            "headers",
             "mode",
             "credentials",
             "cache",
@@ -614,18 +643,22 @@ export class ApiClient {
             "referrerPolicy",
             "integrity",
             "keepalive",
-            "signal",
             "window",
         ];
 
         const objKeys = Object.keys(obj);
 
-        // Si tiene alguna de las keys de RequestOptions/RequestInit (excepto 'body'), es RequestOptions
+        // Si tiene alguna de las keys exclusivas de RequestOptions, es RequestOptions
         const hasRequestOptionKey = objKeys.some((key) =>
             knownKeys.includes(key)
         );
 
-        return hasRequestOptionKey;
+        // Si tiene headers, verificamos que no sea un body que casualmente los incluya
+        // (por ejemplo, un objeto de configuración que se está enviando)
+        const hasHeaders = "headers" in obj;
+        const bodyHeuristic = objKeys.length < 5; // Heurística: si tiene pocas keys y tiene headers, es probable que sean opciones
+
+        return hasRequestOptionKey || (hasHeaders && bodyHeuristic);
     }
 
     private mergeHeaders(overrides?: HeadersInit) {

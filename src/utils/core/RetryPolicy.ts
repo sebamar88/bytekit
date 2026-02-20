@@ -167,4 +167,20 @@ export class RetryPolicy {
             message.includes("econnreset")
         );
     }
+
+    getConfig(): {
+        maxAttempts: number;
+        initialDelayMs: number;
+        maxDelayMs: number;
+        backoffMultiplier: number;
+        shouldRetry: (error: Error, attempt: number) => boolean;
+    } {
+        return {
+            maxAttempts: this.maxAttempts,
+            initialDelayMs: this.initialDelayMs,
+            maxDelayMs: this.maxDelayMs,
+            backoffMultiplier: this.backoffMultiplier,
+            shouldRetry: this.shouldRetry,
+        };
+    }
 }
