@@ -14,17 +14,17 @@ describe("FormUtils Extra Coverage", () => {
             initialValues: { email: "", age: 0 },
             rules: {
                 email: { required: true, email: true },
-                age: { min: 18 }
+                age: { min: 18 },
             },
-            validateOnBlur: true
+            validateOnBlur: true,
         });
-        
+
         await form.validate();
         expect(form.hasError("email")).toBe(true);
-        
+
         form.touchField("age");
         expect(form.isTouched("age")).toBe(true);
-        
+
         form.reset();
         expect(form.isTouched("age")).toBe(false);
     });

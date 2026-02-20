@@ -1,5 +1,11 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { ErrorBoundary, AppError, TimeoutError, AppValidationError, NotFoundError } from "../src/utils/core/ErrorBoundary";
+import {
+    ErrorBoundary,
+    AppError,
+    TimeoutError,
+    AppValidationError,
+    NotFoundError,
+} from "../src/utils/core/ErrorBoundary";
 import { Logger } from "../src/utils/core/Logger";
 
 describe("ErrorBoundary Exhaustive", () => {
@@ -48,9 +54,11 @@ describe("ErrorBoundary Exhaustive", () => {
 
     it("should handle wrapSync and catch errors", () => {
         const spy = vi.spyOn(boundary, "handle");
-        const fn = () => { throw new Error("sync error"); };
+        const fn = () => {
+            throw new Error("sync error");
+        };
         const wrapped = boundary.wrapSync(fn);
-        
+
         expect(() => wrapped()).toThrow("sync error");
         expect(spy).toHaveBeenCalled();
     });
@@ -59,11 +67,11 @@ describe("ErrorBoundary Exhaustive", () => {
         const smallBoundary = new ErrorBoundary();
         // @ts-expect-error - setting small limit for test
         smallBoundary.maxStackSize = 2;
-        
+
         await smallBoundary.handle(new Error("1"));
         await smallBoundary.handle(new Error("2"));
         await smallBoundary.handle(new Error("3"));
-        
+
         expect(smallBoundary.getErrorHistory().length).toBe(2);
     });
 
