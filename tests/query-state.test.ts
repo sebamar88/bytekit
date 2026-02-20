@@ -1,9 +1,9 @@
 import { describe, it, expect } from "vitest";
-import { 
-    createInitialState, 
-    createLoadingState, 
-    createSuccessState, 
-    createErrorState 
+import {
+    createInitialState,
+    createLoadingState,
+    createSuccessState,
+    createErrorState,
 } from "../src/utils/core/QueryState";
 import { ApiError } from "../src/utils/core/ApiClient";
 

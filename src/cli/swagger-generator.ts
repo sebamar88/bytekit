@@ -112,15 +112,19 @@ export async function generateFromSwagger(
 function generateInterface(name: string, schema: any): string {
     // Sanitize name (remove invalid characters)
     const sanitizedName = name.replace(/[^a-zA-Z0-9]/g, "");
-    
-    if (schema.type === "object" || schema.properties || schema.additionalProperties) {
+
+    if (
+        schema.type === "object" ||
+        schema.properties ||
+        schema.additionalProperties
+    ) {
         if (schema.additionalProperties && !schema.properties) {
             return `export type ${sanitizedName} = Record<string, ${mapOpenApiToTs(schema.additionalProperties)}>;`;
         }
 
         const properties = schema.properties || {};
         const required = schema.required || [];
-        
+
         const props = Object.entries(properties)
             .map(([propName, propSchema]: [string, any]) => {
                 const isRequired = required.includes(propName);

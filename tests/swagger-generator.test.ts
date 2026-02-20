@@ -28,24 +28,24 @@ describe("swagger-generator", () => {
                         type: "object",
                         properties: {
                             id: { type: "integer" },
-                            name: { type: "string" }
+                            name: { type: "string" },
                         },
-                        required: ["id"]
-                    }
-                }
-            }
+                        required: ["id"],
+                    },
+                },
+            },
         };
 
         globalThis.fetch = vi.fn().mockResolvedValue({
             ok: true,
             headers: new Headers({ "content-type": "application/json" }),
-            json: async () => spec
+            json: async () => spec,
         });
 
         const output = "api-types.ts";
         await generateFromSwagger({
             url: "https://api.example.com/swagger.json",
-            output: output
+            output: output,
         });
 
         const content = await fs.readFile(path.join(tempDir, output), "utf8");
@@ -57,7 +57,7 @@ describe("swagger-generator", () => {
         const htmlRes = {
             ok: true,
             headers: new Headers({ "content-type": "text/html" }),
-            text: async () => "<html>Swagger UI</html>"
+            text: async () => "<html>Swagger UI</html>",
         };
 
         const specRes = {
@@ -65,12 +65,16 @@ describe("swagger-generator", () => {
             headers: new Headers({ "content-type": "application/json" }),
             json: async () => ({
                 definitions: {
-                    Product: { type: "object", properties: { price: { type: "number" } } }
-                }
-            })
+                    Product: {
+                        type: "object",
+                        properties: { price: { type: "number" } },
+                    },
+                },
+            }),
         };
 
-        globalThis.fetch = vi.fn()
+        globalThis.fetch = vi
+            .fn()
             .mockResolvedValueOnce(htmlRes)
             .mockResolvedValueOnce({ ok: false })
             .mockResolvedValueOnce(specRes);
@@ -78,7 +82,7 @@ describe("swagger-generator", () => {
         const output = "product-types.ts";
         await generateFromSwagger({
             url: "https://api.example.com/docs",
-            output: output
+            output: output,
         });
 
         const content = await fs.readFile(path.join(tempDir, output), "utf8");
@@ -91,16 +95,16 @@ describe("swagger-generator", () => {
                 schemas: {
                     Status: {
                         type: "string",
-                        enum: ["active", "inactive"]
-                    }
-                }
-            }
+                        enum: ["active", "inactive"],
+                    },
+                },
+            },
         };
 
         globalThis.fetch = vi.fn().mockResolvedValue({
             ok: true,
             headers: new Headers({ "content-type": "application/json" }),
-            json: async () => spec
+            json: async () => spec,
         });
 
         const output = "enums.ts";
@@ -114,7 +118,7 @@ describe("swagger-generator", () => {
         globalThis.fetch = vi.fn().mockResolvedValue({
             ok: true,
             headers: new Headers({ "content-type": "application/json" }),
-            json: async () => ({ components: {} })
+            json: async () => ({ components: {} }),
         });
         const spy = vi.spyOn(console, "warn").mockImplementation(() => {});
         await generateFromSwagger({ url: "http://api.com/empty" });
@@ -126,16 +130,21 @@ describe("swagger-generator", () => {
             components: {
                 schemas: {
                     Union: { oneOf: [{ type: "string" }, { type: "number" }] },
-                    Intersection: { allOf: [{ $ref: "#/components/schemas/A" }] },
-                    Map: { type: "object", additionalProperties: { type: "string" } }
-                }
-            }
+                    Intersection: {
+                        allOf: [{ $ref: "#/components/schemas/A" }],
+                    },
+                    Map: {
+                        type: "object",
+                        additionalProperties: { type: "string" },
+                    },
+                },
+            },
         };
 
         globalThis.fetch = vi.fn().mockResolvedValue({
             ok: true,
             headers: new Headers({ "content-type": "application/json" }),
-            json: async () => spec
+            json: async () => spec,
         });
 
         const output = "complex.ts";
@@ -147,11 +156,17 @@ describe("swagger-generator", () => {
     });
 
     it("should handle fetch errors", async () => {
-        globalThis.fetch = vi.fn().mockResolvedValue({ ok: false, status: 500 });
+        globalThis.fetch = vi
+            .fn()
+            .mockResolvedValue({ ok: false, status: 500 });
         const spy = vi.spyOn(console, "error").mockImplementation(() => {});
-        const exitSpy = vi.spyOn(process, "exit").mockImplementation(() => { throw new Error("exit"); });
-        
-        await expect(generateFromSwagger({ url: "http://api.com/fail" })).rejects.toThrow();
+        const exitSpy = vi.spyOn(process, "exit").mockImplementation(() => {
+            throw new Error("exit");
+        });
+
+        await expect(
+            generateFromSwagger({ url: "http://api.com/fail" })
+        ).rejects.toThrow();
         expect(spy).toHaveBeenCalled();
         exitSpy.mockRestore();
     });

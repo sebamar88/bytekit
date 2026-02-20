@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, beforeEach } from "vitest";
 import { QueryClient } from "../src/utils/core/QueryClient";
 import { ApiClient } from "../src/utils/core/ApiClient";
 
@@ -14,9 +14,9 @@ describe("QueryClient Refetch Scenarios", () => {
     it("should handle invalidation of multiple queries", () => {
         client.setQueryData(["user", "1"], { name: "A" });
         client.setQueryData(["user", "2"], { name: "B" });
-        
+
         client.invalidateQueries(["user"]);
-        
+
         expect(client.getQueryState(["user", "1"])?.status).toBe("idle");
         expect(client.getQueryState(["user", "2"])?.status).toBe("idle");
     });

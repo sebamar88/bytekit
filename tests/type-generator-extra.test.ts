@@ -24,17 +24,21 @@ describe("type-generator extra", () => {
         globalThis.fetch = vi.fn().mockResolvedValue({
             ok: false,
             status: 404,
-            statusText: "Not Found"
+            statusText: "Not Found",
         });
-        
-        const spy = vi.spyOn(console, "error").mockImplementation(() => {});
-        const exitSpy = vi.spyOn(process, "exit").mockImplementation(() => { throw new Error("exit"); });
 
-        await expect(generateTypesFromEndpoint({
-            endpoint: "http://api.com/fail",
-            output: "fail.ts"
-        })).rejects.toThrow();
-        
+        const spy = vi.spyOn(console, "error").mockImplementation(() => {});
+        const exitSpy = vi.spyOn(process, "exit").mockImplementation(() => {
+            throw new Error("exit");
+        });
+
+        await expect(
+            generateTypesFromEndpoint({
+                endpoint: "http://api.com/fail",
+                output: "fail.ts",
+            })
+        ).rejects.toThrow();
+
         expect(spy).toHaveBeenCalledWith(expect.stringContaining("404"));
         exitSpy.mockRestore();
     });
@@ -42,17 +46,23 @@ describe("type-generator extra", () => {
     it("should handle non-JSON responses", async () => {
         globalThis.fetch = vi.fn().mockResolvedValue({
             ok: true,
-            json: async () => { throw new Error("parse error"); }
+            json: async () => {
+                throw new Error("parse error");
+            },
         });
-        
-        const spy = vi.spyOn(console, "error").mockImplementation(() => {});
-        const exitSpy = vi.spyOn(process, "exit").mockImplementation(() => { throw new Error("exit"); });
 
-        await expect(generateTypesFromEndpoint({
-            endpoint: "http://api.com/bad-json",
-            output: "bad.ts"
-        })).rejects.toThrow();
-        
+        vi.spyOn(console, "error").mockImplementation(() => {});
+        const exitSpy = vi.spyOn(process, "exit").mockImplementation(() => {
+            throw new Error("exit");
+        });
+
+        await expect(
+            generateTypesFromEndpoint({
+                endpoint: "http://api.com/bad-json",
+                output: "bad.ts",
+            })
+        ).rejects.toThrow();
+
         exitSpy.mockRestore();
     });
 });

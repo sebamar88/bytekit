@@ -27,8 +27,10 @@ describe("bytekit CLI Integration", () => {
         // We use a small inline script to run the CLI with a mocked fetch
         const scriptPath = path.join(tempDir, "run-test.js");
         // Convert to file:// URL for Windows compatibility in ESM imports
-        const cliUrl = pathToFileURL(path.join(originalCwd, "dist/cli/index.js")).href;
-        
+        const cliUrl = pathToFileURL(
+            path.join(originalCwd, "dist/cli/index.js")
+        ).href;
+
         const script = `
             import { runCli } from "${cliUrl}";
             globalThis.fetch = async () => ({
@@ -57,7 +59,9 @@ describe("bytekit CLI Integration", () => {
 
     test("should generate types from a Swagger specification", async () => {
         const scriptPath = path.join(tempDir, "run-swagger.js");
-        const cliUrl = pathToFileURL(path.join(originalCwd, "dist/cli/index.js")).href;
+        const cliUrl = pathToFileURL(
+            path.join(originalCwd, "dist/cli/index.js")
+        ).href;
 
         const script = `
             import { runCli } from "${cliUrl}";

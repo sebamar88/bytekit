@@ -13,13 +13,20 @@ describe("QueryClient", () => {
 
     it("should fetch and cache data using query() method", async () => {
         const fetcher = vi.spyOn(api, "get").mockResolvedValue("data");
-        const result = await client.query({ queryKey: ["test"], path: "/test" });
+        const result = await client.query({
+            queryKey: ["test"],
+            path: "/test",
+        });
 
         expect(result).toBe("data");
         expect(fetcher).toHaveBeenCalledTimes(1);
 
         // Second call should use cache (default staleTime is 0, but query happens in same tick)
-        const cachedResult = await client.query({ queryKey: ["test"], path: "/test", staleTime: 10000 });
+        const cachedResult = await client.query({
+            queryKey: ["test"],
+            path: "/test",
+            staleTime: 10000,
+        });
         expect(cachedResult).toBe("data");
         expect(fetcher).toHaveBeenCalledTimes(1);
     });
@@ -35,9 +42,9 @@ describe("QueryClient", () => {
     it("should invalidate queries", async () => {
         vi.spyOn(api, "get").mockResolvedValue("data");
         await client.query({ queryKey: ["test"], path: "/test" });
-        
+
         client.invalidateQueries(["test"]);
-        
+
         // After invalidation, status should be idle
         const state = client.getQueryState(["test"]);
         expect(state?.status).toBe("idle");
@@ -47,7 +54,7 @@ describe("QueryClient", () => {
         let callCount = 0;
         vi.spyOn(api, "get").mockImplementation(async () => {
             callCount++;
-            await new Promise(r => setTimeout(r, 50));
+            await new Promise((r) => setTimeout(r, 50));
             return "data";
         });
 
@@ -79,10 +86,10 @@ describe("QueryClient", () => {
         const onSuccess = vi.fn();
         vi.spyOn(api, "get").mockResolvedValue("ok");
 
-        await client.query({ 
-            queryKey: ["cb"], 
+        await client.query({
+            queryKey: ["cb"],
             path: "/cb",
-            callbacks: { onSuccess }
+            callbacks: { onSuccess },
         });
 
         expect(onSuccess).toHaveBeenCalledWith("ok", expect.anything());
@@ -109,10 +116,10 @@ describe("QueryClient", () => {
     it("should support event subscription", async () => {
         const onStart = vi.fn();
         client.on("query:start", onStart);
-        
+
         vi.spyOn(api, "get").mockResolvedValue("ok");
         await client.query({ queryKey: ["event"], path: "/test" });
-        
+
         expect(onStart).toHaveBeenCalled();
     });
 

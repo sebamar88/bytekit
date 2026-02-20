@@ -14,7 +14,7 @@ describe("Validator Extra Coverage", () => {
         expect(Validator.isStrongPassword("ABC!!!abc")).toBe(false); // No number
         expect(Validator.isStrongPassword("abc123!!!")).toBe(false); // No upper
         // Minimum valid: 8 chars, 1 upper, 1 number, 1 special
-        expect(Validator.isStrongPassword("Abc123!!!")).toBe(true); 
+        expect(Validator.isStrongPassword("Abc123!!!")).toBe(true);
     });
 
     it("should cover date range edge cases", () => {
