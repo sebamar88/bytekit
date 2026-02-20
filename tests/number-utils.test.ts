@@ -1,4 +1,3 @@
-
 import assert from "node:assert";
 import { NumberUtils } from "../src/utils/helpers/NumberUtils";
 

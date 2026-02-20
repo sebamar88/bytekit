@@ -1,5 +1,3 @@
-
-
 import { ResponseValidator } from "../src/index";
 
 test("ResponseValidator validates object structure", () => {

@@ -1,5 +1,3 @@
-
-
 import { StringUtils } from "../src/utils/helpers/StringUtils";
 
 describe("StringUtils - Case Conversion", () => {

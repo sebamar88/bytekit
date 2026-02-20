@@ -1,4 +1,3 @@
-
 import assert from "node:assert";
 import { ColorUtils } from "../src/utils/helpers/ColorUtils";
 

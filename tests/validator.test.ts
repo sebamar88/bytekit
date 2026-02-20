@@ -1,5 +1,3 @@
-
-
 import { Validator } from "../src/index";
 
 const buildValidCuit = (prefix, dni) => {

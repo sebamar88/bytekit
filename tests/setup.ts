@@ -38,10 +38,16 @@ const assertShim = {
     notEqual: (a: any, b: any) => expect(a).not.toBe(b),
     notDeepEqual: (a: any, b: any) => expect(a).not.toEqual(b),
     notStrictEqual: (a: any, b: any) => expect(a).not.toBe(b),
-    throws: (fn: () => any, reg?: RegExp | object) => expect(fn).toThrow(reg instanceof RegExp ? reg : undefined),
-    rejects: (promise: Promise<any>, reg?: RegExp | object) => expect(promise).rejects.toThrow(reg instanceof RegExp ? reg : undefined),
+    throws: (fn: () => any, reg?: RegExp | object) =>
+        expect(fn).toThrow(reg instanceof RegExp ? reg : undefined),
+    rejects: (promise: Promise<any>, reg?: RegExp | object) =>
+        expect(promise).rejects.toThrow(
+            reg instanceof RegExp ? reg : undefined
+        ),
     match: (a: string, b: RegExp) => expect(a).toMatch(b),
-    fail: (msg?: string) => { throw new Error(msg || "Assertion failed"); },
+    fail: (msg?: string) => {
+        throw new Error(msg || "Assertion failed");
+    },
 };
 
 (globalThis as any).assert = assertShim;

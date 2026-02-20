@@ -1,5 +1,3 @@
-
-
 import { Profiler } from "../src/utils/core/Profiler";
 
 test("Profiler records duration for labeled blocks", () => {

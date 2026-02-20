@@ -1,5 +1,3 @@
-
-
 import { EnvManager } from "../src/index";
 
 test("EnvManager.get reads from process.env in Node", () => {

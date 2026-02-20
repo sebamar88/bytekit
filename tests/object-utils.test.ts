@@ -1,5 +1,3 @@
-
-
 import { ObjectUtils } from "../src/index";
 
 test("ObjectUtils.isEmpty detects empty values", () => {

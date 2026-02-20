@@ -1,4 +1,3 @@
-
 import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
@@ -44,7 +43,10 @@ describe("bytekit CLI Integration", () => {
         process.chdir(tempDir);
         execSync(`node ${scriptPath}`);
 
-        const typeFile = await fs.readFile(path.join(tempDir, "src", "types", "info.ts"), "utf8");
+        const typeFile = await fs.readFile(
+            path.join(tempDir, "src", "types", "info.ts"),
+            "utf8"
+        );
         assert.ok(typeFile.includes("export interface Info"));
         assert.ok(typeFile.includes("id: number;"));
     });
@@ -76,7 +78,10 @@ describe("bytekit CLI Integration", () => {
         process.chdir(tempDir);
         execSync(`node ${scriptPath}`);
 
-        const swaggerFile = await fs.readFile(path.join(tempDir, "src", "types", "api-docs.ts"), "utf8");
+        const swaggerFile = await fs.readFile(
+            path.join(tempDir, "src", "types", "api-docs.ts"),
+            "utf8"
+        );
         assert.ok(swaggerFile.includes("export interface User"));
         assert.ok(swaggerFile.includes("login?: string;"));
     });

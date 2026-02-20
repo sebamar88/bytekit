@@ -34,7 +34,7 @@ describe("debounceAsync function", () => {
                 const promise1 = debounced(1);
                 const promise2 = debounced(2);
                 const promise3 = debounced(3);
-                
+
                 // Attach silent catch to prevent unhandled rejection warnings
                 promise1.catch(() => {});
                 promise2.catch(() => {});

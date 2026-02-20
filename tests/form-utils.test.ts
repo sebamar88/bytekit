@@ -1,5 +1,3 @@
-
-
 import { FormUtils, createForm, Validators } from "../src/index";
 
 test("FormUtils initializes with correct state", () => {

@@ -1,9 +1,4 @@
-
-
-import {
-    UrlBuilder,
-    createUrlBuilder,
-} from "../src/utils/helpers/UrlBuilder";
+import { UrlBuilder, createUrlBuilder } from "../src/utils/helpers/UrlBuilder";
 
 // ============================================================================
 // UrlBuilder Tests

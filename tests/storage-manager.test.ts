@@ -1,5 +1,3 @@
-
-
 import { StorageManager } from "../src/index";
 
 class MemoryStorage {

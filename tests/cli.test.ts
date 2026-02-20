@@ -3,7 +3,6 @@ import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 
-
 import { runCli } from "../src/cli/index";
 
 const readFile = (target) => fs.readFile(target, "utf8");

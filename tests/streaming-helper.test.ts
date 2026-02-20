@@ -1,5 +1,3 @@
-
-
 import { StreamingHelper } from "../src/utils/helpers/StreamingHelper";
 
 // Mocking global objects for Node.js environment

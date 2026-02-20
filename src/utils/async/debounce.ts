@@ -38,7 +38,10 @@ export function debounceAsync<TArgs extends any[], TReturn>(
         throw new TypeError("Delay must be a non-negative number");
     }
 
-    const { leading = false, trailing = options.leading === true ? false : true } = options;
+    const {
+        leading = false,
+        trailing = options.leading === true ? false : true,
+    } = options;
 
     let timeoutId: ReturnType<typeof setTimeout> | null = null;
     let pendingArgs: TArgs | null = null;
@@ -74,8 +77,9 @@ export function debounceAsync<TArgs extends any[], TReturn>(
      */
     const debounced = function (...args: TArgs): Promise<TReturn> {
         const now = Date.now();
-        const isInvoking = leading && (now - lastCallTime >= delay || lastCallTime === 0);
-        
+        const isInvoking =
+            leading && (now - lastCallTime >= delay || lastCallTime === 0);
+
         lastCallTime = now;
         pendingArgs = args;
 

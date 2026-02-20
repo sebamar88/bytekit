@@ -1,5 +1,3 @@
-
-
 import { FileUploadHelper } from "../src/utils/helpers/FileUploadHelper";
 
 // Mocking global fetch for testing

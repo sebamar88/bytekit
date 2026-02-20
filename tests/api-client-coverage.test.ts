@@ -1,5 +1,3 @@
-
-
 import { ApiClient, ApiError } from "../src/index";
 
 describe("ApiClient Coverage", () => {
@@ -103,7 +101,9 @@ describe("ApiClient Coverage", () => {
                 await client.get("/network-error");
             },
             (err) => {
-                return err.name === "RetryError" || err.message === "Network Error";
+                return (
+                    err.name === "RetryError" || err.message === "Network Error"
+                );
             }
         );
     });

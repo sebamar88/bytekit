@@ -76,7 +76,7 @@ describe("throttleAsync function", () => {
                 // Queue multiple calls
                 const promise2 = throttled(2);
                 const promise3 = throttled(3);
-                
+
                 // Attach silent catch to prevent unhandled rejection warnings
                 promise2.catch(() => {});
 

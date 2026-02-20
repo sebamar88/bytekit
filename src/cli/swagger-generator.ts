@@ -9,35 +9,55 @@ export interface SwaggerOptions {
 /**
  * Generate TypeScript interfaces from an OpenAPI/Swagger specification
  */
-export async function generateFromSwagger(options: SwaggerOptions): Promise<void> {
+export async function generateFromSwagger(
+    options: SwaggerOptions
+): Promise<void> {
     const { url, output = "src/types/api-docs.ts" } = options;
 
-    console.log(`\n📖 Attempting to resolve Swagger/OpenAPI spec from ${url}...`);
+    console.log(
+        `\n📖 Attempting to resolve Swagger/OpenAPI spec from ${url}...`
+    );
 
     try {
         let spec: any;
         const response = await fetch(url);
-        
+
         if (!response.ok) {
             throw new Error(`HTTP ${response.status}: ${response.statusText}`);
         }
 
         const contentType = response.headers.get("content-type") || "";
-        
+
         // If it's HTML (likely Swagger UI), try to guess the JSON location
         if (contentType.includes("text/html")) {
-            console.log("🔍 URL looks like a documentation page, trying to find spec JSON...");
-            
+            console.log(
+                "🔍 URL looks like a documentation page, trying to find spec JSON..."
+            );
+
             // Try to find the spec by replacing /docs or adding common paths
-            const baseUrl = url.replace(/\/docs\/?$/, "").replace(/\/swagger-ui\/?$/, "");
-            const commonPaths = ["/openapi.json", "/swagger.json", "/v2/api-docs", "/api-docs"];
-            
+            const baseUrl = url
+                .replace(/\/docs\/?$/, "")
+                .replace(/\/swagger-ui\/?$/, "");
+            const commonPaths = [
+                "/openapi.json",
+                "/swagger.json",
+                "/v2/api-docs",
+                "/api-docs",
+            ];
+
             let found = false;
             for (const p of commonPaths) {
-                const tryUrl = baseUrl.endsWith("/") ? `${baseUrl}${p.slice(1)}` : `${baseUrl}${p}`;
+                const tryUrl = baseUrl.endsWith("/")
+                    ? `${baseUrl}${p.slice(1)}`
+                    : `${baseUrl}${p}`;
                 try {
                     const tryRes = await fetch(tryUrl);
-                    if (tryRes.ok && (tryRes.headers.get("content-type") || "").includes("json")) {
+                    if (
+                        tryRes.ok &&
+                        (tryRes.headers.get("content-type") || "").includes(
+                            "json"
+                        )
+                    ) {
                         console.log(`✨ Found spec at: ${tryUrl}`);
                         spec = await tryRes.json();
                         found = true;
@@ -49,16 +69,20 @@ export async function generateFromSwagger(options: SwaggerOptions): Promise<void
             }
 
             if (!found) {
-                throw new Error("Could not automatically find the OpenAPI/Swagger JSON from the documentation page. Please provide the direct JSON URL.");
+                throw new Error(
+                    "Could not automatically find the OpenAPI/Swagger JSON from the documentation page. Please provide the direct JSON URL."
+                );
             }
         } else {
             spec = await response.json();
         }
 
         const schemas = spec.components?.schemas || spec.definitions || {};
-        
+
         if (Object.keys(schemas).length === 0) {
-            console.warn("⚠️ No schemas or definitions found in the specification.");
+            console.warn(
+                "⚠️ No schemas or definitions found in the specification."
+            );
             return;
         }
 
@@ -70,11 +94,13 @@ export async function generateFromSwagger(options: SwaggerOptions): Promise<void
 
         const outputPath = path.join(process.cwd(), output);
         const outputDir = path.dirname(outputPath);
-        
+
         await fs.mkdir(outputDir, { recursive: true });
         await fs.writeFile(outputPath, typeDefinitions, "utf8");
 
-        console.log(`✅ Successfully generated ${Object.keys(schemas).length} types!`);
+        console.log(
+            `✅ Successfully generated ${Object.keys(schemas).length} types!`
+        );
         console.log(`📝 Output: ${outputPath}\n`);
     } catch (error) {
         const message = error instanceof Error ? error.message : String(error);
@@ -86,11 +112,11 @@ export async function generateFromSwagger(options: SwaggerOptions): Promise<void
 function generateInterface(name: string, schema: any): string {
     // Sanitize name (remove invalid characters)
     const sanitizedName = name.replace(/[^a-zA-Z0-9]/g, "");
-    
+
     if (schema.type === "object" || schema.properties) {
         const properties = schema.properties || {};
         const required = schema.required || [];
-        
+
         const props = Object.entries(properties)
             .map(([propName, propSchema]: [string, any]) => {
                 const isRequired = required.includes(propName);
@@ -103,7 +129,9 @@ function generateInterface(name: string, schema: any): string {
     }
 
     if (schema.enum) {
-        const values = schema.enum.map((v: any) => typeof v === "string" ? `'${v}'` : v).join(" | ");
+        const values = schema.enum
+            .map((v: any) => (typeof v === "string" ? `'${v}'` : v))
+            .join(" | ");
         return `export type ${sanitizedName} = ${values};`;
     }
 
@@ -122,7 +150,8 @@ function mapOpenApiToTs(schema: any): string {
     // Handle basic types
     switch (schema.type) {
         case "string":
-            if (schema.format === "date" || schema.format === "date-time") return "string | Date";
+            if (schema.format === "date" || schema.format === "date-time")
+                return "string | Date";
             return "string";
         case "integer":
         case "number":
@@ -141,7 +170,9 @@ function mapOpenApiToTs(schema: any): string {
         default:
             // Handle combinations (oneOf, anyOf, allOf)
             if (schema.oneOf || schema.anyOf) {
-                const types = (schema.oneOf || schema.anyOf).map((s: any) => mapOpenApiToTs(s));
+                const types = (schema.oneOf || schema.anyOf).map((s: any) =>
+                    mapOpenApiToTs(s)
+                );
                 return `(${types.join(" | ")})`;
             }
             if (schema.allOf) {

@@ -33,7 +33,9 @@ describe("retry function", () => {
 
                 const promise = retry(fn, { maxAttempts: 3, baseDelay: 10 });
                 await expect(promise).rejects.toThrow(RetryError);
-                await expect(promise).rejects.toThrow("Failed after 3 attempts");
+                await expect(promise).rejects.toThrow(
+                    "Failed after 3 attempts"
+                );
 
                 expect(fn).toHaveBeenCalledTimes(3);
             });
@@ -55,7 +57,9 @@ describe("retry function", () => {
             });
 
             it("should throw TypeError for non-function argument", async () => {
-                const promise = retry("not a function" as unknown as () => Promise<string>);
+                const promise = retry(
+                    "not a function" as unknown as () => Promise<string>
+                );
                 await expect(promise).rejects.toThrow(TypeError);
                 await expect(promise).rejects.toThrow("must be a function");
             });

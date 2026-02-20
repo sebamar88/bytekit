@@ -1,5 +1,3 @@
-
-
 import { ApiClient } from "../src/index";
 
 const jsonResponse = (body, init = {}) => {

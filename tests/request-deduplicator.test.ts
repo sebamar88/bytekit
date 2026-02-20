@@ -1,5 +1,3 @@
-
-
 import { RequestDeduplicator } from "../src/index";
 
 test("RequestDeduplicator executes request once for multiple calls", async () => {

@@ -1,5 +1,3 @@
-
-
 import { ApiClient, ApiError } from "../src/index";
 
 const jsonResponse = (body, init = {}) => {

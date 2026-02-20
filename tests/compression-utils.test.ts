@@ -1,5 +1,3 @@
-
-
 import { CompressionUtils } from "../src/utils/helpers/CompressionUtils";
 
 test("CompressionUtils compress/decompress roundtrip", () => {

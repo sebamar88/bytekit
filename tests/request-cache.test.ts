@@ -1,5 +1,3 @@
-
-
 import { RequestCache } from "../src/index";
 
 test("RequestCache stores and retrieves data", () => {

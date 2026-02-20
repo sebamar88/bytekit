@@ -1,5 +1,3 @@
-
-
 import { StringUtils } from "../src/index";
 
 test("StringUtils.slugify removes diacritics and normalizes separators", () => {

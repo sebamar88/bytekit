@@ -1,5 +1,3 @@
-
-
 import { TimeUtils } from "../src/index";
 
 describe("TimeUtils", () => {

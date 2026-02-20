@@ -1,5 +1,3 @@
-
-
 import {
     EventEmitter,
     createEventEmitter,

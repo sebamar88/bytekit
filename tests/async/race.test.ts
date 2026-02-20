@@ -24,7 +24,7 @@ describe("race function", () => {
                     Promise.reject(error),
                     sleep(50).then(() => "medium"),
                 ]);
-                
+
                 expect(result).toBe("medium");
             });
 

@@ -1,9 +1,5 @@
-
 import assert from "node:assert";
-import {
-    UrlBuilder,
-    createUrlBuilder,
-} from "../src/utils/helpers/UrlBuilder";
+import { UrlBuilder, createUrlBuilder } from "../src/utils/helpers/UrlBuilder";
 
 test("UrlBuilder builds basic URL", () => {
     const url = new UrlBuilder("https://api.example.com").build();
