@@ -152,11 +152,44 @@ export const DateUtils = {
         return requireDate(a).getTime() > requireDate(b).getTime();
     },
 
-    format(date: Date, locale = "es-AR"): string {
-        return date.toLocaleDateString(locale, {
-            year: "numeric",
-            month: "short",
-            day: "2-digit",
-        });
-    },
-};
+        /**
+         * Format a date into a custom string or using a locale.
+         * @param date Date to format
+         * @param formatOrLocale Custom format string (e.g. 'YYYY-MM-DD') or locale (e.g. 'es-AR')
+         */
+        format(dateInput: DateInput, formatOrLocale = "es-AR"): string {
+            const date = requireDate(dateInput);
+    
+            // If it contains format tokens, treat as a custom format string
+            const tokens = ["YYYY", "MM", "DD", "HH", "mm", "ss"];
+            const hasTokens = tokens.some((token) => formatOrLocale.includes(token));
+    
+            if (hasTokens) {
+                const map: Record<string, string | number> = {
+                    YYYY: date.getFullYear(),
+                    MM: pad(date.getMonth() + 1),
+                    DD: pad(date.getDate()),
+                    HH: pad(date.getHours()),
+                    mm: pad(date.getMinutes()),
+                    ss: pad(date.getSeconds()),
+                };
+    
+                return formatOrLocale.replace(
+                    /YYYY|MM|DD|HH|mm|ss/g,
+                    (matched) => map[matched].toString()
+                );
+            }
+    
+            // Validate if it's a potential locale string (simple check)
+            try {
+                return date.toLocaleDateString(formatOrLocale, {
+                    year: "numeric",
+                    month: "short",
+                    day: "2-digit",
+                });
+            } catch {
+                // If toLocaleDateString fails, return ISO string as fallback
+                return date.toISOString();
+            }
+        },
+    };

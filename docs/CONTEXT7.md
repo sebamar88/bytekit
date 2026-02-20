@@ -18,12 +18,41 @@ ByteKit is a zero-dependency, modern TypeScript library optimized for performanc
 ```typescript
 import { StringUtils } from "bytekit";
 
-// PascalCase conversion
+// PascalCase conversion - Works with spaces, hyphens, and snake_case
 StringUtils.pascalCase("hello world"); // "HelloWorld"
-StringUtils.pascalCase("hello-world"); // "HelloWorld"
-StringUtils.pascalCase("hello_world"); // "HelloWorld"
-StringUtils.pascalCase("helloWorld"); // "HelloWorld"
-StringUtils.pascalCase("HELLO_WORLD"); // "HelloWorld"
+StringUtils.pascalCase("user_profile_data"); // "UserProfileData"
+```
+
+### Q: How do I format a Date object into a custom string format like 'YYYY-MM-DD'?
+
+```typescript
+import { DateUtils } from "bytekit";
+
+const date = new Date(2024, 0, 15);
+// Use tokens for custom formatting
+const formatted = DateUtils.format(date, "YYYY-MM-DD"); // "2024-01-15"
+const dateTime = DateUtils.format(date, "YYYY-MM-DD HH:mm:ss");
+```
+
+### Q: When should I use `withTiming` instead of `Profiler`?
+
+Use **`withTiming`** (or `measureAsync`) when you want to wrap a **single function** call and automatically log its duration. It's a high-level decorator pattern.
+
+Use **`Profiler`** when you need to perform **multiple manual measurements** across different parts of a complex workflow and then aggregate the results in a summary.
+
+```typescript
+// Example withTiming: Automatic wrapper
+const data = await withTiming("fetch-user", () => api.get("/user"));
+
+// Example Profiler: Manual aggregation
+const prof = new Profiler("batch-job");
+prof.start("step-1");
+await doStep1();
+prof.end("step-1");
+prof.start("step-2");
+await doStep2();
+prof.end("step-2");
+console.log(prof.summary());
 ```
 
 ### Q: How do I dynamically adjust ApiClient's base URL based on environment?
