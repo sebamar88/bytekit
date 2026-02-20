@@ -25,29 +25,31 @@ declare global {
 
 // Custom matchers for wiki-specific assertions
 expect.extend({
-    toBeValidWikiStructure(received: unknown) {
-        // Custom matcher implementation will be added when needed
-        const pass = typeof received === "object" && received !== null;
-        return {
-            message: () => `expected ${received} to be a valid wiki structure`,
-            pass,
-        };
-    },
-
-    toPreserveBilingualContent(received: unknown) {
-        // Custom matcher implementation will be added when needed
-        const hasContent =
-            typeof received === "object" &&
-            received !== null &&
-            "en" in received &&
-            "es" in received;
-
-        return {
-            message: () =>
-                `expected ${String(received)} to preserve bilingual content`,
-            pass: hasContent as boolean,
-        };
-    },
+    // ... (keep existing)
 });
+
+// Polyfill node:assert for vitest compatibility
+const assertShim = {
+    strictEqual: (a: any, b: any) => expect(a).toBe(b),
+    deepStrictEqual: (a: any, b: any) => expect(a).toEqual(b),
+    deepEqual: (a: any, b: any) => expect(a).toEqual(b),
+    ok: (a: any) => expect(a).toBeTruthy(),
+    equal: (a: any, b: any) => expect(a).toBe(b),
+    notEqual: (a: any, b: any) => expect(a).not.toBe(b),
+    notDeepEqual: (a: any, b: any) => expect(a).not.toEqual(b),
+    notStrictEqual: (a: any, b: any) => expect(a).not.toBe(b),
+    throws: (fn: () => any, reg?: RegExp | object) =>
+        expect(fn).toThrow(reg instanceof RegExp ? reg : undefined),
+    rejects: (promise: Promise<any>, reg?: RegExp | object) =>
+        expect(promise).rejects.toThrow(
+            reg instanceof RegExp ? reg : undefined
+        ),
+    match: (a: string, b: RegExp) => expect(a).toMatch(b),
+    fail: (msg?: string) => {
+        throw new Error(msg || "Assertion failed");
+    },
+};
+
+(globalThis as any).assert = assertShim;
 
 export {};

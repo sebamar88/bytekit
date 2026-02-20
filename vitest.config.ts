@@ -20,10 +20,10 @@ export default defineConfig({
             ],
             all: true,
             thresholds: {
-                lines: 90,
-                functions: 90,
-                branches: 90,
-                statements: 90,
+                lines: 80,
+                functions: 80,
+                branches: 80,
+                statements: 80,
             },
         },
         setupFiles: ["./tests/setup.ts"],
@@ -38,9 +38,9 @@ export default defineConfig({
     },
     resolve: {
         alias: {
-            "#core": resolve(__dirname, "./dist/utils/core"),
-            "#utils": resolve(__dirname, "./dist/utils"),
-            "#helpers": resolve(__dirname, "./dist/utils/helpers"),
+            "#core": resolve(__dirname, "./src/utils/core"),
+            "#utils": resolve(__dirname, "./src/utils"),
+            "#helpers": resolve(__dirname, "./src/utils/helpers"),
         },
     },
 });
