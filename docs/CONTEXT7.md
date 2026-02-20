@@ -153,3 +153,69 @@ const api = new ApiClient({
         env.get("API_URL") || (isServer ? "http://localhost:3000" : "/api"),
 });
 ```
+
+## Advanced Asynchronous Flow Control
+
+### Q: How do I implement a robust retry mechanism for my API calls?
+
+```typescript
+import { retry } from "bytekit/async";
+
+// Retry with exponential backoff
+const data = await retry(async () => {
+    return await api.get("/orders");
+}, {
+    maxAttempts: 3,
+    baseDelay: 1000,
+    backoff: "exponential"
+});
+```
+
+### Q: How do I process a large array of tasks without overloading the server?
+
+```typescript
+import { parallel } from "bytekit/async";
+
+const urls = ["/1", "/2", ... "/100"];
+const tasks = urls.map(url => () => api.get(url));
+
+// Process 5 URLs at a time
+const results = await parallel(tasks, { concurrency: 5 });
+```
+
+### Q: How do I handle multiple search requests in a type-ahead input?
+
+```typescript
+import { debounceAsync } from "bytekit/async";
+
+const debouncedSearch = debounceAsync(async (query) => {
+    return await api.get(`/search?q=${query}`);
+}, 300);
+
+// In your search handler, previous intermediate results are automatically cancelled
+const currentResults = await debouncedSearch("my query");
+```
+
+## CLI Productivity & Automation
+
+### Q: How do I generate TypeScript interfaces from my OpenAPI docs?
+
+```bash
+# Using the bytekit global binary
+bytekit swagger https://api.myservice.com/swagger.json -o src/types/api.ts
+```
+
+### Q: How do I quickly generate a type from a live API response?
+
+```bash
+# Bytekit will fetch the data and infer the TS interface
+bytekit type https://jsonplaceholder.typicode.com/users/1 --name User
+```
+
+### Q: How do I scaffold a new backend-to-frontend resource?
+
+```bash
+# This creates the API client, hooks, and types for the resource
+bytekit resource customer
+```
+

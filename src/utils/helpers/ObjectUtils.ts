@@ -357,7 +357,8 @@ export class ObjectUtils {
     /**
      * Get object size (number of keys)
      */
-    static size(obj: Record<string, unknown>): number {
+    static size(obj: Record<string, unknown> | null | undefined): number {
+        if (!obj) return 0;
         return Object.keys(obj).length;
     }
 
@@ -365,8 +366,9 @@ export class ObjectUtils {
      * Convert object to array of [key, value] pairs
      */
     static entries<T extends Record<string, unknown>>(
-        obj: T
+        obj: T | null | undefined
     ): Array<[string, unknown]> {
+        if (!obj) return [];
         return Object.entries(obj);
     }
 

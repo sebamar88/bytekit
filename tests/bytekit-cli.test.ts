@@ -1,8 +1,9 @@
 import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
-
+import { pathToFileURL } from "node:url";
 import { execSync } from "node:child_process";
+import { expect, test, describe, beforeEach, afterEach } from "vitest";
 
 /**
  * Integration tests for the bytekit CLI using subprocess execution
@@ -25,8 +26,11 @@ describe("bytekit CLI Integration", () => {
     test("should generate types from an API endpoint", async () => {
         // We use a small inline script to run the CLI with a mocked fetch
         const scriptPath = path.join(tempDir, "run-test.js");
+        // Convert to file:// URL for Windows compatibility in ESM imports
+        const cliUrl = pathToFileURL(path.join(originalCwd, "dist/cli/index.js")).href;
+        
         const script = `
-            import { runCli } from "${path.join(originalCwd, "dist/cli/index.js")}";
+            import { runCli } from "${cliUrl}";
             globalThis.fetch = async () => ({
                 ok: true,
                 status: 200,
@@ -47,14 +51,16 @@ describe("bytekit CLI Integration", () => {
             path.join(tempDir, "src", "types", "info.ts"),
             "utf8"
         );
-        assert.ok(typeFile.includes("export interface Info"));
-        assert.ok(typeFile.includes("id: number;"));
+        expect(typeFile).toContain("export interface Info");
+        expect(typeFile).toContain("id: number;");
     });
 
     test("should generate types from a Swagger specification", async () => {
         const scriptPath = path.join(tempDir, "run-swagger.js");
+        const cliUrl = pathToFileURL(path.join(originalCwd, "dist/cli/index.js")).href;
+
         const script = `
-            import { runCli } from "${path.join(originalCwd, "dist/cli/index.js")}";
+            import { runCli } from "${cliUrl}";
             globalThis.fetch = async () => ({
                 ok: true,
                 status: 200,
@@ -82,7 +88,7 @@ describe("bytekit CLI Integration", () => {
             path.join(tempDir, "src", "types", "api-docs.ts"),
             "utf8"
         );
-        assert.ok(swaggerFile.includes("export interface User"));
-        assert.ok(swaggerFile.includes("login?: string;"));
+        expect(swaggerFile).toContain("export interface User");
+        expect(swaggerFile).toContain("login?: string;");
     });
 });
