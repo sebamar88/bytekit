@@ -19,7 +19,7 @@ describe("StringUtils Case Conversions", () => {
     it("should convert to snakeCase", () => {
         expect(StringUtils.snakeCase("HelloWorld")).toBe("hello_world");
         expect(StringUtils.snakeCase("user-id")).toBe("user_id");
-        expect(StringUtils.snakeCase("already_snake")).toBe("already_world"); // wait, already_snake should be already_snake
+        expect(StringUtils.snakeCase("already_snake")).toBe("already_snake");
     });
 
     it("should convert to kebabCase", () => {
