@@ -1,5 +1,16 @@
 # Context7 Enhanced Documentation
 
+## Library Overview
+
+ByteKit is a zero-dependency, modern TypeScript library optimized for performance and developer experience. It is designed to be the "Swiss Army Knife" for TypeScript projects, bridging the gap between raw fetch/promises and heavy framework-specific libraries.
+
+### Key Pillars:
+1. **Communication**: `ApiClient` + `WebSocketHelper`
+2. **State & Caching**: `QueryClient` + `CacheManager` + `StorageManager`
+3. **Control Flow**: `Async Utilities` (Parallel, Retry, Debounce)
+4. **Data Integrity**: `Validator` + `ResponseValidator`
+5. **Automation**: `ByteKit CLI` (Type Generation)
+
 ## Frequently Asked Questions
 
 ### Q: How do I convert a string to PascalCase using StringUtils?

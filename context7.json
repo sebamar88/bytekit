@@ -1,4 +1,18 @@
 {
     "url": "https://context7.com/sebamar88/bytekit",
-    "public_key": "pk_XoORr8O7CUjZDhhBsPmPO"
+    "public_key": "pk_XoORr8O7CUjZDhhBsPmPO",
+    "description": "Lightning-fast, zero-dependency TypeScript utility suite featuring an isomorphic ApiClient with retries, a robust Async Toolkit (retry, parallel, debounce), and a CLI for Swagger/OpenAPI type generation.",
+    "categories": ["utilities", "async", "typescript", "cli", "api-client"],
+    "documentation": {
+        "guides": "docs/guides",
+        "examples": "examples",
+        "api": "docs/api"
+    },
+    "features": {
+        "api_client": "Isomorphic fetch wrapper with interceptors and circuit breakers",
+        "async_toolkit": "Retry with backoff, concurrency control, and AggregateError support",
+        "query_client": "Framework-agnostic state management and caching",
+        "cli_automation": "Generate types from Swagger/OpenAPI specifications",
+        "validation": "Comprehensive suite of validators for common data types"
+    }
 }
