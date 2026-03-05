@@ -10,6 +10,7 @@ export interface CircuitBreakerConfig {
     failureThreshold?: number;
     successThreshold?: number;
     timeoutMs?: number;
+    errorMessageFormatter?: (ms: number) => string;
 }
 
 export type CircuitBreakerState = "closed" | "open" | "half-open";
@@ -22,11 +23,13 @@ export class CircuitBreaker {
     private readonly failureThreshold: number;
     private readonly successThreshold: number;
     private readonly timeoutMs: number;
+    private readonly errorMessageFormatter?: (ms: number) => string;
 
     constructor(config: CircuitBreakerConfig = {}) {
         this.failureThreshold = config.failureThreshold ?? 5;
         this.successThreshold = config.successThreshold ?? 2;
         this.timeoutMs = config.timeoutMs ?? 60000;
+        this.errorMessageFormatter = config.errorMessageFormatter;
     }
 
     async execute<T>(fn: () => Promise<T>): Promise<T> {
@@ -34,9 +37,18 @@ export class CircuitBreaker {
             if (this.shouldAttemptReset()) {
                 this.state = "half-open";
             } else {
-                throw new Error(
-                    `Circuit breaker is open. Retry after ${this.getRetryAfterMs()}ms`
-                );
+                const retryAfter = this.getRetryAfterMs();
+                let message = `Circuit breaker is open. Retry after ${retryAfter}ms`;
+
+                if (this.errorMessageFormatter) {
+                    try {
+                        message = this.errorMessageFormatter(retryAfter);
+                    } catch {
+                        // Fallback to default message if formatter fails
+                    }
+                }
+
+                throw new Error(message);
             }
         }
 

@@ -40,10 +40,28 @@ const assertShim = {
     notStrictEqual: (a: any, b: any) => expect(a).not.toBe(b),
     throws: (fn: () => any, reg?: RegExp | object) =>
         expect(fn).toThrow(reg instanceof RegExp ? reg : undefined),
-    rejects: (promise: Promise<any>, reg?: RegExp | object) =>
-        expect(promise).rejects.toThrow(
-            reg instanceof RegExp ? reg : undefined
-        ),
+    rejects: async (
+        promise: Promise<any> | (() => Promise<any>),
+        regOrFunc?: RegExp | object | ((error: any) => boolean)
+    ) => {
+        const p = typeof promise === "function" ? promise() : promise;
+        if (typeof regOrFunc === "function") {
+            try {
+                await p;
+                throw new Error("Promise did not reject");
+            } catch (err) {
+                const error = err as any;
+                if (error.message === "Promise did not reject") throw error;
+                const result = regOrFunc(error);
+                if (!result)
+                    throw new Error("Validation function returned false");
+            }
+        } else {
+            await expect(p).rejects.toThrow(
+                regOrFunc instanceof RegExp ? regOrFunc : undefined
+            );
+        }
+    },
     match: (a: string, b: RegExp) => expect(a).toMatch(b),
     fail: (msg?: string) => {
         throw new Error(msg || "Assertion failed");

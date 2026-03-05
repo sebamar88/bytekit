@@ -82,3 +82,28 @@ test("CircuitBreaker closes after successful recovery", async () => {
     assert.equal(result, "recovered");
     assert.equal(breaker.getState(), "closed");
 });
+
+test("CircuitBreaker uses custom error message formatter", async () => {
+    const breaker = new CircuitBreaker({
+        failureThreshold: 1,
+        errorMessageFormatter: (ms: number) => `Wait ${ms / 1000}s`,
+    });
+
+    // Trigger failure
+    await assert.rejects(() =>
+        breaker.execute(async () => {
+            throw new Error("Failed");
+        })
+    );
+
+    assert.equal(breaker.getState(), "open");
+
+    // Should use custom formatter
+    await assert.rejects(
+        () => breaker.execute(async () => "success"),
+        (error: any) => {
+            assert.match(error.message, /Wait \d+(\.\d+)?s/);
+            return true;
+        }
+    );
+});
