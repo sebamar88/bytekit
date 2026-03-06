@@ -1,8 +1,7 @@
 {
     "name": "bytekit",
     "description": "Lightning-fast TypeScript utilities: Isomorphic API client, Async toolkit (retry, debounce, parallel), QueryClient for state management, and CLI for Swagger/OpenAPI type generation.",
-    "version": "1.0.30",
-    "website": "https://sebamar88-bytekit.mintlify.app/",
+    "version": "1.0.31",
     "type": "module",
     "imports": {
         "#core/*": "./dist/utils/core/*",
@@ -214,7 +213,7 @@
     "bugs": {
         "url": "https://github.com/sebamar88/bytekit/issues"
     },
-    "homepage": "https://github.com/sebamar88/bytekit#readme",
+    "homepage": "https://sebamar88-bytekit.mintlify.app/",
     "author": "Sebastián Martinez",
     "license": "MIT",
     "sideEffects": false,
