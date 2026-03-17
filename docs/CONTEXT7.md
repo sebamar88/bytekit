@@ -2,36 +2,34 @@
 
 ## Library Overview
 
-ByteKit is a zero-dependency TypeScript toolkit for isomorphic networking and async coordination. The bundle keeps your runtime lean while combining:
+ByteKit is a lean, zero-dependency TypeScript toolkit built around **isomorphic HTTP control**. Today the package surface revolves around:
 
-- **Communication & resiliency**: `ApiClient`, `RetryPolicy`, `CircuitBreaker`, `RequestCache`, `RequestDeduplicator`, `RateLimiter`, `StreamingHelper`, `FileUploadHelper` and `WebSocketHelper`.
-- **Observability & debugging**: `Logger`, `createLogger`, `Profiler`, `withTiming`, `measureAsync` and `createStopwatch` make it easy to measure latency without pulling in heavy agents.
-- **Async toolkit**: `parallel`, `race`, `retry`, `sleep`, `debounce`, `throttle`, `timeout` and `allSettled` coordinate concurrent jobs safely.
-- **Validation & storage helpers**: `ResponseValidator`, `SchemaAdapter`, `StorageManager`, `CacheManager`, `EnvManager`, `QueryStringHelper`, `UrlSlugHelper`, `DiffUtils`, `CompressionUtils`, `CryptoUtils` tackle schema validation, caching, and derived data.
+- **ApiClient & resilience**: a typed fetch wrapper with `retryPolicy`, `CircuitBreaker`, `RequestCache`, `RequestDeduplicator`, `RateLimiter`, localized `ApiError`s and automatic schema validation.
+- **Observability**: `Logger`, `createLogger`, `Profiler`, `withTiming`, `measureAsync` and `createStopwatch` for capturing latency without extra agents.
+- **Async tooling**: low-level helpers (`parallel`, `race`, `retry`, `sleep`, `debounce`, `throttle`, `timeout`, `allSettled`) that coordinate promises so your HTTP flows behave reliably.
+- **Schema enforcement**: `ResponseValidator` and `SchemaAdapter` let you validate payloads at the edge of every request/response pair.
 
 ## Frequently Asked Questions
 
-### Q1: Describe a scenario where `withTiming` is preferred over `Profiler` for performance monitoring, and provide an example of its use for an asynchronous operation.
+### Q1: When should I prefer `withTiming` over `Profiler` for measuring HTTP work?
 
-Use `withTiming` when you only need a single async block measured and optionally logged. It wraps a promise, logs the duration, and lets the rest of your code stay linear. Use `Profiler` when you need to mark many steps inside one workflow.
+`withTiming` is ideal when you only need to time a single async step (e.g., a single API call) and optionally log the duration. `Profiler` is for multi-step workflows where you need labeled intervals. For a fetch, wrap the promise via `withTiming` and let it log automatically.
 
 ```ts
 import { ApiClient, withTiming, createLogger } from "bytekit";
 
-const logger = createLogger({ namespace: "user-fetch", level: "info" });
+const logger = createLogger({ namespace: "user", level: "info" });
+const client = new ApiClient({ baseUrl: "https://api.service.local" });
 
-const api = new ApiClient({ baseUrl: "https://api.service.local" });
-
-const profile = await withTiming("fetch-profile", async () => {
-    return await api.get("/profiles/123");
-}, { logger });
-
-logger.info("Profile fetched", { duration: profile });
+const response = await withTiming("fetch-user", () => client.get("/users/123"), {
+    logger,
+});
+logger.info("Fetch-user complete", { durationMs: response });
 ```
 
-### Q2: Explain how to dynamically adjust the `ApiClient` base URL based on whether the code runs in Node.js or the browser.
+### Q2: How can I dynamically choose the ApiClient base URL for Node vs the browser?
 
-Instantiate `EnvManager` once and prefer a browser-relative path when `window` exists; fall back to an env-var driven host on the server.
+Use `typeof window` to detect the runtime and let `EnvManager` drive the server address while defaulting to a relative path in the browser.
 
 ```ts
 import { ApiClient, EnvManager } from "bytekit";
@@ -45,135 +43,88 @@ const baseUrl =
 const client = new ApiClient({ baseUrl });
 ```
 
-### Q3: Implement a validation check for a URL string using ByteKit's built-in `ResponseValidator`.
+### Q3: How do I validate an HTTP response using ByteKit’s validators?
+
+Supply a `ResponseValidator` schema or a `SchemaAdapter` to the request options. If validation fails, `ApiClient` throws detailed errors you can log, metric, or surface to the user.
 
 ```ts
-import { ResponseValidator } from "bytekit";
+import { ApiClient, ResponseValidator } from "bytekit";
 
-const schema = {
-    type: "string",
-    pattern: /^https?:\\/\\/[\\w\\-]+(\\.[\\w\\-]+)+([\\w\\-.,@?^=%&:/~+#]*[\\w\\-@?^=%&/~+#])?$/
-};
-
-const input = "https://bytekit.dev/docs";
-const errors = ResponseValidator.validate(input, schema);
-if (errors.length) {
-    throw new Error("URL validation failed: " + errors.map((err) => err.message).join(", "));
-}
+const client = new ApiClient({ baseUrl: "https://api.service.local" });
+await client.get("/products", {
+    validateResponse: {
+        type: "object",
+        properties: {
+            id: { type: "string", required: true },
+            price: { type: "number", required: true },
+        },
+    },
+});
 ```
 
-### Q4: Demonstrate how to store and retrieve a complex JavaScript object using `StorageManager`.
+### Q4: How do I catch and log localized API errors?
 
-`StorageManager` serializes JSON for you, tracks TTL, and cleans up expired entries.
-
-```ts
-import { StorageManager } from "bytekit";
-
-const storage = new StorageManager();
-storage.set(
-    "session",
-    { userId: "u1", tokens: { access: "xxxx", refresh: "yyyy" } },
-    5 * 60 * 1000
-);
-
-const session = storage.get<{ userId: string }>("session");
-console.log(session?.userId);
-```
-
-### Q5: Show how to coordinate multiple HTTP calls and wait for every result with ByteKit's async helpers.
-
-```ts
-import { parallel } from "bytekit/async";
-import { ApiClient } from "bytekit";
-
-const api = new ApiClient({ baseUrl: "https://api.service.local" });
-
-const [users, settings] = await parallel(
-    [
-        () => api.get("/users", { validateResponse: { type: "array" } }),
-        () => api.get("/settings"),
-    ],
-    { concurrency: 2 }
-);
-
-console.log(users.length, settings);
-```
-
-### Q6: Provide a code snippet illustrating how to measure the execution time of a function using `Profiler`.
-
-```ts
-import { Profiler } from "bytekit";
-
-const profiler = new Profiler("import-job");
-profiler.start("download");
-await downloadAssets();
-profiler.end("download");
-
-profiler.start("hydrate");
-await hydrateDatabase();
-profiler.end("hydrate");
-
-console.log(profiler.summary());
-```
-
-### Q7: Implement a structured logger using `createLogger` that outputs messages with a custom namespace.
-
-```ts
-import { createLogger } from "bytekit";
-
-const logger = createLogger({ namespace: "orders", level: "info" });
-logger.info("Order created", { orderId: "ORD-123" });
-```
-
-### Q8: Show how to make an `ApiClient` request and handle a localized error message on failure.
+`ApiClient` normalizes errors into `ApiError` instances that expose status, message, body, and a localized message depending on the configured `locale`. Wrap your call in a `try/catch` and inspect the error properties.
 
 ```ts
 import { ApiClient, ApiError } from "bytekit";
 
 const api = new ApiClient({
     baseUrl: "https://api.service.local",
-    locale: "es"
+    locale: "es",
 });
 
 try {
     await api.post("/orders", { body: JSON.stringify({ product: "coffee" }) });
 } catch (error) {
     if (error instanceof ApiError) {
-        console.error("✖", error.message, "status", error.status);
+        console.error("ApiError", error.status, error.message, error.body);
     } else {
         throw error;
     }
 }
 ```
 
-### Q9: Demonstrate how to configure the `ApiClient` to automatically retry failed requests a specified number of times.
+### Q5: How can I combine retries, circuit breaking, and rate limiting?
+
+Pass `retryPolicy`, `circuitBreaker`, and `rateLimiter` configuration into the `ApiClient`. Retries handle transient failures, the circuit breaker pauses calls after repeated errors, and the rate limiter keeps you under throughput caps.
 
 ```ts
-import { ApiClient } from "bytekit";
-
-const api = new ApiClient({
+const client = new ApiClient({
     baseUrl: "https://api.service.local",
-    retryPolicy: {
-        maxAttempts: 5,
-        initialDelayMs: 200,
-        backoffMultiplier: 2,
-    }
+    retryPolicy: { maxAttempts: 4, initialDelayMs: 200, backoffMultiplier: 2 },
+    circuitBreaker: { failureThreshold: 5, timeoutMs: 30_000 },
+    rateLimiter: { requestsPerInterval: 10, intervalMs: 1_000 },
 });
-
-await api.get("/unstable-endpoint");
+await client.get("/inventory");
 ```
 
-### Q10: Explain how to keep request results cached with `CacheManager` and inspect hit/miss statistics.
+### Q6: How do I prevent duplicate requests and cache responses?
+
+Enable `RequestDeduplicator` and `RequestCache` through `ApiClient` options. Deduplication shares a pending promise when the same request is in flight, while the cache short-circuits identical GETs.
 
 ```ts
-import { CacheManager } from "bytekit";
+const client = new ApiClient({
+    baseUrl: "https://api.service.local",
+    requestCache: { ttlMs: 60_000 },
+    requestDeduplicator: true,
+});
+const [first, second] = await Promise.all([
+    client.get("/stats"),
+    client.get("/stats"),
+]);
+```
 
-const cache = new CacheManager({ defaultTTL: 60_000, enableLocalStorage: true });
-cache.set("profile", { name: "Luisa" });
+### Q7: How can I add structured logging around HTTP retries?
 
-if (cache.has("profile")) {
-    console.log("cached", cache.get("profile"));
-}
+Create a logger and pass it to `ApiClient`. The logger records each attempt; use its `child` namespaces to separate concerns.
 
-console.log("stats", cache.getStats());
+```ts
+import { createLogger } from "bytekit";
+
+const logger = createLogger({ namespace: "api", level: "info" });
+const client = new ApiClient({ baseUrl: "https://api.service.local", logger });
+
+await client.get("/events");
+logger.info("Events fetched");
 ```
