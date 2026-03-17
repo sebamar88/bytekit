@@ -1,5 +1,5 @@
 import { Logger } from "#core/Logger.js";
-import { StringUtils } from "#helpers/StringUtils.js";
+import { QueryStringHelper } from "#helpers/QueryStringHelper.js";
 import { retry as retryFn } from "../async/retry.js";
 import {
     RetryPolicy,
@@ -11,6 +11,7 @@ import {
     ResponseValidator,
     ValidationSchema,
 } from "#core/ResponseValidator.js";
+import { SchemaAdapter, isSchemaAdapter } from "./SchemaAdapter.js";
 
 export type QueryParamValue = string | number | boolean | null | undefined;
 export type QueryParam =
@@ -44,12 +45,12 @@ export interface ApiClientConfig {
     circuitBreaker?: CircuitBreakerConfig;
 }
 
-export interface RequestOptions extends Omit<RequestInit, "body"> {
+export interface RequestOptions<TResponse = unknown> extends Omit<RequestInit, "body"> {
     searchParams?: Record<string, QueryParam>;
     body?: FormData | string | Blob | ArrayBuffer | Record<string, unknown>;
     errorLocale?: Locale;
     timeoutMs?: number;
-    validateResponse?: ValidationSchema;
+    validateResponse?: ValidationSchema | SchemaAdapter<TResponse>;
     skipRetry?: boolean;
     skipInterceptors?: boolean;
     logHeaders?: boolean;
@@ -72,7 +73,8 @@ export interface FilterParams {
 
 export interface ListOptions<
     TFilter extends FilterParams = FilterParams,
-> extends Omit<RequestOptions, "searchParams"> {
+    TResponse = unknown
+> extends Omit<RequestOptions<TResponse>, "searchParams"> {
     pagination?: PaginationParams;
     sort?: SortParams;
     filters?: TFilter;
@@ -261,7 +263,7 @@ export class ApiClient {
     // -------------------------
     // Core request shortcuts
     // -------------------------
-    async get<T>(path: string, options?: RequestOptions) {
+    async get<T>(path: string, options?: RequestOptions<T>) {
         return this.request<T>(path, { ...options, method: "GET" });
     }
 
@@ -277,28 +279,28 @@ export class ApiClient {
      *   headers: { "X-Custom": "value" }
      * })
      */
-    async post<T>(path: string, bodyOrOptions?: RequestOptions | unknown) {
-        const options = this.normalizeBodyOrOptions(bodyOrOptions);
+    async post<T>(path: string, bodyOrOptions?: RequestOptions<T> | unknown) {
+        const options = this.normalizeBodyOrOptions<T>(bodyOrOptions);
         return this.request<T>(path, { ...options, method: "POST" });
     }
 
     /**
      * PUT request - Acepta body directamente o RequestOptions
      */
-    async put<T>(path: string, bodyOrOptions?: RequestOptions | unknown) {
-        const options = this.normalizeBodyOrOptions(bodyOrOptions);
+    async put<T>(path: string, bodyOrOptions?: RequestOptions<T> | unknown) {
+        const options = this.normalizeBodyOrOptions<T>(bodyOrOptions);
         return this.request<T>(path, { ...options, method: "PUT" });
     }
 
     /**
      * PATCH request - Acepta body directamente o RequestOptions
      */
-    async patch<T>(path: string, bodyOrOptions?: RequestOptions | unknown) {
-        const options = this.normalizeBodyOrOptions(bodyOrOptions);
+    async patch<T>(path: string, bodyOrOptions?: RequestOptions<T> | unknown) {
+        const options = this.normalizeBodyOrOptions<T>(bodyOrOptions);
         return this.request<T>(path, { ...options, method: "PATCH" });
     }
 
-    async delete<T>(path: string, options?: RequestOptions) {
+    async delete<T>(path: string, options?: RequestOptions<T>) {
         return this.request<T>(path, { ...options, method: "DELETE" });
     }
 
@@ -307,7 +309,7 @@ export class ApiClient {
     // -------------------------
     async getList<T, TFilter extends FilterParams = FilterParams>(
         path: string,
-        options?: ListOptions<TFilter>
+        options?: ListOptions<TFilter, PaginatedResponse<T>>
     ): Promise<PaginatedResponse<T>> {
         const searchParams: Record<string, QueryParam> = {};
 
@@ -424,34 +426,40 @@ export class ApiClient {
      */
     private async processResponse<T>(
         response: Response,
-        validateResponse?: ValidationSchema
+        validateResponse?: ValidationSchema | SchemaAdapter<T>
     ): Promise<T> {
         if (response.status === 204) {
             return undefined as T;
         }
 
         const contentType = response.headers.get("content-type") || "";
-        let data: T;
+        let data: unknown;
 
         if (/json/i.test(contentType)) {
-            data = (await response.json()) as T;
+            data = await response.json();
         } else {
-            data = (await response.text()) as unknown as T;
+            data = await response.text();
         }
 
         // Validate response if schema provided
         if (validateResponse) {
-            const errors = ResponseValidator.validate(data, validateResponse);
-            if (errors.length > 0) {
-                throw new Error(
-                    `Response validation failed: ${errors
-                        .map((e) => e.message)
-                        .join(", ")}`
-                );
+            if (isSchemaAdapter(validateResponse)) {
+                // Use SchemaAdapter (Zod/Valibot/etc.)
+                return validateResponse.parse(data);
+            } else {
+                // Use built-in ResponseValidator
+                const errors = ResponseValidator.validate(data, validateResponse as ValidationSchema);
+                if (errors.length > 0) {
+                    throw new Error(
+                        `Response validation failed: ${errors
+                            .map((e) => e.message)
+                            .join(", ")}`
+                    );
+                }
             }
         }
 
-        return data;
+        return data as T;
     }
 
     /**
@@ -489,7 +497,7 @@ export class ApiClient {
         throw err;
     }
 
-    async request<T>(path: string, options: RequestOptions = {}): Promise<T> {
+    async request<T>(path: string, options: RequestOptions<T> = {}): Promise<T> {
         const {
             validateResponse,
             skipRetry,
@@ -591,16 +599,16 @@ export class ApiClient {
      * 1. Body directo: post("/path", { name: "John" })
      * 2. RequestOptions: post("/path", { body: {...}, headers: {...} })
      */
-    private normalizeBodyOrOptions(
-        bodyOrOptions?: RequestOptions | unknown
-    ): RequestOptions {
+    private normalizeBodyOrOptions<T>(
+        bodyOrOptions?: RequestOptions<T> | unknown
+    ): RequestOptions<T> {
         if (!bodyOrOptions) {
             return {};
         }
 
         // Si tiene propiedades típicas de RequestOptions, tratarlo como options
         if (this.isRequestOptions(bodyOrOptions)) {
-            return bodyOrOptions as RequestOptions;
+            return bodyOrOptions as RequestOptions<T>;
         }
 
         // Caso contrario, tratarlo como body directo
@@ -731,7 +739,7 @@ export class ApiClient {
         const url = new URL(normalized, this.baseUrl);
 
         if (params) {
-            const queryString = StringUtils.toQueryString(
+            const queryString = QueryStringHelper.stringify(
                 params as Record<string, unknown>
             );
             if (queryString) {

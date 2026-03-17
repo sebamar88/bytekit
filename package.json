@@ -1,7 +1,7 @@
 {
     "name": "bytekit",
     "description": "Lightning-fast TypeScript utilities: Isomorphic API client, Async toolkit (retry, debounce, parallel), QueryClient for state management, and CLI for Swagger/OpenAPI type generation.",
-    "version": "1.0.31",
+    "version": "1.0.32",
     "type": "module",
     "imports": {
         "#core/*": "./dist/utils/core/*",
@@ -30,6 +30,14 @@
             "types": "./dist/utils/core/ResponseValidator.d.ts",
             "import": "./dist/utils/core/ResponseValidator.js"
         },
+        "./schema-adapter": {
+            "types": "./dist/utils/core/SchemaAdapter.d.ts",
+            "import": "./dist/utils/core/SchemaAdapter.js"
+        },
+        "./async": {
+            "types": "./dist/utils/async/index.d.ts",
+            "import": "./dist/utils/async/index.js"
+        },
         "./logger": {
             "types": "./dist/utils/core/Logger.d.ts",
             "import": "./dist/utils/core/Logger.js"
@@ -41,18 +49,6 @@
         "./debug": {
             "types": "./dist/utils/core/debug.d.ts",
             "import": "./dist/utils/core/debug.js"
-        },
-        "./date-utils": {
-            "types": "./dist/utils/helpers/DateUtils.d.ts",
-            "import": "./dist/utils/helpers/DateUtils.js"
-        },
-        "./string-utils": {
-            "types": "./dist/utils/helpers/StringUtils.d.ts",
-            "import": "./dist/utils/helpers/StringUtils.js"
-        },
-        "./validator": {
-            "types": "./dist/utils/helpers/Validator.d.ts",
-            "import": "./dist/utils/helpers/Validator.js"
         },
         "./env-manager": {
             "types": "./dist/utils/helpers/EnvManager.d.ts",
@@ -74,10 +70,6 @@
             "types": "./dist/utils/helpers/WebSocketHelper.d.ts",
             "import": "./dist/utils/helpers/WebSocketHelper.js"
         },
-        "./array-utils": {
-            "types": "./dist/utils/helpers/ArrayUtils.d.ts",
-            "import": "./dist/utils/helpers/ArrayUtils.js"
-        },
         "./cache-manager": {
             "types": "./dist/utils/helpers/CacheManager.d.ts",
             "import": "./dist/utils/helpers/CacheManager.js"
@@ -98,25 +90,9 @@
             "types": "./dist/utils/helpers/EventEmitter.d.ts",
             "import": "./dist/utils/helpers/EventEmitter.js"
         },
-        "./form-utils": {
-            "types": "./dist/utils/helpers/FormUtils.d.ts",
-            "import": "./dist/utils/helpers/FormUtils.js"
-        },
-        "./object-utils": {
-            "types": "./dist/utils/helpers/ObjectUtils.d.ts",
-            "import": "./dist/utils/helpers/ObjectUtils.js"
-        },
-        "./pagination-helper": {
-            "types": "./dist/utils/helpers/PaginationHelper.d.ts",
-            "import": "./dist/utils/helpers/PaginationHelper.js"
-        },
         "./polling-helper": {
             "types": "./dist/utils/helpers/PollingHelper.d.ts",
             "import": "./dist/utils/helpers/PollingHelper.js"
-        },
-        "./time-utils": {
-            "types": "./dist/utils/helpers/TimeUtils.d.ts",
-            "import": "./dist/utils/helpers/TimeUtils.js"
         },
         "./request-cache": {
             "types": "./dist/utils/core/RequestCache.d.ts",
@@ -133,42 +109,6 @@
         "./error-boundary": {
             "types": "./dist/utils/core/ErrorBoundary.d.ts",
             "import": "./dist/utils/core/ErrorBoundary.js"
-        },
-        "./batch-request": {
-            "types": "./dist/utils/core/BatchRequest.d.ts",
-            "import": "./dist/utils/core/BatchRequest.js"
-        },
-        "./http-status": {
-            "types": "./dist/utils/helpers/HttpStatusHelper.d.ts",
-            "import": "./dist/utils/helpers/HttpStatusHelper.js"
-        },
-        "./url-builder": {
-            "types": "./dist/utils/helpers/UrlBuilder.d.ts",
-            "import": "./dist/utils/helpers/UrlBuilder.js"
-        },
-        "./color-utils": {
-            "types": "./dist/utils/helpers/ColorUtils.d.ts",
-            "import": "./dist/utils/helpers/ColorUtils.js"
-        },
-        "./number-utils": {
-            "types": "./dist/utils/helpers/NumberUtils.d.ts",
-            "import": "./dist/utils/helpers/NumberUtils.js"
-        },
-        "./query-client": {
-            "types": "./dist/utils/core/QueryClient.d.ts",
-            "import": "./dist/utils/core/QueryClient.js"
-        },
-        "./query-state": {
-            "types": "./dist/utils/core/QueryState.d.ts",
-            "import": "./dist/utils/core/QueryState.js"
-        },
-        "./signal": {
-            "types": "./dist/utils/helpers/Signal.d.ts",
-            "import": "./dist/utils/helpers/Signal.js"
-        },
-        "./use-signal": {
-            "types": "./dist/utils/helpers/useSignal.d.ts",
-            "import": "./dist/utils/helpers/useSignal.js"
         }
     },
     "scripts": {
@@ -189,7 +129,6 @@
         "test:node:coverage": "vitest run --coverage",
         "test:all": "pnpm run test",
         "typecheck": "tsc --noEmit",
-        "wiki:generate": "node scripts/generate-wiki.js",
         "docs:generate": "typedoc",
         "docs:watch": "typedoc --watch",
         "docs:serve": "npx http-server docs/api -p 8080 -o",
@@ -231,6 +170,7 @@
         "c8": "^10.1.3",
         "eslint": "^9.0.0",
         "fast-check": "^4.5.2",
+        "fs-extra": "^11.3.4",
         "glob": "^10.3.10",
         "globals": "^15.0.0",
         "prettier": "^3.0.0",
@@ -239,7 +179,9 @@
         "typedoc-plugin-markdown": "^4.9.0",
         "typescript": "^5.9.3",
         "typescript-eslint": "^8.0.0",
-        "vitest": "^2.1.8"
+        "valibot": "^1.2.0",
+        "vitest": "^2.1.8",
+        "zod": "^4.3.6"
     },
     "peerDependencies": {
         "typescript": ">=4.5.0"

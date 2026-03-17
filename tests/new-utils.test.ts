@@ -656,54 +656,6 @@ test("CryptoUtils constant-time compares strings", () => {
 });
 
 // ============================================================================
-// PaginationHelper Tests
-// ============================================================================
-
-test("PaginationHelper paginates with offset mode", () => {
-    const items = Array.from({ length: 25 }, (_, i) => i + 1);
-    const paginator = new PaginationHelper(items, {
-        pageSize: 10,
-        mode: "offset",
-    });
-
-    const page1 = paginator.getCurrentPage();
-    assert.equal(page1.length, 10);
-    assert.deepEqual(page1, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
-});
-
-test("PaginationHelper navigates pages", () => {
-    const items = Array.from({ length: 25 }, (_, i) => i + 1);
-    const paginator = new PaginationHelper(items, { pageSize: 10 });
-
-    paginator.next();
-    const page2 = paginator.getCurrentPage();
-    assert.deepEqual(page2, [11, 12, 13, 14, 15, 16, 17, 18, 19, 20]);
-
-    paginator.previous();
-    const page1 = paginator.getCurrentPage();
-    assert.deepEqual(page1, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
-});
-
-test("PaginationHelper tracks state", () => {
-    const items = Array.from({ length: 25 }, (_, i) => i + 1);
-    const paginator = new PaginationHelper(items, { pageSize: 10 });
-
-    const state = paginator.getState();
-    assert.equal(state.currentPage, 1);
-    assert.equal(state.pageSize, 10);
-    assert.equal(state.total, 25);
-    assert.equal(state.totalPages, 3);
-    assert.equal(state.hasNextPage, true);
-    assert.equal(state.hasPreviousPage, false);
-});
-
-test("PaginationHelper factory function works", () => {
-    const items = [1, 2, 3];
-    const paginator = createPaginator(items, { pageSize: 10 });
-    assert.ok(paginator instanceof PaginationHelper);
-});
-
-// ============================================================================
 // CacheManager Tests
 // ============================================================================
 

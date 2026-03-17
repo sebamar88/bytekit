@@ -1,5 +1,4 @@
 export * from "#core/ApiClient.js";
-export * from "#core/BatchRequest.js";
 export * from "#core/Logger.js";
 export * from "#core/Profiler.js";
 export * from "#core/debug.js";
@@ -9,3 +8,4 @@ export * from "#core/RequestCache.js";
 export * from "#core/RateLimiter.js";
 export * from "#core/RequestDeduplicator.js";
 export * from "#core/ErrorBoundary.js";
+export * from "#core/SchemaAdapter.js";
