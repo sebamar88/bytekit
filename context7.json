@@ -1,18 +1,18 @@
 {
     "url": "https://context7.com/sebamar88/bytekit",
     "public_key": "pk_XoORr8O7CUjZDhhBsPmPO",
-    "description": "Lightning-fast, zero-dependency TypeScript utility suite featuring an isomorphic ApiClient with retries, a robust Async Toolkit (retry, parallel, debounce), and a CLI for Swagger/OpenAPI type generation.",
-    "categories": ["utilities", "async", "typescript", "cli", "api-client"],
+    "description": "Lightning-fast, zero-dependency TypeScript toolkit focusing on an Isomorphic HTTP client and advanced Async utilities (retry, parallel, debounce). Features native Zod/Valibot validation and OpenAPI type generation.",
+    "categories": ["utilities", "async", "typescript", "cli", "api-client", "http"],
     "documentation": {
         "guides": "docs/guides",
         "examples": "examples",
         "api": "docs/api"
     },
     "features": {
-        "api_client": "Isomorphic fetch wrapper with interceptors and circuit breakers",
-        "async_toolkit": "Retry with backoff, concurrency control, and AggregateError support",
-        "query_client": "Framework-agnostic state management and caching",
-        "cli_automation": "Generate types from Swagger/OpenAPI specifications",
-        "validation": "Comprehensive suite of validators for common data types"
+        "api_client": "Isomorphic fetch wrapper with interceptors, circuit breakers, and native schema validation (Zod/Valibot)",
+        "async_toolkit": "High-performance retry logic with backoff, concurrency control, and debounce/throttle utilities",
+        "http_helpers": "UrlSlug and QueryString helpers for robust URL manipulation and parameter handling",
+        "cli_automation": "Type-safe CLI for generating TypeScript interfaces from Swagger/OpenAPI 3.0+ specifications",
+        "reliability": "Built-in ErrorBoundary and Logger for structured monitoring and graceful failure recovery"
     }
 }
