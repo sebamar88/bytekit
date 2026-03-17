@@ -235,13 +235,90 @@ export class CryptoUtils {
     }
 
     /**
+     * Encrypt a string using AES-256-GCM
+     * @param str - Plaintext string to encrypt
+     * @param key - Secret key string
+     * @returns Base64 encoded string containing [iv:12bytes][ciphertext]
+     * @security Uses AES-GCM with a random 96-bit IV for each encryption
+     */
+    static async encrypt(str: string, key: string): Promise<string> {
+        const encoder = new TextEncoder();
+        const data = encoder.encode(str);
+
+        // Derive a 256-bit key from the input string using SHA-256
+        const keyHash = await this.hashBytes(key);
+
+        const cryptoKey = await globalThis.crypto.subtle.importKey(
+            "raw",
+            keyHash,
+            { name: "AES-GCM" },
+            false,
+            ["encrypt"]
+        );
+
+        const iv = globalThis.crypto.getRandomValues(new Uint8Array(12));
+        const encrypted = await globalThis.crypto.subtle.encrypt(
+            { name: "AES-GCM", iv },
+            cryptoKey,
+            data
+        );
+
+        const result = new Uint8Array(iv.length + encrypted.byteLength);
+        result.set(iv);
+        result.set(new Uint8Array(encrypted), iv.length);
+
+        return this.uint8ArrayToBase64(result);
+    }
+
+    /**
+     * Decrypt a string using AES-256-GCM
+     * @param encryptedBase64 - Base64 encoded string containing [iv:12bytes][ciphertext]
+     * @param key - Secret key string
+     * @returns Decrypted plaintext string
+     * @throws {Error} If decryption fails
+     */
+    static async decrypt(
+        encryptedBase64: string,
+        key: string
+    ): Promise<string> {
+        const combined = this.base64ToUint8Array(encryptedBase64);
+        if (combined.length < 13) {
+            throw new Error("Invalid encrypted data: too short");
+        }
+
+        const iv = combined.slice(0, 12);
+        const ciphertext = combined.slice(12);
+
+        const keyHash = await this.hashBytes(key);
+
+        const cryptoKey = await globalThis.crypto.subtle.importKey(
+            "raw",
+            keyHash,
+            { name: "AES-GCM" },
+            false,
+            ["decrypt"]
+        );
+
+        try {
+            const decrypted = await globalThis.crypto.subtle.decrypt(
+                { name: "AES-GCM", iv },
+                cryptoKey,
+                ciphertext
+            );
+
+            return new TextDecoder().decode(decrypted);
+        } catch (error) {
+            throw new Error(`Decryption failed: ${error}`);
+        }
+    }
+
+    /**
      * Encrypt string (simple XOR - NOT for production)
-     * For production, use proper encryption libraries like TweetNaCl or libsodium
-     * @deprecated XOR encryption is NOT cryptographically secure. Use proper encryption libraries.
+     * @deprecated XOR encryption is NOT cryptographically secure. Use encrypt() instead.
      */
     static xorEncrypt(str: string, key: string): string {
         console.warn(
-            "WARNING: XOR encryption is not cryptographically secure. Use proper encryption libraries like TweetNaCl or libsodium."
+            "WARNING: XOR encryption is not cryptographically secure. Use encrypt() for a secure alternative."
         );
         let result = "";
         for (let i = 0; i < str.length; i++) {
@@ -254,11 +331,11 @@ export class CryptoUtils {
 
     /**
      * Decrypt string (simple XOR - NOT for production)
-     * @deprecated XOR encryption is NOT cryptographically secure. Use proper encryption libraries.
+     * @deprecated XOR encryption is NOT cryptographically secure. Use decrypt() instead.
      */
     static xorDecrypt(encrypted: string, key: string): string {
         console.warn(
-            "WARNING: XOR encryption is not cryptographically secure. Use proper encryption libraries like TweetNaCl or libsodium."
+            "WARNING: XOR encryption is not cryptographically secure. Use decrypt() for a secure alternative."
         );
         const str = this.base64Decode(encrypted);
         let result = "";
@@ -268,6 +345,47 @@ export class CryptoUtils {
             );
         }
         return result;
+    }
+
+    /**
+     * Internal helper to hash a string and return bytes
+     */
+    private static async hashBytes(str: string): Promise<Uint8Array> {
+        const encoder = new TextEncoder();
+        const data = encoder.encode(str);
+        const hashBuffer = await globalThis.crypto.subtle.digest(
+            "SHA-256",
+            data
+        );
+        return new Uint8Array(hashBuffer);
+    }
+
+    /**
+     * Internal helper for bytes to base64
+     */
+    private static uint8ArrayToBase64(bytes: Uint8Array): string {
+        if (typeof Buffer !== "undefined") {
+            return Buffer.from(bytes).toString("base64");
+        }
+        const binaryString = Array.from(bytes, (byte) =>
+            String.fromCharCode(byte)
+        ).join("");
+        return globalThis.btoa(binaryString);
+    }
+
+    /**
+     * Internal helper for base64 to bytes
+     */
+    private static base64ToUint8Array(base64: string): Uint8Array {
+        if (typeof Buffer !== "undefined") {
+            return new Uint8Array(Buffer.from(base64, "base64"));
+        }
+        const binaryString = globalThis.atob(base64);
+        const bytes = new Uint8Array(binaryString.length);
+        for (let i = 0; i < binaryString.length; i++) {
+            bytes[i] = binaryString.charCodeAt(i);
+        }
+        return bytes;
     }
 
     /**
