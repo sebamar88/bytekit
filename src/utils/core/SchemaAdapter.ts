@@ -14,7 +14,9 @@ export interface SchemaAdapter<T = unknown> {
  * Since Zod schemas already have a `parse` method, this just provides type safety,
  * but you can also pass a Zod schema directly to `validateResponse`.
  */
-export function zodAdapter<T>(schema: { parse: (data: unknown) => T }): SchemaAdapter<T> {
+export function zodAdapter<T>(schema: {
+    parse: (data: unknown) => T;
+}): SchemaAdapter<T> {
     return {
         parse: (data: unknown) => schema.parse(data),
     };
@@ -23,11 +25,11 @@ export function zodAdapter<T>(schema: { parse: (data: unknown) => T }): SchemaAd
 /**
  * Adapter for Valibot schemas.
  * Wraps Valibot's `parse` function and schema into a SchemaAdapter.
- * 
+ *
  * @example
  * import { object, string } from "valibot";
  * import { valibotAdapter } from "bytekit";
- * 
+ *
  * const schema = object({ name: string() });
  * const adapter = valibotAdapter(schema, parse);
  */

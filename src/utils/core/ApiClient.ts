@@ -45,7 +45,10 @@ export interface ApiClientConfig {
     circuitBreaker?: CircuitBreakerConfig;
 }
 
-export interface RequestOptions<TResponse = unknown> extends Omit<RequestInit, "body"> {
+export interface RequestOptions<TResponse = unknown> extends Omit<
+    RequestInit,
+    "body"
+> {
     searchParams?: Record<string, QueryParam>;
     body?: FormData | string | Blob | ArrayBuffer | Record<string, unknown>;
     errorLocale?: Locale;
@@ -73,7 +76,7 @@ export interface FilterParams {
 
 export interface ListOptions<
     TFilter extends FilterParams = FilterParams,
-    TResponse = unknown
+    TResponse = unknown,
 > extends Omit<RequestOptions<TResponse>, "searchParams"> {
     pagination?: PaginationParams;
     sort?: SortParams;
@@ -448,7 +451,10 @@ export class ApiClient {
                 return validateResponse.parse(data);
             } else {
                 // Use built-in ResponseValidator
-                const errors = ResponseValidator.validate(data, validateResponse as ValidationSchema);
+                const errors = ResponseValidator.validate(
+                    data,
+                    validateResponse as ValidationSchema
+                );
                 if (errors.length > 0) {
                     throw new Error(
                         `Response validation failed: ${errors
@@ -497,7 +503,10 @@ export class ApiClient {
         throw err;
     }
 
-    async request<T>(path: string, options: RequestOptions<T> = {}): Promise<T> {
+    async request<T>(
+        path: string,
+        options: RequestOptions<T> = {}
+    ): Promise<T> {
         const {
             validateResponse,
             skipRetry,

@@ -9,28 +9,40 @@ describe("Schema Adapters for ApiClient", () => {
 
     beforeAll(() => {
         // Mock fetch for tests
-        globalThis.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
+        globalThis.fetch = async (
+            input: RequestInfo | URL,
+            init?: RequestInit
+        ) => {
             const url = input.toString();
 
             if (url.includes("/user/zod")) {
-                return new Response(JSON.stringify({ id: 1, name: "Alice", age: 30 }), {
-                    status: 200,
-                    headers: { "Content-Type": "application/json" },
-                });
+                return new Response(
+                    JSON.stringify({ id: 1, name: "Alice", age: 30 }),
+                    {
+                        status: 200,
+                        headers: { "Content-Type": "application/json" },
+                    }
+                );
             }
 
             if (url.includes("/user/valibot")) {
-                return new Response(JSON.stringify({ id: 2, name: "Bob", age: 25 }), {
-                    status: 200,
-                    headers: { "Content-Type": "application/json" },
-                });
+                return new Response(
+                    JSON.stringify({ id: 2, name: "Bob", age: 25 }),
+                    {
+                        status: 200,
+                        headers: { "Content-Type": "application/json" },
+                    }
+                );
             }
 
             if (url.includes("/user/invalid")) {
-                return new Response(JSON.stringify({ id: "invalid", name: 123 }), {
-                    status: 200,
-                    headers: { "Content-Type": "application/json" },
-                });
+                return new Response(
+                    JSON.stringify({ id: "invalid", name: 123 }),
+                    {
+                        status: 200,
+                        headers: { "Content-Type": "application/json" },
+                    }
+                );
             }
 
             return new Response("Not found", { status: 404 });

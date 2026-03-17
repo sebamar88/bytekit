@@ -21,7 +21,7 @@ const removeDiacritics = (value: string) =>
 export class UrlSlugHelper {
     /**
      * Converts a string into a URL-friendly slug.
-     * Examples: 
+     * Examples:
      * - "Mejores celulares para 2026" -> "mejores-celulares-para-2026"
      * - "Café & Té" -> "cafe-te"
      */
@@ -30,11 +30,11 @@ export class UrlSlugHelper {
         { separator = "-", lowercase = true }: SlugifyOptions = {}
     ): string {
         if (!value) return "";
-        
+
         const normalized = removeDiacritics(String(value));
         const base = lowercase ? normalized.toLowerCase() : normalized;
         const escapedSeparator = escapeRegExp(separator);
-        
+
         return base
             .replace(NON_ALPHANUMERIC_REGEX, separator)
             .replace(new RegExp(`${escapedSeparator}+`, "g"), separator)

@@ -7,13 +7,43 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.0.1] - 2026-03-17
+
+### Fixed
+
+- **Version Sync**: Synchronized Git version with npm registry after a versioning regression in the 1.0.3x series.
+- **Context7 Benchmark**: Updated project metadata to align with the new "HTTP & Async Toolkit" identity, improving documentation score.
+
+## [2.0.0] - 2026-03-16
+
 ### Changed
 
-- **BREAKING**: Removed `cross-fetch` dependency - now using native fetch globally
-    - ApiClient now uses `globalThis.fetch` by default (available in Node.js 18+)
-    - Project is now **true zero-dependencies** (except `tsx` for dev tooling)
-    - Updated documentation to reflect native fetch usage
-    - No API changes required - fully backward compatible for consumers
+- **BREAKING**: **Major Scope Reduction**. Bytekit has been refactored to focus strictly on **Isomorphic HTTP Networking** and **Advanced Async Utilities**.
+- **Removed Modules**: To reduce bundle size and maintenance surface, the following non-core modules were removed:
+    - `FormUtils`, `ColorUtils`, `DateUtils`, `ObjectUtils`, `ArrayUtils`, `TimeUtils`, `NumberUtils`.
+    - `QueryClient`, `QueryState`, `Signal`, `useSignal` (Reactivity modules).
+    - `BatchRequest`, `HttpStatusHelper`, `UrlBuilder`.
+- **Added**: `SchemaAdapter` interface with native **Zod** and **Valibot** support for `ApiClient`.
+- **Added**: Native support for `globalThis.fetch` as the default engine (zero-dependencies).
+- **Improved**: `AsyncToolkit` is now a primary export path (`bytekit/async`).
+- **Improved**: Isolated core string utilities into `UrlSlugHelper` and `QueryStringHelper`.
+- **Documentation**: Migrated to TypeDoc for automated API documentation.
+
+## [1.0.33] - 2026-03-17
+
+### Fixed
+
+- Internal maintenance and versioning cleanup.
+
+## [1.0.32] - 2026-03-16
+
+### Changed
+
+- Initial implementation of the v2 refactor (re-labeled as 2.0.0).
+
+## [Unreleased]
+
+### Changed
 
 ## [1.0.21] - 2026-02-06
 

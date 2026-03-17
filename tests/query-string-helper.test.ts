@@ -24,17 +24,17 @@ describe("QueryStringHelper", () => {
         const qs = QueryStringHelper.stringify(params);
         expect(qs).toBe("a=1&b=2&b=3&c%5Bd%5D=4&f=");
 
-        expect(QueryStringHelper.stringify(params, { arrayFormat: "bracket" })).toBe(
-            "a=1&b%5B%5D=2&b%5B%5D=3&c%5Bd%5D=4&f="
-        );
-        
-        expect(QueryStringHelper.stringify(params, { arrayFormat: "comma" })).toBe(
-            "a=1&b=2%2C3&c%5Bd%5D=4&f="
-        );
-        
-        expect(QueryStringHelper.stringify(params, { skipEmptyString: true })).toBe(
-            "a=1&b=2&b=3&c%5Bd%5D=4"
-        );
+        expect(
+            QueryStringHelper.stringify(params, { arrayFormat: "bracket" })
+        ).toBe("a=1&b%5B%5D=2&b%5B%5D=3&c%5Bd%5D=4&f=");
+
+        expect(
+            QueryStringHelper.stringify(params, { arrayFormat: "comma" })
+        ).toBe("a=1&b=2%2C3&c%5Bd%5D=4&f=");
+
+        expect(
+            QueryStringHelper.stringify(params, { skipEmptyString: true })
+        ).toBe("a=1&b=2&b=3&c%5Bd%5D=4");
     });
 
     it("should return empty string with no params", () => {
