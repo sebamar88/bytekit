@@ -30,11 +30,11 @@
         "lib": ["ES2020", "ES2021", "ES2022", "DOM"],
         "moduleResolution": "node",
         "paths": {
-            "#core/*": ["./utils/core/*"],
-            "#helpers/*": ["./utils/helpers/*"],
-            "#utils/*": ["./utils/*"]
+            "#core/*": ["src/utils/core/*"],
+            "#helpers/*": ["src/utils/helpers/*"],
+            "#utils/*": ["src/utils/*"]
         },
-        "baseUrl": "./src"
+        "baseUrl": "."
     },
     "include": ["src"],
     "exclude": ["node_modules", "dist"],
