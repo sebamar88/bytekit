@@ -1,145 +1,49 @@
-# API Documentation
+# API Reference
 
-Complete API reference for bytekit modules.
+Welcome to the **bytekit** API reference. This document provides an overview of all available modules in the current version (**v2.0.1+**).
 
-## 📚 Core Modules
+## 🌐 Networking & Resilience
 
-### ApiClient
+Core modules for making robust, type-safe HTTP requests.
 
-Complete HTTP client with retry policies, circuit breaker, and caching.
+- **[ApiClient](./api/classes/ApiClient.md)** - Isomorphic fetch wrapper with interceptors, circuit breakers, and native schema validation support.
+- **[RetryPolicy](./api/classes/RetryPolicy.md)** - Configurable retry logic with exponential backoff and jitter.
+- **[ResponseValidator](./api/classes/ResponseValidator.md)** - Utilities for manual response body validation.
+- **[SchemaAdapter](./api/interfaces/SchemaAdapter.md)** - Native adapters for **Zod** and **Valibot** validation.
+- **[RequestCache](./api/classes/RequestCache.md)** - In-memory caching for idempotent requests.
+- **[RequestDeduplicator](./api/classes/RequestDeduplicator.md)** - Prevent duplicate concurrent requests.
+- **[RateLimiter](./api/classes/RateLimiter.md)** - Token bucket and sliding window rate limiting.
+- **[ErrorBoundary](./api/classes/ErrorBoundary.md)** - Global error normalization and recovery.
 
-**[→ View Full ApiClient Documentation](./api/ApiClient.md)**
+## ⚡ Async Toolkit (`bytekit/async`)
 
-### Logger
+High-performance utilities for concurrency and execution control.
 
-Structured logging with namespaces, levels, and custom transports.
+- **Concurrency**: `parallel`, `race`, `allSettled`, `sequential`.
+- **Execution**: `retry`, `debounceAsync`, `throttleAsync`.
+- **Timing**: `sleep`, `timeout`.
 
-**[→ View Full Logger Documentation](./api/Logger.md)**
+## 🪵 Observability & Debugging
 
-### Profiler
+- **[Logger](./api/classes/Logger.md)** - Structured, isomorphic logging with levels and namespaces.
+- **[Profiler](./api/classes/Profiler.md)** - Precision performance measurements for async operations.
+- **[Debug](./api/modules/debug.md)** - Diagnostic utilities for development.
 
-Performance profiling and timing utilities.
+## 🛠️ Specialized Helpers
 
-**[→ View Full Profiler Documentation](./api/Profiler.md)**
-
----
-
-## 🔧 Helper Modules
-
-### DateUtils
-
-Date manipulation and formatting utilities.
-
-**[→ View Full DateUtils Documentation](./api/DateUtils.md)**
-
-### StringUtils
-
-String manipulation, formatting, and validation utilities.
-
-**[→ View Full StringUtils Documentation](./api/StringUtils.md)**
-
-### ArrayUtils
-
-Array manipulation and functional programming utilities.
-
-**[→ View Full ArrayUtils Documentation](./api/ArrayUtils.md)**
-
-### ObjectUtils
-
-Object manipulation and transformation utilities.
-
-**[→ View Full ObjectUtils Documentation](./api/ObjectUtils.md)**
-
-### NumberUtils
-
-Number formatting and manipulation utilities.
-
-**[→ View Full NumberUtils Documentation](./api/NumberUtils.md)**
+- **[UrlSlugHelper](./api/classes/UrlSlugHelper.md)** - SEO-friendly URL slug generation.
+- **[QueryStringHelper](./api/classes/QueryStringHelper.md)** - Robust object-to-query-string serialization.
+- **[FileUploadHelper](./api/classes/FileUploadHelper.md)** - Multipart upload management with progress tracking.
+- **[StreamingHelper](./api/classes/StreamingHelper.md)** - Utilities for handling Server-Sent Events (SSE) and streams.
+- **[WebSocketHelper](./api/classes/WebSocketHelper.md)** - Typed WebSocket wrapper with automatic reconnection.
+- **[EventEmitter](./api/classes/EventEmitter.md)** - High-performance, type-safe event emitter.
+- **[CacheManager](./api/classes/CacheManager.md)** - Advanced TTL-based caching strategies.
+- **[CryptoUtils](./api/classes/CryptoUtils.md)** - Secure hashing and UUID generation.
+- **[CompressionUtils](./api/classes/CompressionUtils.md)** - Data compression and decompression (gzip/deflate).
+- **[DiffUtils](./api/classes/DiffUtils.md)** - Deep object and array diffing.
+- **[PollingHelper](./api/classes/PollingHelper.md)** - Configurable polling with intelligent backoff.
+- **[EnvManager](./api/classes/EnvManager.md)** - Isomorphic environment variable management.
 
 ---
 
-## 🛠️ Utility Modules
-
-### CacheManager
-
-In-memory and localStorage caching with TTL support.
-
-**[→ View Full CacheManager Documentation](./api/CacheManager.md)**
-
-### StorageManager
-
-Type-safe localStorage/sessionStorage wrapper.
-
-**[→ View Full StorageManager Documentation](./api/StorageManager.md)**
-
-### FormUtils
-
-Form handling, validation, and state management.
-
-**[→ View Full FormUtils Documentation](./api/FormUtils.md)**
-
-### CryptoUtils
-
-Cryptographic utilities for hashing and token generation.
-
-**[→ View Full CryptoUtils Documentation](./api/CryptoUtils.md)**
-
-### Validator
-
-Input validation utilities for common data types.
-
-**[→ View Full Validator Documentation](./api/Validator.md)**
-
----
-
-## 🔗 Additional Modules
-
-- **[RateLimiter](./api/RateLimiter.md)** - Rate limiting for API calls
-- **[WebSocketHelper](./api/WebSocketHelper.md)** - WebSocket connection management
-- **[StreamingHelper](./api/StreamingHelper.md)** - Server-sent events and streaming
-- **[ErrorBoundary](./api/ErrorBoundary.md)** - Error handling and recovery
-- **[EventEmitter](./api/EventEmitter.md)** - Pub/sub event system
-- **[SignalManager](./api/SignalManager.md)** - Signal-based state management
-- **[EnvManager](./api/EnvManager.md)** - Environment variable management
-
----
-
-## 🔍 Generating API Docs
-
-We're currently setting up automated API documentation generation using TypeDoc.
-
-In the meantime, you can:
-
-1. **Browse the source code** - All modules have comprehensive JSDoc comments
-2. **Check the guides** - [Getting Started](../guides/GETTING_STARTED.md) and [Advanced Usage](../guides/ADVANCED_USAGE.md)
-3. **Try the examples** - [Examples & Snippets](../examples/README.md)
-
-### Future: TypeDoc Integration
-
-Coming soon:
-
-```bash
-# Generate API documentation
-pnpm run docs:generate
-
-# Serve documentation locally
-pnpm run docs:serve
-```
-
-This will create a fully searchable API reference with:
-
-- Complete function signatures
-- Parameter descriptions
-- Return types
-- Usage examples
-- Cross-references between modules
-
----
-
-## 💡 Contributing to Documentation
-
-Want to help improve the API documentation? Check out our [Contributing Guide](../../CONTRIBUTING.md).
-
----
-
-**[← Back to Main Documentation](../../README.md)**
+> **Note**: Modules like `DateUtils`, `StringUtils`, `QueryClient`, and others were removed in **v2.0.0** as part of our focus on the core HTTP & Async identity. For more details, see the [v2 Improvements Guide](./API_CLIENT_V2_IMPROVEMENTS.md).
