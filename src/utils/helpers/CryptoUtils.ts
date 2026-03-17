@@ -250,15 +250,15 @@ export class CryptoUtils {
 
         const cryptoKey = await globalThis.crypto.subtle.importKey(
             "raw",
-            keyHash.buffer,
-            { name: "AES-GCM" },
+            keyHash,
+            { name: "AES-GCM" } as any,
             false,
             ["encrypt"]
         );
 
         const iv = globalThis.crypto.getRandomValues(new Uint8Array(12));
         const encrypted = await globalThis.crypto.subtle.encrypt(
-            { name: "AES-GCM", iv },
+            { name: "AES-GCM", iv } as any,
             cryptoKey,
             data
         );
@@ -293,15 +293,15 @@ export class CryptoUtils {
 
         const cryptoKey = await globalThis.crypto.subtle.importKey(
             "raw",
-            keyHash.buffer,
-            { name: "AES-GCM" },
+            keyHash,
+            { name: "AES-GCM" } as any,
             false,
             ["decrypt"]
         );
 
         try {
             const decrypted = await globalThis.crypto.subtle.decrypt(
-                { name: "AES-GCM", iv },
+                { name: "AES-GCM", iv } as any,
                 cryptoKey,
                 ciphertext
             );
