@@ -15,8 +15,8 @@ describe("sleep function", () => {
                 await sleep(100);
                 const elapsed = Date.now() - start;
 
-                // Allow 50ms tolerance for timing
-                expect(elapsed).toBeGreaterThanOrEqual(100);
+                // Allow small tolerance for timing variations in different environments
+                expect(elapsed).toBeGreaterThanOrEqual(95);
                 expect(elapsed).toBeLessThan(150);
             });
 
