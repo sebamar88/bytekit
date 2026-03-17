@@ -86,11 +86,15 @@ export async function generateFromSwagger(
             return;
         }
 
-        let typeDefinitions = `/**\n * Auto-generated types from Swagger/OpenAPI\n * Generated at ${new Date().toISOString()}\n */\n\n`;
+        const typeDefinitionsArray = [
+            `/**\n * Auto-generated types from Swagger/OpenAPI\n * Generated at ${new Date().toISOString()}\n */`,
+        ];
 
         for (const [name, schema] of Object.entries(schemas)) {
-            typeDefinitions += generateInterface(name, schema as any) + "\n\n";
+            typeDefinitionsArray.push(generateInterface(name, schema as any));
         }
+
+        const typeDefinitions = typeDefinitionsArray.join("\n\n") + "\n\n";
 
         const outputPath = path.join(process.cwd(), output);
         const outputDir = path.dirname(outputPath);
