@@ -1,0 +1,82 @@
+{
+  "$schema": "https://mintlify.com/schema.json",
+  "name": "bytekit",
+  "logo": {
+    "light": "/logo/light.svg",
+    "dark": "/logo/dark.svg"
+  },
+  "favicon": "/favicon.png",
+  "colors": {
+    "primary": "#3b82f6",
+    "light": "#60a5fa",
+    "dark": "#1d4ed8",
+    "anchors": {
+      "from": "#3b82f6",
+      "to": "#93c5fd"
+    }
+  },
+  "topbarLinks": [
+    {
+      "name": "Support",
+      "url": "https://github.com/sebamar88/bytekit/issues"
+    }
+  ],
+  "topbarCtaButton": {
+    "name": "GitHub",
+    "url": "https://github.com/sebamar88/bytekit"
+  },
+  "tabs": [
+    {
+      "name": "Guides",
+      "url": "docs/guides"
+    },
+    {
+      "name": "API Reference",
+      "url": "docs/api"
+    }
+  ],
+  "navigation": [
+    {
+      "group": "Get Started",
+      "pages": [
+        "README",
+        "docs/guides/GETTING_STARTED"
+      ]
+    },
+    {
+      "group": "Core Concepts",
+      "pages": [
+        "docs/guides/BEST_PRACTICES",
+        "docs/guides/ADVANCED_USAGE"
+      ]
+    },
+    {
+      "group": "Features",
+      "pages": [
+        "docs/guides/ASYNC_UTILITIES",
+        "docs/guides/QUERY_CLIENT_STATE",
+        "docs/guides/CLI_AUTOMATION"
+      ]
+    },
+    {
+      "group": "API Reference",
+      "pages": [
+        "docs/API",
+        "docs/ERROR_HANDLING_COMPARISON",
+        "docs/BACKWARD_COMPATIBILITY",
+        "docs/CONTEXT7"
+      ]
+    },
+    {
+      "group": "Releases",
+      "pages": [
+        "CHANGELOG",
+        "docs/RELEASE_NOTES_v1.0.3",
+        "docs/API_CLIENT_V2_IMPROVEMENTS"
+      ]
+    }
+  ],
+  "footerSocials": {
+    "github": "https://github.com/sebamar88/bytekit"
+  }
+}
