@@ -250,7 +250,7 @@ export class CryptoUtils {
 
         const cryptoKey = await globalThis.crypto.subtle.importKey(
             "raw",
-            keyHash,
+            keyHash.buffer,
             { name: "AES-GCM" },
             false,
             ["encrypt"]
@@ -293,7 +293,7 @@ export class CryptoUtils {
 
         const cryptoKey = await globalThis.crypto.subtle.importKey(
             "raw",
-            keyHash,
+            keyHash.buffer,
             { name: "AES-GCM" },
             false,
             ["decrypt"]
