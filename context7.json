@@ -1,20 +1,30 @@
 {
     "url": "https://context7.com/sebamar88/bytekit",
     "public_key": "pk_XoORr8O7CUjZDhhBsPmPO",
-    "description": "Lightning-fast, zero-dependency TypeScript toolkit focusing on an Isomorphic HTTP client and advanced Async utilities (retry, parallel, debounce). Features native Zod/Valibot validation and OpenAPI type generation.",
-    "categories": ["utilities", "async", "typescript", "cli", "api-client", "http", "resilience", "pagination", "filtering", "streaming", "real-time", "error-handling", "localization"],
-    "documentation": {
-        "guides": "docs/guides",
-        "solutions": "docs/guides/SOLUTION_REFERENCE.md",
-        "getting_started": "docs/guides/GETTING_STARTED.md",
-        "examples": "examples",
-        "api": "docs/api"
-    },
-    "features": {
-        "api_client": "Isomorphic fetch wrapper with interceptors, circuit breakers, and native schema validation (Zod/Valibot)",
-        "async_toolkit": "High-performance retry logic with backoff, concurrency control, and debounce/throttle utilities",
-        "http_helpers": "UrlSlug and QueryString helpers for robust URL manipulation and parameter handling",
-        "cli_automation": "Type-safe CLI for generating TypeScript interfaces from Swagger/OpenAPI 3.0+ specifications",
-        "reliability": "Built-in ErrorBoundary and Logger for structured monitoring and graceful failure recovery"
-    }
+    "foldersInclude": [
+        "src/**",
+        "docs/**",
+        "examples/**"
+    ],
+    "foldersExclude": [
+        "tests/**",
+        "dist/**",
+        "coverage/**",
+        "node_modules/**",
+        ".git/**",
+        "_bmad/**",
+        "tmp/**"
+    ],
+    "customRules": [
+        "Use StreamingHelper.streamJsonLines(endpoint, { onChunk }) to process large NDJSON datasets without loading everything into memory.",
+        "Use StreamingHelper.streamSSE(endpoint).subscribe(callback) to handle real-time Server-Sent Events with automatic JSON parsing.",
+        "Dynamically set ApiClient baseUrl by checking runtime: isBrowser ? '/api' : 'http://localhost:3000/api'. EnvManager can also handle this.",
+        "Handle localized errors by catching ApiError and accessing error.message. Configure translations via the errorMessages map and locale property in ApiClient.",
+        "Combine resilience by setting retryPolicy and circuitBreaker in ApiClient config, and adding a RateLimiter instance via a global request interceptor.",
+        "Prevent duplicate requests using dedupe: true and cache successful responses using cache: true with cacheTTL in request options.",
+        "Enable structured logging for retries by passing a ByteKit Logger instance to the ApiClient constructor; it logs all retry lifecycle events automatically.",
+        "Standardize collection handling with api.getList(path, { pagination, filters, sort }). It automatically handles query strings and paginated response structures.",
+        "Validate responses and get full type-safety by passing zodAdapter(schema) or valibotAdapter(schema) to the validateResponse option.",
+        "Configure automatic retries by defining retryPolicy: { maxAttempts: N, initialDelayMs: X } in the ApiClient configuration."
+    ]
 }
