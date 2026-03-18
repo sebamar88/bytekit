@@ -247,18 +247,19 @@ export class CryptoUtils {
 
         // Derive a 256-bit key from the input string using SHA-256
         const keyHash = await this.hashBytes(key);
+        const subtle = globalThis.crypto.subtle as any;
 
-        const cryptoKey = await globalThis.crypto.subtle.importKey(
+        const cryptoKey = await subtle.importKey(
             "raw",
             keyHash,
-            { name: "AES-GCM" } as any,
+            { name: "AES-GCM" },
             false,
             ["encrypt"]
         );
 
         const iv = globalThis.crypto.getRandomValues(new Uint8Array(12));
-        const encrypted = await globalThis.crypto.subtle.encrypt(
-            { name: "AES-GCM", iv } as any,
+        const encrypted = await subtle.encrypt(
+            { name: "AES-GCM", iv },
             cryptoKey,
             data
         );
@@ -290,18 +291,19 @@ export class CryptoUtils {
         const ciphertext = combined.slice(12);
 
         const keyHash = await this.hashBytes(key);
+        const subtle = globalThis.crypto.subtle as any;
 
-        const cryptoKey = await globalThis.crypto.subtle.importKey(
+        const cryptoKey = await subtle.importKey(
             "raw",
             keyHash,
-            { name: "AES-GCM" } as any,
+            { name: "AES-GCM" },
             false,
             ["decrypt"]
         );
 
         try {
-            const decrypted = await globalThis.crypto.subtle.decrypt(
-                { name: "AES-GCM", iv } as any,
+            const decrypted = await subtle.decrypt(
+                { name: "AES-GCM", iv },
                 cryptoKey,
                 ciphertext
             );
