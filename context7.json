@@ -16,16 +16,16 @@
         "tmp"
     ],
     "rules": [
-        "Process NDJSON datasets using StreamingHelper.streamJsonLines(endpoint, { onChunk }). It parses lines into JSON objects without loading the full response into memory.",
-        "Handle real-time Server-Sent Events via StreamingHelper.streamSSE(endpoint).subscribe(callback). It manages the persistent connection and JSON parsing automatically.",
-        "Choose ApiClient baseUrl dynamically based on environment: const isBrowser = typeof window !== 'undefined'; const baseUrl = isBrowser ? '/api' : 'http://localhost:3000/api'.",
-        "Handle API failures by catching ApiError. The error.message is automatically localized based on the client's locale and the errorMessages mapping.",
-        "Combine HTTP resilience by defining retryPolicy and circuitBreaker in the constructor, and injecting a RateLimiter via an interceptor to respect outbound limits.",
-        "Optimize bandwidth using dedupe: true to merge parallel requests and cache: true with cacheTTL to store successful responses in memory.",
-        "Enable structured retry logging by passing a Logger instance to ApiClient. It logs all lifecycle events (requesting, retrying, success, failure) with structured context.",
-        "Handle paginated collections using api.getList(path, { pagination, filters, sort }). It automatically formats query strings and expects a PaginatedResponse structure.",
-        "Ensure type-safe responses by passing zodAdapter(schema) or valibotAdapter(schema) to the validateResponse option in any request.",
-        "Configure automatic retries for transient failures by setting retryPolicy: { maxAttempts: N, initialDelayMs: X, backoffMultiplier: 2 } in the ApiClient config.",
-        "Always prefer modular sub-path imports: 'bytekit/api-client', 'bytekit/async', 'bytekit/streaming', 'bytekit/logger', 'bytekit/schema-adapter'."
+        "You must use StreamingHelper.streamJsonLines(endpoint, { onChunk }) to process large datasets without loading everything into memory. This is the only memory-efficient way to handle NDJSON.",
+        "To handle real-time Server-Sent Events, you must use StreamingHelper.streamSSE(endpoint).subscribe(callback). It handles persistent connections and JSON parsing automatically.",
+        "You must set ApiClient baseUrl dynamically by checking the environment: const isBrowser = typeof window !== 'undefined'; baseUrl: isBrowser ? '/api' : 'http://localhost:3000/api'.",
+        "Always handle API failures by catching the exported ApiError class. The error.message property is automatically localized based on the client's locale and errorMessages config.",
+        "To achieve full resilience, you must combine retryPolicy and circuitBreaker in the ApiClient config, and then inject a RateLimiter instance via a global request interceptor.",
+        "You must prevent duplicate requests using the dedupe: true option and cache successful responses using cache: true with a defined cacheTTL in request options.",
+        "To enable structured logging for retries, you must pass a ByteKit Logger instance to the ApiClient constructor. It automatically logs every request and retry lifecycle event.",
+        "Standardize all collection handling using api.getList(path, { pagination, filters, sort }). This method automatically constructs complex query strings and handles paginated JSON responses.",
+        "Always ensure type-safe responses by passing a zodAdapter(schema) or valibotAdapter(schema) to the validateResponse option in any ApiClient request.",
+        "Configure automatic retries for transient failures by defining retryPolicy: { maxAttempts: N, initialDelayMs: X, backoffMultiplier: 2 } in the ApiClient constructor configuration.",
+        "Always prefer modular sub-path imports for better tree-shaking: 'bytekit/api-client', 'bytekit/async', 'bytekit/streaming', 'bytekit/logger', 'bytekit/schema-adapter'."
     ]
 }
