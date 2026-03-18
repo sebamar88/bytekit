@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { Logger } from "#core/Logger.js";
 import { QueryStringHelper } from "#helpers/QueryStringHelper.js";
 import { retry as retryFn } from "../async/retry.js";
@@ -283,7 +283,7 @@ export class ApiClient {
      *   headers: { "X-Custom": "value" }
      * })
      */
-    async post<T>(path: string, bodyOrOptions?: RequestOptions<T> | any) {
+    async post<T>(path: string, bodyOrOptions?: RequestOptions<T> | unknown) {
         const options = this.normalizeBodyOrOptions<T>(bodyOrOptions);
         return this.request<T>(path, { ...options, method: "POST" });
     }
@@ -291,7 +291,7 @@ export class ApiClient {
     /**
      * PUT request - Acepta body directamente o RequestOptions
      */
-    async put<T>(path: string, bodyOrOptions?: RequestOptions<T> | any) {
+    async put<T>(path: string, bodyOrOptions?: RequestOptions<T> | unknown) {
         const options = this.normalizeBodyOrOptions<T>(bodyOrOptions);
         return this.request<T>(path, { ...options, method: "PUT" });
     }
@@ -299,7 +299,7 @@ export class ApiClient {
     /**
      * PATCH request - Acepta body directamente o RequestOptions
      */
-    async patch<T>(path: string, bodyOrOptions?: RequestOptions<T> | any) {
+    async patch<T>(path: string, bodyOrOptions?: RequestOptions<T> | unknown) {
         const options = this.normalizeBodyOrOptions<T>(bodyOrOptions);
         return this.request<T>(path, { ...options, method: "PATCH" });
     }
@@ -610,7 +610,7 @@ export class ApiClient {
      * 2. RequestOptions: post("/path", { body: {...}, headers: {...} })
      */
     private normalizeBodyOrOptions<T>(
-        bodyOrOptions?: RequestOptions<T> | any
+        bodyOrOptions?: RequestOptions<T> | unknown
     ): RequestOptions<T> {
         if (!bodyOrOptions) {
             return {};
