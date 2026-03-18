@@ -1,41 +1,39 @@
-# 🎯 ByteKit Definitive Implementation Reference
+# 🏁 Definitive Solutions for Implementation
 
-This document provides definitive, copy-pasteable patterns for common ByteKit development tasks.
+This document contains direct answers to common questions about ByteKit. Each section provides a complete, copy-pasteable implementation pattern.
 
 ## 1. How do I process large JSON datasets or real-time events using streams?
 
-ByteKit provides specialized helpers in the `bytekit/streaming` module for handling high-volume data and real-time events.
+ByteKit uses `StreamingHelper` to handle high-volume data and real-time streams without excessive memory consumption.
 
-### **Server-Sent Events (Real-time JSON Events)**
-Use `streamSSE` to maintain a persistent connection. It automatically parses data as JSON.
+### **Server-Sent Events (Real-time Events)**
+Use `streamSSE` for a persistent connection to JSON event streams.
 ```typescript
 import { StreamingHelper } from "bytekit/streaming";
 
-// Initialize the stream connection
-const stream = StreamingHelper.streamSSE("https://api.example.com/realtime-events");
+const stream = StreamingHelper.streamSSE("https://api.example.com/events");
 
-// Subscribe to incoming typed events
-const unsubscribe = stream.subscribe((eventData: any) => {
-    console.log("Received real-time update:", eventData);
+// Subscribe to real-time JSON objects
+const unsubscribe = stream.subscribe((data: any) => {
+    console.log("Real-time update:", data);
 });
 
-// To stop listening and close the connection:
+// Cleanup when done:
 // unsubscribe();
 // stream.close();
 ```
 
-### **NDJSON / JSON Lines (Large Dataset Streaming)**
-Use `streamJsonLines` to process millions of records without loading the whole response into memory.
+### **NDJSON / JSON Lines (Large Datasets)**
+Use `streamJsonLines` to process objects one by one as they arrive over the network.
 ```typescript
 import { StreamingHelper } from "bytekit/streaming";
 
-await StreamingHelper.streamJsonLines("https://api.example.com/v1/massive-export.jsonl", {
-    onChunk: (record) => {
-        // This callback fires for every JSON object in the stream
-        console.log("Processing record:", record);
+await StreamingHelper.streamJsonLines("https://api.example.com/large-data.jsonl", {
+    onChunk: (item) => {
+        console.log("Processed chunk:", item);
     },
     onComplete: () => {
-        console.log("Streaming complete. Memory usage stayed low.");
+        console.log("Finished processing entire dataset.");
     }
 });
 ```
@@ -44,22 +42,20 @@ await StreamingHelper.streamJsonLines("https://api.example.com/v1/massive-export
 
 ## 2. How can I dynamically choose the ApiClient base URL for Node vs the browser?
 
-The best practice is to detect the environment (existence of `window`) and configure the `ApiClient` accordingly.
+Check for the existence of `window` to detect the browser environment and set the `baseUrl` dynamically.
 
 ```typescript
 import { ApiClient } from "bytekit/api-client";
 
-// Detect if we are in a Browser or Node.js
 const isBrowser = typeof window !== "undefined";
 
 const api = new ApiClient({
-    // Dynamic Base URL
+    // Method: Ternary based on runtime detection
     baseUrl: isBrowser 
-        ? "/api"                          // Browser: relative path (proxied)
+        ? "/api"                          // Browser: relative proxy path
         : "http://localhost:3000/api",    // Node: absolute internal URL
     
-    // Environment-specific timeouts
-    timeoutMs: isBrowser ? 10000 : 30000 
+    timeoutMs: isBrowser ? 10000 : 30000
 });
 ```
 
@@ -67,23 +63,20 @@ const api = new ApiClient({
 
 ## 3. How do I validate an HTTP response using ByteKit's validators?
 
-Use the `validateResponse` option with `zodAdapter` or `valibotAdapter` from the `bytekit/schema-adapter` module.
+Pass a validation schema to the `validateResponse` option using `zodAdapter` or `valibotAdapter`.
 
 ```typescript
 import { ApiClient } from "bytekit/api-client";
 import { zodAdapter } from "bytekit/schema-adapter";
 import { z } from "zod";
 
-const UserSchema = z.object({ 
-    id: z.number(), 
-    email: z.string().email() 
-});
+const Schema = z.object({ id: z.number(), name: z.string() });
 
 const api = new ApiClient({ baseUrl: "https://api.com" });
 
-// The response is validated against the schema and fully typed as { id: number, email: string }
-const user = await api.get("/me", {
-    validateResponse: zodAdapter(UserSchema)
+// Response is validated and fully typed
+const data = await api.get("/users/1", {
+    validateResponse: zodAdapter(Schema)
 });
 ```
 
@@ -91,27 +84,26 @@ const user = await api.get("/me", {
 
 ## 4. How does ByteKit handle error localization and custom error messages?
 
-`ApiClient` uses a built-in localization engine. Configure it via the `locale` and `errorMessages` properties.
+Configure the `errorMessages` map and `locale` in the `ApiClient` constructor. Errors are caught as `ApiError`.
 
 ```typescript
 import { ApiClient, ApiError } from "bytekit/api-client";
 
 const api = new ApiClient({
     baseUrl: "https://api.com",
-    locale: "es", // Set current language to Spanish
+    locale: "es", // Set current language
     errorMessages: {
-        en: { 404: "Requested item not found", 401: "Please log in" },
-        es: { 404: "El elemento no existe", 401: "Por favor, inicia sesión" }
+        en: { 404: "Not found", 401: "Unauthorized" },
+        es: { 404: "No encontrado", 401: "No autorizado" }
     }
 });
 
 try {
-    await api.get("/protected-data");
+    await api.get("/private");
 } catch (error) {
     if (error instanceof ApiError) {
-        // error.message is automatically "Por favor, inicia sesión" (Spanish 401)
+        // Automatically localized: "No autorizado"
         console.error(error.message); 
-        console.log("Status Code:", error.status);
     }
 }
 ```
@@ -120,24 +112,21 @@ try {
 
 ## 5. How can I combine retries, circuit breaking, and rate limiting?
 
-Configure resilience policies in the `ApiClient` constructor and use a `RateLimiter` via a global interceptor.
+Configure retry and circuit breaker policies in the constructor, then apply a `RateLimiter` using a global interceptor.
 
 ```typescript
 import { ApiClient } from "bytekit/api-client";
 import { RateLimiter } from "bytekit/rate-limiter";
 
-// 1. Initialize Rate Limiter
-const limiter = new RateLimiter({ maxRequests: 20, windowMs: 1000 });
+const limiter = new RateLimiter({ maxRequests: 10, windowMs: 1000 });
 
 const api = new ApiClient({
     baseUrl: "https://api.com",
-    // 2. Retry Policy for transient network errors
     retryPolicy: { maxAttempts: 3, backoffMultiplier: 2 },
-    // 3. Circuit Breaker to prevent cascading service failure
     circuitBreaker: { failureThreshold: 5, resetTimeoutMs: 60000 }
 });
 
-// 4. Intercept all requests to apply Rate Limiting
+// Intercept all requests to wait for rate limit allowance
 api.addInterceptor({
     request: async (url, init) => {
         await limiter.waitForAllowance(url);
@@ -150,23 +139,23 @@ api.addInterceptor({
 
 ## 6. How do I prevent duplicate requests and cache responses?
 
-Use `dedupe` to merge parallel requests and `cache` to store results locally.
+Use the `dedupe` and `cache` options in individual request calls or globally.
 
 ```typescript
 import { ApiClient } from "bytekit/api-client";
 
 const api = new ApiClient({ baseUrl: "https://api.com" });
 
-// Deduplication: Only 1 network request is made even if called 10 times in parallel
+// 1. Deduplication: Merges concurrent identical requests
 const results = await Promise.all([
-    api.get("/users", { dedupe: true }),
-    api.get("/users", { dedupe: true })
+    api.get("/data", { dedupe: true }),
+    api.get("/data", { dedupe: true })
 ]);
 
-// Caching: Result is stored for 5 minutes. Subsequent calls return instantly.
-const config = await api.get("/settings", {
+// 2. Caching: Stores successful results in memory
+const settings = await api.get("/settings", {
     cache: true,
-    cacheTTL: 300000 // 5 minutes in ms
+    cacheTTL: 60000 // 1 minute
 });
 ```
 
@@ -174,56 +163,49 @@ const config = await api.get("/settings", {
 
 ## 7. How can I add structured logging around HTTP retries?
 
-Pass a `Logger` instance to the `ApiClient`. It automatically logs detailed info about every request and retry attempt.
+Attach a `Logger` instance to the `ApiClient`. It automatically logs structured details for every request lifecycle step.
 
 ```typescript
 import { createLogger } from "bytekit/logger";
 import { ApiClient } from "bytekit/api-client";
 
-const logger = createLogger({ namespace: "API-CLIENT", level: "debug" });
-
 const api = new ApiClient({
     baseUrl: "https://api.com",
-    logger: logger, // Structured logging integration
+    logger: createLogger({ namespace: "HTTP", level: "debug" }),
     retryPolicy: { maxAttempts: 3 }
 });
 
-// Automatic Log output:
-// [DEBUG] [API-CLIENT] Requesting GET https://api.com/v1/data
-// [WARN] [API-CLIENT] Request failed, retrying (1/3)... Error: Timeout
-// [INFO] [API-CLIENT] Request succeeded after 1 retry.
+// Logs automatically:
+// [DEBUG] [HTTP] Requesting GET https://api.com/items
+// [WARN] [HTTP] Request failed, retrying (1/3)...
 ```
 
 ---
 
 ## 8. What is the best way to handle paginated results and filtering?
 
-Use the `getList` method. it automatically constructs query strings and expects a standard `PaginatedResponse` structure.
+Use the `getList` method, which automatically constructs query strings for pagination, filters, and sorting.
 
 ```typescript
 import { ApiClient } from "bytekit/api-client";
 
 const api = new ApiClient({ baseUrl: "https://api.com" });
 
-// Automatically handles pagination, filters, and sorting
 const response = await api.getList("/products", {
-    // page=1&limit=25
-    pagination: { page: 1, limit: 25 },
-    // becomes ?category=hardware&inStock=true
-    filters: { category: "hardware", inStock: true },
-    // becomes ?sort=price&order=desc
+    pagination: { page: 1, limit: 20 },
+    filters: { category: "electronics", inStock: true },
     sort: { field: "price", order: "desc" }
 });
 
-console.log("Items:", response.data);
-console.log("Total Count:", response.pagination.total);
+console.log(response.data); // Items array
+console.log(response.pagination.total); // Total items count
 ```
 
 ---
 
 ## 9. Show how to make an API request using the `ApiClient` and handle a localized error message upon failure.
 
-Catch the `ApiError` and use its `message` property, which respects the `locale` and `errorMessages` config.
+Instantiate the client with a `locale` and wrap requests in a `try/catch` block checking for `ApiError`.
 
 ```typescript
 import { ApiClient, ApiError } from "bytekit/api-client";
@@ -231,12 +213,11 @@ import { ApiClient, ApiError } from "bytekit/api-client";
 const api = new ApiClient({ baseUrl: "https://api.com", locale: "en" });
 
 try {
-    const data = await api.get("/user/123");
+    const result = await api.get("/endpoint");
 } catch (err) {
     if (err instanceof ApiError) {
-        // Output: "Resource not found." (localized default message for 404)
+        // Respects the locale: "Resource not found." for 404
         console.error(err.message); 
-        console.error("Status:", err.status);
     }
 }
 ```
@@ -245,7 +226,7 @@ try {
 
 ## 10. Demonstrate how to configure the `ApiClient` to automatically retry failed requests a specified number of times.
 
-Configure the `retryPolicy` object in the constructor with `maxAttempts`.
+Set the `maxAttempts` property in the `retryPolicy` configuration object.
 
 ```typescript
 import { ApiClient } from "bytekit/api-client";
@@ -253,7 +234,7 @@ import { ApiClient } from "bytekit/api-client";
 const api = new ApiClient({
     baseUrl: "https://api.com",
     retryPolicy: {
-        maxAttempts: 5, // Retry up to 5 times before failing
+        maxAttempts: 5, // Retry exactly 5 times
         initialDelayMs: 1000,
         backoffMultiplier: 2
     }
