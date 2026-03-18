@@ -29,8 +29,8 @@ export interface ApiClientInterceptors {
 }
 
 export interface ApiClientConfig {
-    baseUrl?: string;
-    baseURL?: string; // Alias for baseUrl (common convention)
+    baseUrl?: string | URL;
+    baseURL?: string | URL; // Alias for baseUrl (common convention)
     defaultHeaders?: HeadersInit;
     fetchImpl?: typeof fetch;
     locale?: Locale;
@@ -238,7 +238,8 @@ export class ApiClient {
                 "ApiClient requires either 'baseUrl' or 'baseURL' in config"
             );
         }
-        this.baseUrl = new URL(url.endsWith("/") ? url : `${url}/`);
+        const urlStr = String(url);
+        this.baseUrl = new URL(urlStr.endsWith("/") ? urlStr : `${urlStr}/`);
         this.headers = defaultHeaders ?? {};
         this.fetchImpl = fetchImpl ?? globalThis.fetch.bind(globalThis);
         this.locale = locale;
@@ -266,7 +267,7 @@ export class ApiClient {
     // -------------------------
     // Core request shortcuts
     // -------------------------
-    async get<T>(path: string, options?: RequestOptions<T>) {
+    async get<T>(path: string | URL, options?: RequestOptions<T>) {
         return this.request<T>(path, { ...options, method: "GET" });
     }
 
@@ -282,7 +283,7 @@ export class ApiClient {
      *   headers: { "X-Custom": "value" }
      * })
      */
-    async post<T>(path: string, bodyOrOptions?: RequestOptions<T> | unknown) {
+    async post<T>(path: string | URL, bodyOrOptions?: RequestOptions<T> | unknown) {
         const options = this.normalizeBodyOrOptions<T>(bodyOrOptions);
         return this.request<T>(path, { ...options, method: "POST" });
     }
@@ -290,7 +291,7 @@ export class ApiClient {
     /**
      * PUT request - Acepta body directamente o RequestOptions
      */
-    async put<T>(path: string, bodyOrOptions?: RequestOptions<T> | unknown) {
+    async put<T>(path: string | URL, bodyOrOptions?: RequestOptions<T> | unknown) {
         const options = this.normalizeBodyOrOptions<T>(bodyOrOptions);
         return this.request<T>(path, { ...options, method: "PUT" });
     }
@@ -298,12 +299,12 @@ export class ApiClient {
     /**
      * PATCH request - Acepta body directamente o RequestOptions
      */
-    async patch<T>(path: string, bodyOrOptions?: RequestOptions<T> | unknown) {
+    async patch<T>(path: string | URL, bodyOrOptions?: RequestOptions<T> | unknown) {
         const options = this.normalizeBodyOrOptions<T>(bodyOrOptions);
         return this.request<T>(path, { ...options, method: "PATCH" });
     }
 
-    async delete<T>(path: string, options?: RequestOptions<T>) {
+    async delete<T>(path: string | URL, options?: RequestOptions<T>) {
         return this.request<T>(path, { ...options, method: "DELETE" });
     }
 
@@ -311,7 +312,7 @@ export class ApiClient {
     // Paginated list requests
     // -------------------------
     async getList<T, TFilter extends FilterParams = FilterParams>(
-        path: string,
+        path: string | URL,
         options?: ListOptions<TFilter, PaginatedResponse<T>>
     ): Promise<PaginatedResponse<T>> {
         const searchParams: Record<string, QueryParam> = {};
@@ -363,7 +364,7 @@ export class ApiClient {
      * Prepares request configuration with headers, body, and interceptors
      */
     private async prepareRequestConfig(
-        path: string,
+        path: string | URL,
         requestOptions: Partial<RequestOptions>,
         skipInterceptors?: boolean
     ): Promise<{
@@ -504,7 +505,7 @@ export class ApiClient {
     }
 
     async request<T>(
-        path: string,
+        path: string | URL,
         options: RequestOptions<T> = {}
     ): Promise<T> {
         const {
@@ -741,10 +742,11 @@ export class ApiClient {
     }
 
     private buildUrl(
-        path: string,
+        path: string | URL,
         params?: Record<string, QueryParam>
     ): string {
-        const normalized = path.startsWith("/") ? path.slice(1) : path;
+        const pathStr = String(path);
+        const normalized = pathStr.startsWith("/") ? pathStr.slice(1) : pathStr;
         const url = new URL(normalized, this.baseUrl);
 
         if (params) {

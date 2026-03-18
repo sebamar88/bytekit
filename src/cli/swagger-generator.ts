@@ -2,7 +2,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 
 export interface SwaggerOptions {
-    url: string;
+    url: string | URL;
     output?: string;
 }
 
@@ -13,14 +13,15 @@ export async function generateFromSwagger(
     options: SwaggerOptions
 ): Promise<void> {
     const { url, output = "src/types/api-docs.ts" } = options;
+    const urlStr = String(url);
 
     console.log(
-        `\n📖 Attempting to resolve Swagger/OpenAPI spec from ${url}...`
+        `\n📖 Attempting to resolve Swagger/OpenAPI spec from ${urlStr}...`
     );
 
     try {
         let spec: any;
-        const response = await fetch(url);
+        const response = await fetch(urlStr);
 
         if (!response.ok) {
             throw new Error(`HTTP ${response.status}: ${response.statusText}`);
@@ -35,7 +36,7 @@ export async function generateFromSwagger(
             );
 
             // Try to find the spec by replacing /docs or adding common paths
-            const baseUrl = url
+            const baseUrl = urlStr
                 .replace(/\/docs\/?$/, "")
                 .replace(/\/swagger-ui\/?$/, "");
             const commonPaths = [
