@@ -69,6 +69,28 @@ test("WebSocketHelper connects and sends heartbeat", async () => {
     wsh.close();
 });
 
+test("WebSocketHelper handles non-Error objects thrown by handlers", async () => {
+    const wsh = new WebSocketHelper("ws://localhost");
+    await wsh.connect();
+
+    let caughtError: Error | null = null;
+    wsh.onError((err) => {
+        caughtError = err;
+    });
+
+    wsh.on("string-error", () => {
+        throw "something went wrong";
+    });
+
+    // @ts-expect-error - Test type override
+    wsh.ws._receive({ type: "string-error", data: {} });
+
+    assert.ok(caughtError instanceof Error);
+    assert.equal(caughtError?.message, "something went wrong");
+
+    wsh.close();
+});
+
 test("WebSocketHelper receives messages and notifies subscribers", async () => {
     const wsh = new WebSocketHelper("ws://localhost");
     await wsh.connect();
@@ -282,4 +304,32 @@ test("WebSocketHelper notifyError ignores handler exceptions", async () => {
 
     wsh.close();
     console.error = originalError;
+});
+
+test("WebSocketHelper continues to next handler if one fails", async () => {
+    const wsh = new WebSocketHelper("ws://localhost");
+    await wsh.connect();
+
+    let handler2Called = false;
+    let errorNotified = false;
+
+    wsh.onError(() => {
+        errorNotified = true;
+    });
+
+    wsh.on("multi", () => {
+        throw new Error("First handler failed");
+    });
+
+    wsh.on("multi", () => {
+        handler2Called = true;
+    });
+
+    // @ts-expect-error - Test type override
+    wsh.ws._receive({ type: "multi", data: { ok: true } });
+
+    assert.equal(errorNotified, true);
+    assert.equal(handler2Called, true);
+
+    wsh.close();
 });
