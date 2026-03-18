@@ -11,6 +11,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - No changes yet.
 
+## [2.0.6] - 2026-03-18
+
+### Fixed
+
+- **ApiClient**: Added support for `URL` objects in `baseUrl`, `baseURL`, and request `path`.
+- **CLI**: `swagger-generator` now supports `URL` objects.
+
 ## [2.0.5] - 2026-03-18
 
 ### Changed
