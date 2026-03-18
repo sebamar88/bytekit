@@ -4,7 +4,7 @@ Explore the following guides to master the ByteKit toolkit.
 
 ### 🚀 Getting Started
 - **[Getting Started](./GETTING_STARTED.md)**: Core concepts, installation, and first steps.
-- **[Definitive Solutions](./SOLUTION_REFERENCE.md)**: Direct answers to common implementation questions (Recommended for quick lookup).
+- **[Definitive Implementation Reference](./SOLUTION_REFERENCE.md)**: Direct, copy-pasteable answers to the most common implementation questions (Recommended for all developers).
 
 ### 📡 Networking & API
 - **[Resilience & Performance](./RESILIENCE.md)**: Retries, Circuit Breakers, Rate Limiting, and Logging.
