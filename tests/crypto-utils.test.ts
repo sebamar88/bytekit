@@ -80,6 +80,17 @@ test("CryptoUtils.verifyHash works correctly", async () => {
     assert.equal(await CryptoUtils.verifyHash(data, "wrong-hash"), false);
 });
 
+test("CryptoUtils.encrypt and decrypt", async () => {
+    const original = "secret message";
+    const key = "pass";
+
+    const encrypted = await CryptoUtils.encrypt(original, key);
+    assert.notEqual(encrypted, original);
+
+    const decrypted = await CryptoUtils.decrypt(encrypted, key);
+    assert.equal(decrypted, original);
+});
+
 test("CryptoUtils.xorEncrypt and xorDecrypt", () => {
     const original = "secret message";
     const key = "pass";
@@ -89,6 +100,35 @@ test("CryptoUtils.xorEncrypt and xorDecrypt", () => {
 
     const decrypted = CryptoUtils.xorDecrypt(encrypted, key);
     assert.equal(decrypted, original);
+});
+
+test("CryptoUtils.encrypt is non-deterministic (uses random IV)", async () => {
+    const original = "secret message";
+    const key = "pass";
+
+    const encrypted1 = await CryptoUtils.encrypt(original, key);
+    const encrypted2 = await CryptoUtils.encrypt(original, key);
+
+    assert.notEqual(encrypted1, encrypted2);
+
+    const decrypted1 = await CryptoUtils.decrypt(encrypted1, key);
+    const decrypted2 = await CryptoUtils.decrypt(encrypted2, key);
+
+    assert.equal(decrypted1, original);
+    assert.equal(decrypted2, original);
+});
+
+test("CryptoUtils.decrypt fails with wrong key", async () => {
+    const original = "secret message";
+    const key = "pass";
+    const wrongKey = "wrong";
+
+    const encrypted = await CryptoUtils.encrypt(original, key);
+
+    await assert.rejects(
+        async () => await CryptoUtils.decrypt(encrypted, wrongKey),
+        /Decryption failed/
+    );
 });
 
 test("CryptoUtils.randomBytes generates Uint8Array", () => {
@@ -243,9 +283,9 @@ test("CryptoUtils.hmac with default algorithm", async () => {
     assert.match(hmac, /^[0-9a-f]+$/);
 });
 
-test("CryptoUtils.xorEncrypt handles empty strings", () => {
-    const encrypted = CryptoUtils.xorEncrypt("", "key");
-    const decrypted = CryptoUtils.xorDecrypt(encrypted, "key");
+test("CryptoUtils.encrypt handles empty strings", async () => {
+    const encrypted = await CryptoUtils.encrypt("", "key");
+    const decrypted = await CryptoUtils.decrypt(encrypted, "key");
     assert.equal(decrypted, "");
 });
 
@@ -282,12 +322,12 @@ test("CryptoUtils.randomBytes generates different values", () => {
     assert.notDeepEqual(bytes1, bytes2);
 });
 
-test("CryptoUtils.xorEncrypt with long key", () => {
+test("CryptoUtils.encrypt with long key", async () => {
     const original = "short";
     const key = "very-long-encryption-key-that-exceeds-message-length";
 
-    const encrypted = CryptoUtils.xorEncrypt(original, key);
-    const decrypted = CryptoUtils.xorDecrypt(encrypted, key);
+    const encrypted = await CryptoUtils.encrypt(original, key);
+    const decrypted = await CryptoUtils.decrypt(encrypted, key);
 
     assert.equal(decrypted, original);
 });
