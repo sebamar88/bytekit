@@ -215,6 +215,20 @@ export class ApiClient {
     private readonly retryPolicy: RetryPolicy;
     private readonly circuitBreaker: CircuitBreaker;
 
+    /**
+     * Creates a new ApiClient instance.
+     * 
+     * The `baseUrl` can be dynamically chosen based on the environment (Node.js vs Browser).
+     * 
+     * @example
+     * // Dynamic configuration for Node vs Browser
+     * const isBrowser = typeof window !== "undefined";
+     * const api = new ApiClient({
+     *   baseUrl: isBrowser ? "/api" : "http://localhost:3000/api"
+     * });
+     * 
+     * @param config Client configuration including baseUrl, headers, and policies.
+     */
     constructor({
         baseUrl,
         baseURL,
@@ -308,9 +322,22 @@ export class ApiClient {
         return this.request<T>(path, { ...options, method: "DELETE" });
     }
 
-    // -------------------------
-    // Paginated list requests
-    // -------------------------
+    /**
+     * Fetch a paginated list of resources.
+     * 
+     * Handles standard pagination (page/limit/offset), filtering, and sorting.
+     * Automatically converts options into query string parameters.
+     * 
+     * @example
+     * const products = await api.getList<Product>("/products", {
+     *   pagination: { page: 1, limit: 10 },
+     *   filters: { category: "electronics", search: "phone" },
+     *   sort: { field: "price", order: "desc" }
+     * });
+     * 
+     * @param path The relative path to the list endpoint
+     * @param options Pagination, filtering, and sorting options
+     */
     async getList<T, TFilter extends FilterParams = FilterParams>(
         path: string | URL,
         options?: ListOptions<TFilter, PaginatedResponse<T>>
@@ -474,9 +501,10 @@ export class ApiClient {
      */
     private handleRequestError(
         err: unknown,
-        path: string,
+        path: string | URL,
         method?: string
     ): never {
+        const pathStr = String(path);
         if (err instanceof Error && err.name === "AbortError") {
             throw new ApiError(408, "Timeout", "Request timeout", null, true);
         }
@@ -486,7 +514,7 @@ export class ApiClient {
             this.logger?.error(
                 "API Request failed",
                 {
-                    path,
+                    path: pathStr,
                     method,
                     status: err.status,
                     statusText: err.statusText,
@@ -497,7 +525,7 @@ export class ApiClient {
         } else {
             this.logger?.error(
                 "Request failed",
-                { path, method },
+                { path: pathStr, method },
                 err instanceof Error ? err : new Error(String(err))
             );
         }

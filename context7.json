@@ -2,10 +2,11 @@
     "url": "https://context7.com/sebamar88/bytekit",
     "public_key": "pk_XoORr8O7CUjZDhhBsPmPO",
     "description": "Lightning-fast, zero-dependency TypeScript toolkit focusing on an Isomorphic HTTP client and advanced Async utilities (retry, parallel, debounce). Features native Zod/Valibot validation and OpenAPI type generation.",
-    "categories": ["utilities", "async", "typescript", "cli", "api-client", "http", "resilience", "pagination", "filtering", "streaming", "real-time", "error-handling"],
+    "categories": ["utilities", "async", "typescript", "cli", "api-client", "http", "resilience", "pagination", "filtering", "streaming", "real-time", "error-handling", "localization"],
     "documentation": {
         "guides": "docs/guides",
-        "cookbook": "docs/guides/COOKBOOK.md",
+        "solutions": "docs/guides/SOLUTION_REFERENCE.md",
+        "getting_started": "docs/guides/GETTING_STARTED.md",
         "examples": "examples",
         "api": "docs/api"
     },

@@ -55,8 +55,19 @@ export class StreamingHelper {
     }
 
     /**
-     * Stream JSON lines from an endpoint
-     * Each line should be a valid JSON object
+     * Stream JSON lines from an endpoint (NDJSON).
+     * 
+     * Use this method to process large JSON datasets without loading the entire response into memory.
+     * Each line in the response must be a valid JSON object.
+     * 
+     * @example
+     * await StreamingHelper.streamJsonLines("https://api.example.com/large-data", {
+     *   onChunk: (item) => console.log("Processed item:", item),
+     *   onComplete: () => console.log("Done!")
+     * });
+     * 
+     * @param endpoint The URL to fetch from
+     * @param options Stream options including callbacks and timeout
      */
     static async streamJsonLines<T>(
         endpoint: string,
@@ -131,7 +142,22 @@ export class StreamingHelper {
     }
 
     /**
-     * Stream Server-Sent Events (SSE)
+     * Stream Server-Sent Events (SSE).
+     * 
+     * Establishes a persistent connection to receive real-time updates from the server.
+     * Automatically parses incoming data as JSON.
+     * 
+     * @example
+     * const stream = StreamingHelper.streamSSE("https://api.example.com/events");
+     * const unsubscribe = stream.subscribe((data) => {
+     *   console.log("New real-time data:", data);
+     * });
+     * 
+     * // To close:
+     * // stream.close();
+     * 
+     * @param endpoint The SSE endpoint URL
+     * @param options Subscription options and custom event type
      */
     static streamSSE<T>(
         endpoint: string,
