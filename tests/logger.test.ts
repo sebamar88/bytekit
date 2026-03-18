@@ -72,7 +72,6 @@ test("consoleTransportNode formats correctly", () => {
 
     assert.match(output, /INFO.*\[test\].*hello/);
 
-
     console.log = originalLog;
 });
 
@@ -97,7 +96,6 @@ test("consoleTransportBrowser formats correctly (mocked environment)", () => {
     });
 
     assert.match(output, /%cINFO.*\[test\].*hello/);
-
 
     console.log = originalLog;
     delete globalThis.window;
