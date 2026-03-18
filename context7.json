@@ -1,5 +1,4 @@
 {
-    "$schema": "https://context7.com/schema/context7.json",
     "projectTitle": "bytekit",
     "description": "Lightning-fast, zero-dependency TypeScript toolkit for Isomorphic HTTP networking and Advanced Async utilities.",
     "folders": [
