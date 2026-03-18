@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { describe, it, expect } from "vitest";
 import { sequential } from "../../src/utils/async/sequential";
 import { sleep } from "../../src/utils/async/sleep";

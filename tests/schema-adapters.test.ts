@@ -11,7 +11,7 @@ describe("Schema Adapters for ApiClient", () => {
         // Mock fetch for tests
         globalThis.fetch = async (
             input: RequestInfo | URL,
-            init?: RequestInit
+            _init?: RequestInit
         ) => {
             const url = input.toString();
 

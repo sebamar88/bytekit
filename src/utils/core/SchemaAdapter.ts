@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /**
  * Generic interface for schema validation adapters (e.g., Zod, Valibot, ArkType)
  */

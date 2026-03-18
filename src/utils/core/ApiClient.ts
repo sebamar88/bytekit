@@ -346,9 +346,9 @@ export class ApiClient {
 
         // Extract only needed properties for request
         const {
-            pagination: _pagination,
-            sort: _sort,
-            filters: _filters,
+            pagination: _,
+            sort: __,
+            filters: ___,
             ...requestOptions
         } = options ?? {};
 

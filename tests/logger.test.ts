@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import {
     Logger,
     createLogger,
@@ -55,7 +56,7 @@ test("Logger.child creates nested namespaces", () => {
 test("consoleTransportNode formats correctly", () => {
     const originalLog = console.log;
     let output = "";
-    // eslint-disable-next-line no-console
+
     console.log = (msg) => {
         output = msg;
     };
@@ -71,7 +72,7 @@ test("consoleTransportNode formats correctly", () => {
 
     assert.match(output, /INFO.*\[test\].*hello/);
 
-    // eslint-disable-next-line no-console
+
     console.log = originalLog;
 });
 
@@ -82,7 +83,7 @@ test("consoleTransportBrowser formats correctly (mocked environment)", () => {
 
     const originalLog = console.log;
     let output = "";
-    // eslint-disable-next-line no-console
+
     console.log = (msg) => {
         output = msg;
     };
@@ -97,7 +98,7 @@ test("consoleTransportBrowser formats correctly (mocked environment)", () => {
 
     assert.match(output, /%cINFO.*\[test\].*hello/);
 
-    // eslint-disable-next-line no-console
+
     console.log = originalLog;
     delete globalThis.window;
     delete globalThis.document;
