@@ -1,24 +1,25 @@
 {
-    "url": "https://context7.com/sebamar88/bytekit",
-    "public_key": "pk_XoORr8O7CUjZDhhBsPmPO",
-    "foldersInclude": [
-        "src/**",
-        "docs/**",
-        "examples/**"
+    "$schema": "https://context7.com/schema/context7.json",
+    "projectTitle": "bytekit",
+    "description": "Lightning-fast, zero-dependency TypeScript toolkit for Isomorphic HTTP networking and Advanced Async utilities.",
+    "folders": [
+        "src",
+        "docs",
+        "examples"
     ],
-    "foldersExclude": [
-        "tests/**",
-        "dist/**",
-        "coverage/**",
-        "node_modules/**",
-        ".git/**",
-        "_bmad/**",
-        "tmp/**"
+    "excludeFolders": [
+        "tests",
+        "dist",
+        "coverage",
+        "node_modules",
+        ".git",
+        "_bmad",
+        "tmp"
     ],
-    "customRules": [
+    "rules": [
         "Use StreamingHelper.streamJsonLines(endpoint, { onChunk }) to process large NDJSON datasets without loading everything into memory.",
         "Use StreamingHelper.streamSSE(endpoint).subscribe(callback) to handle real-time Server-Sent Events with automatic JSON parsing.",
-        "Dynamically set ApiClient baseUrl by checking runtime: isBrowser ? '/api' : 'http://localhost:3000/api'. EnvManager can also handle this.",
+        "Dynamically set ApiClient baseUrl by checking runtime: const isBrowser = typeof window !== 'undefined'; const baseUrl = isBrowser ? '/api' : 'http://localhost:3000/api'.",
         "Handle localized errors by catching ApiError and accessing error.message. Configure translations via the errorMessages map and locale property in ApiClient.",
         "Combine resilience by setting retryPolicy and circuitBreaker in ApiClient config, and adding a RateLimiter instance via a global request interceptor.",
         "Prevent duplicate requests using dedupe: true and cache successful responses using cache: true with cacheTTL in request options.",
