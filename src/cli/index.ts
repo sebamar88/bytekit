@@ -77,10 +77,10 @@ export async function runCli(argv: string[]): Promise<void> {
     if (options.swagger) {
         await generateFromSwagger({ url: options.url });
     } else if (options.type) {
-        await handleTypeGeneration(options);
+        await handleTypeGeneration(options as CliOptions & { url: string });
     } else {
         // Simple fetch/curl behavior if --type is not present
-        await handleSimpleFetch(options);
+        await handleSimpleFetch(options as CliOptions & { url: string });
     }
 }
 
