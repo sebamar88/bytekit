@@ -1,5 +1,5 @@
 import { Logger } from "#core/Logger.js";
-import { QueryStringHelper } from "#helpers/QueryStringHelper.js";
+import { UrlHelper } from "#helpers/UrlHelper.js";
 import { retry as retryFn } from "../async/retry.js";
 import {
     RetryPolicy,
@@ -778,7 +778,7 @@ export class ApiClient {
         const url = new URL(normalized, this.baseUrl);
 
         if (params) {
-            const queryString = QueryStringHelper.stringify(
+            const queryString = UrlHelper.stringify(
                 params as Record<string, unknown>
             );
             if (queryString) {

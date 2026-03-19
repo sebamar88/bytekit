@@ -8,5 +8,5 @@ export * from "#helpers/FileUploadHelper.js";
 export * from "#helpers/PollingHelper.js";
 export * from "#helpers/StorageUtils.js";
 export * from "#helpers/StreamingHelper.js";
-export * from "#helpers/QueryStringHelper.js";
+export * from "#helpers/UrlHelper.js";
 export * from "#helpers/WebSocketHelper.js";

@@ -103,7 +103,7 @@ const escapeRegExp = (value: string) =>
 const removeDiacritics = (value: string) =>
     value.normalize("NFD").replace(DIACRITICS_REGEX, "");
 
-export class QueryStringHelper {
+export class UrlHelper {
     static stringify(
         params: Record<string, unknown> | null | undefined,
         customOptions: QueryStringOptions = {}
