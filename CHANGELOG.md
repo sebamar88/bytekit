@@ -11,6 +11,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - No changes yet.
 
+## [2.1.0] - 2026-03-19
+
+### Added
+
+- **QueryStringHelper**: Added native SEO `slugify` feature capable of parsing strings and deeply nested objects into perfectly cleansed URI paths (e.g. `categoria-ropa-color-rojo`).
+
+### Changed
+
+- **Refactor**: Eradicated isolated `UrlSlugHelper`, merging all semantic validations, unicode/diacritic normalization algorithms, and format handlers seamlessly into `QueryStringHelper` core.
+
+### Removed
+
+- **UrlSlugHelper**: Module completely removed from exports to reduce package bloat. Replace legacy imports calling `UrlSlugHelper.generate` with `QueryStringHelper.slugify`.
+
 ## [2.0.6] - 2026-03-18
 
 ### Fixed
