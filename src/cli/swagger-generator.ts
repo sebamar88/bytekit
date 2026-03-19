@@ -2,7 +2,7 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 
-export interface SwaggerOptions {
+interface SwaggerOptions {
     url: string | URL;
     output?: string;
 }

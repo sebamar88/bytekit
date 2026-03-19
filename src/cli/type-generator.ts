@@ -1,7 +1,7 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 
-export interface TypeGeneratorOptions {
+interface TypeGeneratorOptions {
     endpoint: string;
     method?: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
     output?: string;
