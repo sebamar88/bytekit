@@ -87,6 +87,8 @@ const buildQueryPairs = (
     pairs.push([key, serialized]);
 };
 
+import { UrlSlugHelper } from "./UrlSlugHelper";
+
 export class QueryStringHelper {
     static stringify(
         params: Record<string, unknown> | null | undefined,
@@ -109,5 +111,34 @@ export class QueryStringHelper {
                 return `${encodedKey}=${encodedValue}`;
             })
             .join("&");
+    }
+
+    /**
+     * Converts an object representation into an SEO friendly slug URL string.
+     * Example: { category: "Smart Phones", brand: "Apple" } -> "category-smart-phones-brand-apple"
+     */
+    static slugify(
+        params: Record<string, unknown> | null | undefined,
+        separator = "-"
+    ): string {
+        if (!params) return "";
+        
+        const options = { ...DEFAULT_QUERY_OPTIONS };
+        const pairs: QueryPair[] = [];
+        const entries = Object.entries(params);
+        if (options.sortKeys) entries.sort(([a], [b]) => a.localeCompare(b));
+
+        for (const [key, value] of entries) {
+            // We use the same deep flattening logic as stringify but we skip encoding
+            buildQueryPairs(key, value, { ...options, encode: false }, pairs);
+        }
+
+        // Combine keys and values
+        const rawString = pairs
+            .filter(([, value]) => value !== "")
+            .map(([key, value]) => `${key} ${value}`)
+            .join(" ");
+
+        return UrlSlugHelper.generate(rawString, { separator });
     }
 }
