@@ -41,4 +41,30 @@ describe("QueryStringHelper", () => {
         expect(QueryStringHelper.stringify(null)).toBe("");
         expect(QueryStringHelper.stringify({})).toBe("");
     });
+    
+    describe("slugify", () => {
+        it("should convert an object into an SEO string", () => {
+            const slug = QueryStringHelper.slugify({ 
+                category: "Zapatos Deporte", 
+                brand: ["Nike", "Adidas"]
+            });
+            expect(slug).toBe("brand-nike-brand-adidas-category-zapatos-deporte");
+        });
+
+        it("should handle raw strings correctly", () => {
+            const slug = QueryStringHelper.slugify("Crème brûlée -- Especial", "_");
+            expect(slug).toBe("creme_brulee_especial");
+        });
+
+        it("should create standard URL slugs", () => {
+            const result = QueryStringHelper.slugify("Mejores celulares para 2026");
+            expect(result).toBe("mejores-celulares-para-2026");
+        });
+
+        it("should handle empty or null values", () => {
+            expect(QueryStringHelper.slugify("")).toBe("");
+            expect(QueryStringHelper.slugify(null)).toBe("");
+            expect(QueryStringHelper.slugify(undefined)).toBe("");
+        });
+    });
 });

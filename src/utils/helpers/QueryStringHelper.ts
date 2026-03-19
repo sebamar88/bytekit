@@ -87,7 +87,21 @@ const buildQueryPairs = (
     pairs.push([key, serialized]);
 };
 
-import { UrlSlugHelper } from "./UrlSlugHelper";
+const DIACRITICS_REGEX = /[\u0300-\u036f]/g;
+const NON_ALPHANUMERIC_REGEX = /[^a-z0-9]+/gi;
+
+export interface SlugifyOptions {
+    /** The character to use between words. Default: "-" */
+    separator?: string;
+    /** Whether to convert the string to lowercase. Default: true */
+    lowercase?: boolean;
+}
+
+const escapeRegExp = (value: string) =>
+    value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+const removeDiacritics = (value: string) =>
+    value.normalize("NFD").replace(DIACRITICS_REGEX, "");
 
 export class QueryStringHelper {
     static stringify(
@@ -114,31 +128,52 @@ export class QueryStringHelper {
     }
 
     /**
-     * Converts an object representation into an SEO friendly slug URL string.
+     * Converts an object representation or a raw string into an SEO friendly slug URL string.
      * Example: { category: "Smart Phones", brand: "Apple" } -> "category-smart-phones-brand-apple"
+     * Example: "Pantalon jean negro" -> "pantalon-jean-negro"
      */
     static slugify(
-        params: Record<string, unknown> | null | undefined,
-        separator = "-"
+        params: Record<string, unknown> | string | null | undefined,
+        options: string | SlugifyOptions = {}
     ): string {
         if (!params) return "";
         
-        const options = { ...DEFAULT_QUERY_OPTIONS };
-        const pairs: QueryPair[] = [];
-        const entries = Object.entries(params);
-        if (options.sortKeys) entries.sort(([a], [b]) => a.localeCompare(b));
+        // Mantener compatibilidad con el parámetro 'separator' como string si se envía así
+        const opts: SlugifyOptions = typeof options === "string" ? { separator: options } : options;
+        const { separator = "-", lowercase = true } = opts;
+        
+        let rawString = "";
 
-        for (const [key, value] of entries) {
-            // We use the same deep flattening logic as stringify but we skip encoding
-            buildQueryPairs(key, value, { ...options, encode: false }, pairs);
+        if (typeof params === "string") {
+            rawString = params;
+        } else {
+            const queryOptions = { ...DEFAULT_QUERY_OPTIONS };
+            const pairs: QueryPair[] = [];
+            const entries = Object.entries(params);
+            if (queryOptions.sortKeys) entries.sort(([a], [b]) => a.localeCompare(b));
+
+            for (const [key, value] of entries) {
+                // We use the same deep flattening logic as stringify but we skip encoding
+                buildQueryPairs(key, value, { ...queryOptions, encode: false }, pairs);
+            }
+
+            // Combine keys and values
+            rawString = pairs
+                .filter(([, value]) => value !== "")
+                .map(([key, value]) => `${key} ${value}`)
+                .join(" ");
         }
 
-        // Combine keys and values
-        const rawString = pairs
-            .filter(([, value]) => value !== "")
-            .map(([key, value]) => `${key} ${value}`)
-            .join(" ");
+        const normalized = removeDiacritics(rawString);
+        const base = lowercase ? normalized.toLowerCase() : normalized;
+        const escapedSeparator = escapeRegExp(separator);
 
-        return UrlSlugHelper.generate(rawString, { separator });
+        return base
+            .replace(NON_ALPHANUMERIC_REGEX, separator)
+            .replace(new RegExp(`${escapedSeparator}+`, "g"), separator)
+            .replace(
+                new RegExp(`^${escapedSeparator}|${escapedSeparator}$`, "g"),
+                ""
+            );
     }
 }
