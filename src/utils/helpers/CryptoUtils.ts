@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /**
  * Cryptographic utilities for hashing, encoding, and token generation
  * Isomorphic crypto operations for Node.js and browsers

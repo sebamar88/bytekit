@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { RetryPolicy, CircuitBreaker } from "../src/index";
 
 test("RetryPolicy retries on failure and succeeds", async () => {
