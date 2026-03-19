@@ -75,14 +75,19 @@ export async function runCli(argv: string[]): Promise<void> {
     if (options.swagger) {
         await generateFromSwagger({ url: options.url });
     } else if (options.type) {
-        await handleTypeGeneration(options);
+        await handleTypeGeneration(options as any);
     } else {
         // Simple fetch/curl behavior if --type is not present
-        await handleSimpleFetch(options);
+        await handleSimpleFetch(options as any);
     }
 }
 
-async function handleTypeGeneration(options: any): Promise<void> {
+async function handleTypeGeneration(options: {
+    url: string;
+    method: HttpMethod;
+    body?: string;
+    headers: Record<string, string>;
+}): Promise<void> {
     const url = new URL(options.url);
     const endpointName = url.pathname.split("/").filter(Boolean).pop() || "api";
 
@@ -104,7 +109,12 @@ async function handleTypeGeneration(options: any): Promise<void> {
     });
 }
 
-async function handleSimpleFetch(options: any): Promise<void> {
+async function handleSimpleFetch(options: {
+    url: string;
+    method: HttpMethod;
+    body?: string;
+    headers: Record<string, string>;
+}): Promise<void> {
     console.log(`\n📡 Fetching ${options.method} ${options.url}...`);
     try {
         const response = await fetch(options.url, {
