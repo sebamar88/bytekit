@@ -11,27 +11,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - No changes yet.
 
-## [2.1.0] - 2026-03-19
-
-### Added
-
-- **UrlHelper**: Added native SEO `slugify` feature capable of parsing strings and deeply nested objects into perfectly cleansed URI paths (e.g. `categoria-ropa-color-rojo`).
-
-### Changed
-
-- **Refactor**: Eradicated isolated `UrlSlugHelper`, merging all semantic validations, unicode/diacritic normalization algorithms, and format handlers seamlessly into `UrlHelper` core.
-
-### Removed
-
-- **UrlSlugHelper**: Module completely removed from exports to reduce package bloat. Replace legacy imports calling `UrlSlugHelper.generate` with `UrlHelper.slugify`.
-
-## [2.0.6] - 2026-03-18
-
-### Fixed
-
-- **ApiClient**: Added support for `URL` objects in `baseUrl`, `baseURL`, and request `path`.
-- **CLI**: `swagger-generator` now supports `URL` objects.
-
 ## [2.0.5] - 2026-03-18
 
 ### Changed
@@ -71,7 +50,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Added**: `SchemaAdapter` interface with native **Zod** and **Valibot** support for `ApiClient`.
 - **Added**: Native support for `globalThis.fetch` as the default engine (zero-dependencies).
 - **Improved**: `AsyncToolkit` is now a primary export path (`bytekit/async`).
-- **Improved**: Isolated core string utilities into `UrlSlugHelper` and `UrlHelper`.
+- **Improved**: Isolated core string utilities into `UrlSlugHelper` and `QueryStringHelper`.
 - **Documentation**: Migrated to TypeDoc for automated API documentation.
 
 ## [1.0.33] - 2026-03-17
