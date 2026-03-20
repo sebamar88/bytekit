@@ -1,0 +1,19 @@
+{
+  "$schema": "https://unpkg.com/knip@5/schema.json",
+  "entry": [
+    "src/api-client.ts!",
+    "src/debug.ts!",
+    "src/env-manager.ts!",
+    "src/file-upload.ts!",
+    "src/logger.ts!",
+    "src/profiler.ts!",
+    "src/response-validator.ts!",
+    "src/retry-policy.ts!",
+    "src/storage-utils.ts!",
+    "src/streaming.ts!",
+    "src/websocket.ts!",
+    "src/utils/helpers/index.ts!"
+  ],
+  "project": ["src/**/*.ts", "bin/**/*.js"],
+  "ignoreExportsUsedInFile": true
+}

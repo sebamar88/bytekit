@@ -6,6 +6,15 @@ import { generateFromSwagger } from "./swagger-generator.js";
 
 type HttpMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
 
+interface CliOptions {
+    type?: boolean;
+    swagger?: boolean;
+    method: HttpMethod;
+    body?: string;
+    url?: string;
+    headers: Record<string, string>;
+}
+
 /**
  * Main CLI entry point for bytekit
  */
@@ -15,14 +24,7 @@ export async function runCli(argv: string[]): Promise<void> {
         return;
     }
 
-    const options: {
-        type?: boolean;
-        swagger?: boolean;
-        method: HttpMethod;
-        body?: string;
-        url?: string;
-        headers: Record<string, string>;
-    } = {
+    const options: CliOptions = {
         method: "GET",
         headers: {},
     };
@@ -75,19 +77,16 @@ export async function runCli(argv: string[]): Promise<void> {
     if (options.swagger) {
         await generateFromSwagger({ url: options.url });
     } else if (options.type) {
-        await handleTypeGeneration(options as any);
+        await handleTypeGeneration(options as CliOptions & { url: string });
     } else {
         // Simple fetch/curl behavior if --type is not present
-        await handleSimpleFetch(options as any);
+        await handleSimpleFetch(options as CliOptions & { url: string });
     }
 }
 
-async function handleTypeGeneration(options: {
-    url: string;
-    method: HttpMethod;
-    body?: string;
-    headers: Record<string, string>;
-}): Promise<void> {
+async function handleTypeGeneration(
+    options: CliOptions & { url: string }
+): Promise<void> {
     const url = new URL(options.url);
     const endpointName = url.pathname.split("/").filter(Boolean).pop() || "api";
 
@@ -109,12 +108,9 @@ async function handleTypeGeneration(options: {
     });
 }
 
-async function handleSimpleFetch(options: {
-    url: string;
-    method: HttpMethod;
-    body?: string;
-    headers: Record<string, string>;
-}): Promise<void> {
+async function handleSimpleFetch(
+    options: CliOptions & { url: string }
+): Promise<void> {
     console.log(`\n📡 Fetching ${options.method} ${options.url}...`);
     try {
         const response = await fetch(options.url, {

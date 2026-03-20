@@ -1,5 +1,6 @@
+
 import { Logger } from "#core/Logger.js";
-import { QueryStringHelper } from "#helpers/QueryStringHelper.js";
+import { UrlHelper } from "#helpers/UrlHelper.js";
 import { retry as retryFn } from "../async/retry.js";
 import {
     RetryPolicy,
@@ -29,8 +30,8 @@ export interface ApiClientInterceptors {
 }
 
 export interface ApiClientConfig {
-    baseUrl?: string;
-    baseURL?: string; // Alias for baseUrl (common convention)
+    baseUrl?: string | URL;
+    baseURL?: string | URL; // Alias for baseUrl (common convention)
     defaultHeaders?: HeadersInit;
     fetchImpl?: typeof fetch;
     locale?: Locale;
@@ -44,6 +45,14 @@ export interface ApiClientConfig {
     retryPolicy?: RetryConfig;
     circuitBreaker?: CircuitBreakerConfig;
 }
+
+export type RequestBody =
+    | Record<string, unknown>
+    | unknown[]
+    | string
+    | FormData
+    | Blob
+    | BufferSource;
 
 export interface RequestOptions<TResponse = unknown> extends Omit<
     RequestInit,
@@ -215,6 +224,20 @@ export class ApiClient {
     private readonly retryPolicy: RetryPolicy;
     private readonly circuitBreaker: CircuitBreaker;
 
+    /**
+     * Creates a new ApiClient instance.
+     * 
+     * The `baseUrl` can be dynamically chosen based on the environment (Node.js vs Browser).
+     * 
+     * @example
+     * // Dynamic configuration for Node vs Browser
+     * const isBrowser = typeof window !== "undefined";
+     * const api = new ApiClient({
+     *   baseUrl: isBrowser ? "/api" : "http://localhost:3000/api"
+     * });
+     * 
+     * @param config Client configuration including baseUrl, headers, and policies.
+     */
     constructor({
         baseUrl,
         baseURL,
@@ -238,7 +261,8 @@ export class ApiClient {
                 "ApiClient requires either 'baseUrl' or 'baseURL' in config"
             );
         }
-        this.baseUrl = new URL(url.endsWith("/") ? url : `${url}/`);
+        const urlStr = String(url);
+        this.baseUrl = new URL(urlStr.endsWith("/") ? urlStr : `${urlStr}/`);
         this.headers = defaultHeaders ?? {};
         this.fetchImpl = fetchImpl ?? globalThis.fetch.bind(globalThis);
         this.locale = locale;
@@ -266,7 +290,7 @@ export class ApiClient {
     // -------------------------
     // Core request shortcuts
     // -------------------------
-    async get<T>(path: string, options?: RequestOptions<T>) {
+    async get<T>(path: string | URL, options?: RequestOptions<T>) {
         return this.request<T>(path, { ...options, method: "GET" });
     }
 
@@ -282,7 +306,7 @@ export class ApiClient {
      *   headers: { "X-Custom": "value" }
      * })
      */
-    async post<T>(path: string, bodyOrOptions?: RequestOptions<T> | unknown) {
+    async post<T>(path: string | URL, bodyOrOptions?: RequestOptions<T> | unknown) {
         const options = this.normalizeBodyOrOptions<T>(bodyOrOptions);
         return this.request<T>(path, { ...options, method: "POST" });
     }
@@ -290,7 +314,7 @@ export class ApiClient {
     /**
      * PUT request - Acepta body directamente o RequestOptions
      */
-    async put<T>(path: string, bodyOrOptions?: RequestOptions<T> | unknown) {
+    async put<T>(path: string | URL, bodyOrOptions?: RequestOptions<T> | unknown) {
         const options = this.normalizeBodyOrOptions<T>(bodyOrOptions);
         return this.request<T>(path, { ...options, method: "PUT" });
     }
@@ -298,20 +322,33 @@ export class ApiClient {
     /**
      * PATCH request - Acepta body directamente o RequestOptions
      */
-    async patch<T>(path: string, bodyOrOptions?: RequestOptions<T> | unknown) {
+    async patch<T>(path: string | URL, bodyOrOptions?: RequestOptions<T> | unknown) {
         const options = this.normalizeBodyOrOptions<T>(bodyOrOptions);
         return this.request<T>(path, { ...options, method: "PATCH" });
     }
 
-    async delete<T>(path: string, options?: RequestOptions<T>) {
+    async delete<T>(path: string | URL, options?: RequestOptions<T>) {
         return this.request<T>(path, { ...options, method: "DELETE" });
     }
 
-    // -------------------------
-    // Paginated list requests
-    // -------------------------
+    /**
+     * Fetch a paginated list of resources.
+     * 
+     * Handles standard pagination (page/limit/offset), filtering, and sorting.
+     * Automatically converts options into query string parameters.
+     * 
+     * @example
+     * const products = await api.getList<Product>("/products", {
+     *   pagination: { page: 1, limit: 10 },
+     *   filters: { category: "electronics", search: "phone" },
+     *   sort: { field: "price", order: "desc" }
+     * });
+     * 
+     * @param path The relative path to the list endpoint
+     * @param options Pagination, filtering, and sorting options
+     */
     async getList<T, TFilter extends FilterParams = FilterParams>(
-        path: string,
+        path: string | URL,
         options?: ListOptions<TFilter, PaginatedResponse<T>>
     ): Promise<PaginatedResponse<T>> {
         const searchParams: Record<string, QueryParam> = {};
@@ -363,7 +400,7 @@ export class ApiClient {
      * Prepares request configuration with headers, body, and interceptors
      */
     private async prepareRequestConfig(
-        path: string,
+        path: string | URL,
         requestOptions: Partial<RequestOptions>,
         skipInterceptors?: boolean
     ): Promise<{
@@ -473,9 +510,10 @@ export class ApiClient {
      */
     private handleRequestError(
         err: unknown,
-        path: string,
+        path: string | URL,
         method?: string
     ): never {
+        const pathStr = String(path);
         if (err instanceof Error && err.name === "AbortError") {
             throw new ApiError(408, "Timeout", "Request timeout", null, true);
         }
@@ -485,7 +523,7 @@ export class ApiClient {
             this.logger?.error(
                 "API Request failed",
                 {
-                    path,
+                    path: pathStr,
                     method,
                     status: err.status,
                     statusText: err.statusText,
@@ -496,7 +534,7 @@ export class ApiClient {
         } else {
             this.logger?.error(
                 "Request failed",
-                { path, method },
+                { path: pathStr, method },
                 err instanceof Error ? err : new Error(String(err))
             );
         }
@@ -504,7 +542,7 @@ export class ApiClient {
     }
 
     async request<T>(
-        path: string,
+        path: string | URL,
         options: RequestOptions<T> = {}
     ): Promise<T> {
         const {
@@ -609,7 +647,7 @@ export class ApiClient {
      * 2. RequestOptions: post("/path", { body: {...}, headers: {...} })
      */
     private normalizeBodyOrOptions<T>(
-        bodyOrOptions?: RequestOptions<T> | unknown
+        bodyOrOptions?: RequestOptions<T> | RequestBody
     ): RequestOptions<T> {
         if (!bodyOrOptions) {
             return {};
@@ -741,14 +779,15 @@ export class ApiClient {
     }
 
     private buildUrl(
-        path: string,
+        path: string | URL,
         params?: Record<string, QueryParam>
     ): string {
-        const normalized = path.startsWith("/") ? path.slice(1) : path;
+        const pathStr = String(path);
+        const normalized = pathStr.startsWith("/") ? pathStr.slice(1) : pathStr;
         const url = new URL(normalized, this.baseUrl);
 
         if (params) {
-            const queryString = QueryStringHelper.stringify(
+            const queryString = UrlHelper.stringify(
                 params as Record<string, unknown>
             );
             if (queryString) {

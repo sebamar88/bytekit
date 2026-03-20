@@ -187,7 +187,7 @@ export class PollingHelper<T = unknown> {
             const {
                 result,
                 error,
-                responseTime: _responseTime,
+                responseTime: _,
             } = await this.executeAttempt(attempt, responseTimes);
 
             if (result !== undefined) {

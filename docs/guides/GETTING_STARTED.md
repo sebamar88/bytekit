@@ -194,66 +194,133 @@ const api = new ApiClient({
 
 ## 🌍 Environment-Specific Configuration
 
-### Dynamic Base URL Based on Environment
+### Dynamic Base URL (Node.js vs. Browser)
 
-Configure ApiClient differently for Node.js vs browser environments:
+In modern full-stack applications, you often need to configure your API client differently depending on where the code is running.
 
 ```typescript
 import { ApiClient } from "bytekit";
 
-// Detect environment
-const isNode = typeof process !== "undefined" && process.versions?.node;
+// Detect environment reliably
+const isBrowser = typeof window !== "undefined";
+const isNode = !isBrowser;
 
 const api = new ApiClient({
-    baseUrl: isNode
-        ? process.env.API_URL || "http://localhost:3000/api"
-        : "https://api.example.com",
+    // In Browser: use relative path or VITE_ prefixed env var
+    // In Node: use absolute URL from process.env
+    baseUrl: isBrowser
+        ? (import.meta.env.VITE_API_URL || "/api")
+        : (process.env.API_URL || "http://localhost:3000/api"),
 
+    // Configure different timeouts
+    timeoutMs: isNode ? 30000 : 10000,
+
+    // Add environment-specific headers
     defaultHeaders: {
-        "User-Agent": isNode ? "MyApp-Server" : "MyApp-Browser",
-    },
-
-    timeoutMs: isNode ? 30000 : 10000, // Different timeouts
+        "X-Platform": isBrowser ? "web" : "server",
+        "X-Environment": isNode ? (process.env.NODE_ENV || "development") : "production"
+    }
 });
 ```
 
-### Using Environment Variables
+### Using EnvManager for Cross-Platform Safety
+
+`EnvManager` automatically handles the difference between `process.env` (Node) and `import.meta.env` (Vite/Browser):
 
 ```typescript
-import { ApiClient } from "bytekit";
-import { EnvManager } from "bytekit/env-manager";
+import { ApiClient, EnvManager } from "bytekit";
 
 const env = new EnvManager();
 
 const api = new ApiClient({
-    baseUrl:
-        env.get("API_URL") ||
-        (typeof window !== "undefined"
-            ? window.location.origin + "/api"
-            : "http://localhost:3000"),
+    baseUrl: env.get("API_URL") || "https://api.production.com",
+    locale: env.get("APP_LOCALE") || "en"
 });
+
+// Check environment properties
+if (env.isProd()) {
+    console.log("Running in production mode");
+}
 ```
 
-### Factory Function Pattern
+## 🛠️ Error Handling and Localization
+
+bytekit makes it easy to handle API errors with built-in localization and custom message mapping.
+
+### Catching and Processing Errors
+
+Always use `try/catch` with `ApiError` to handle failures gracefully:
 
 ```typescript
-function createApiClient() {
-    const isNode = typeof process !== "undefined";
+import { ApiClient, ApiError } from "bytekit";
 
-    return new ApiClient(
-        isNode
-            ? {
-                  baseUrl: process.env.API_URL || "http://localhost:3000",
-                  timeoutMs: 30000,
-              }
-            : {
-                  baseUrl: "/api",
-                  timeoutMs: 10000,
-              }
-    );
+const api = new ApiClient({
+    baseUrl: "https://api.example.com",
+    locale: "en" // Default language
+});
+
+async function fetchUser(id: string) {
+    try {
+        return await api.get(`/users/${id}`);
+    } catch (error) {
+        if (error instanceof ApiError) {
+            // error.message is automatically localized based on status code
+            console.error(`Error ${error.status}: ${error.message}`);
+
+            // Access raw API response body if available
+            if (error.body) {
+                console.log("Details:", error.body);
+            }
+
+            // Check if it was a timeout
+            if (error.isTimeout) {
+                alert("The request took too long. Please try again.");
+            }
+        } else {
+            // Handle unexpected network or logic errors
+            console.error("Unexpected error:", error);
+        }
+    }
 }
+```
 
-const api = createApiClient();
+### Custom Localized Messages
+
+You can provide your own error message map for different languages and status codes:
+
+```typescript
+const api = new ApiClient({
+    baseUrl: "https://api.example.com",
+    locale: "es", // Set current language to Spanish
+    errorMessages: {
+        en: {
+            401: "Please sign in to access your profile",
+            404: "We couldn't find that user",
+            500: "Our servers are having trouble. Try again later."
+        },
+        es: {
+            401: "Por favor inicia sesión para ver tu perfil",
+            404: "No pudimos encontrar a ese usuario",
+            500: "Nuestros servidores tienen problemas. Intenta más tarde."
+        }
+    }
+});
+
+// If a 404 occurs, error.message will be "No pudimos encontrar a ese usuario"
+```
+
+### Dynamic Language Switching
+
+Switch the language at any time or for a single request:
+
+```typescript
+// Change global language for all future requests
+api.setLocale("en");
+
+// Override language for a specific request only
+const data = await api.get("/orders", {
+    errorLocale: "es"
+});
 ```
 
 ## 🛠️ Utility Helpers

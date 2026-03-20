@@ -2,6 +2,12 @@
 
 This guide covers advanced patterns and techniques for getting the most out of bytekit.
 
+For specific advanced topics, see our dedicated guides:
+- [📊 Resilience & Performance](./RESILIENCE.md) (Retries, Circuit Breaker, Rate Limiting)
+- [📑 Pagination & Filtering](./PAGINATION.md)
+- [🌊 Streaming Data](./STREAMING.md) (NDJSON, Downloads)
+- [⚡ Real-Time Communication](./REALTIME.md) (WebSockets, Events)
+
 ## 📡 Advanced ApiClient Patterns
 
 ### Custom Fetch Implementation
