@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /**
  * Jest setup file for wiki documentation system tests
  * Configures property-based testing with fast-check

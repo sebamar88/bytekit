@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /**
  * Cryptographic utilities for hashing, encoding, and token generation
  * Isomorphic crypto operations for Node.js and browsers
@@ -188,7 +189,7 @@ export class CryptoUtils {
             const encoder = new TextEncoder();
             const key = await globalThis.crypto.subtle.importKey(
                 "raw",
-                encoder.encode(secret),
+                encoder.encode(secret) as BufferSource,
                 { name: "HMAC", hash: algorithm },
                 false,
                 ["sign"]

@@ -17,7 +17,7 @@ describe("CLI main entry", () => {
 
         try {
             await runCli(["--invalid"]);
-        } catch (e) {
+        } catch {
             // ignore exit error
         }
 

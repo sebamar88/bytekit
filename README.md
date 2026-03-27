@@ -1,4 +1,4 @@
-# bytekit
+# Bytekit
 
 > **Previously known as:** `@sebamar88/utils` (v0.1.9 and earlier)
 

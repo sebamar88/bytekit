@@ -1,3 +1,4 @@
+
 import { Logger } from "#core/Logger.js";
 import { UrlHelper } from "#helpers/UrlHelper.js";
 import { retry as retryFn } from "../async/retry.js";
@@ -44,6 +45,14 @@ export interface ApiClientConfig {
     retryPolicy?: RetryConfig;
     circuitBreaker?: CircuitBreakerConfig;
 }
+
+export type RequestBody =
+    | Record<string, unknown>
+    | unknown[]
+    | string
+    | FormData
+    | Blob
+    | BufferSource;
 
 export interface RequestOptions<TResponse = unknown> extends Omit<
     RequestInit,
@@ -638,7 +647,7 @@ export class ApiClient {
      * 2. RequestOptions: post("/path", { body: {...}, headers: {...} })
      */
     private normalizeBodyOrOptions<T>(
-        bodyOrOptions?: RequestOptions<T> | unknown
+        bodyOrOptions?: RequestOptions<T> | RequestBody
     ): RequestOptions<T> {
         if (!bodyOrOptions) {
             return {};

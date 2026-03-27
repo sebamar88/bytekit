@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { describe, it, expect } from "vitest";
 import { timeout, withTimeout } from "../../src/utils/async/timeout";
 import { allSettled } from "../../src/utils/async/allSettled";
