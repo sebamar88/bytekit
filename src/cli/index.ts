@@ -1,6 +1,7 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { generateDddBoilerplate } from "./ddd-boilerplate.js";
 import { generateTypesFromEndpoint } from "./type-generator.js";
 import { generateFromSwagger } from "./swagger-generator.js";
 
@@ -15,12 +16,85 @@ interface CliOptions {
     headers: Record<string, string>;
 }
 
+interface DddCliArgs {
+    domain: string;
+    /** Nombre del puerto secundario (interfaz outbound), p. ej. OrderRepository o order-repository. */
+    port: string;
+    outDir?: string;
+    /**
+     * Comma-separated list of domain actions to scaffold.
+     * E.g. "create,findById,update"
+     */
+    actions?: string[];
+}
+
+function parseDddArgs(argv: string[]): DddCliArgs | null {
+    if (!argv.includes("--ddd")) {
+        return null;
+    }
+    let domain: string | undefined;
+    let port: string | undefined;
+    let outDir: string | undefined;
+    let actions: string[] | undefined;
+
+    for (const arg of argv) {
+        if (arg.startsWith("--domain=")) {
+            domain = arg.slice("--domain=".length);
+        } else if (arg.startsWith("--port=")) {
+            port = arg.slice("--port=".length);
+        } else if (arg.startsWith("--out=")) {
+            outDir = arg.slice("--out=".length);
+        } else if (arg.startsWith("--actions=")) {
+            const raw = arg.slice("--actions=".length);
+            actions = raw.split(",").map((a) => a.trim()).filter(Boolean);
+        }
+    }
+
+    if (!domain?.trim()) {
+        console.error(
+            "\u001b[31mError:\u001b[0m --ddd requiere --domain=<nombre del contexto acotado>"
+        );
+        process.exit(1);
+    }
+    if (!port?.trim()) {
+        console.error(
+            "\u001b[31mError:\u001b[0m --ddd requiere --port=<nombre del puerto driven/outbound>, p. ej. OrderRepository"
+        );
+        process.exit(1);
+    }
+
+    return {
+        domain: domain.trim(),
+        port: port.trim(),
+        outDir: outDir?.trim() || undefined,
+        actions,
+    };
+}
+
 /**
  * Main CLI entry point for bytekit
  */
 export async function runCli(argv: string[]): Promise<void> {
     if (argv.length === 0 || argv.includes("--help") || argv.includes("-h")) {
         printHelp();
+        return;
+    }
+
+    const dddArgs = parseDddArgs(argv);
+    if (dddArgs) {
+        const { rootDir, slug } = await generateDddBoilerplate({
+            domain: dddArgs.domain,
+            port: dddArgs.port,
+            outDir: dddArgs.outDir,
+            actions: dddArgs.actions,
+        });
+        const actionsNote =
+            dddArgs.actions && dddArgs.actions.length > 0
+                ? ` · acciones: ${dddArgs.actions.join(", ")}`
+                : "";
+        console.log(
+            `\u001b[32m✓\u001b[0m Estructura DDD / hexagonal en \u001b[1m${rootDir}\u001b[0m (contexto: ${slug}, puerto outbound: ${dddArgs.port}${actionsNote})`
+        );
         return;
     }
 
@@ -144,6 +218,16 @@ function printHelp(): void {
                         Saves to src/types/{endpoint}.ts
   --swagger             Generate all TypeScript DTOs from a Swagger/OpenAPI spec.
                         Saves to src/types/api-docs.ts
+  --ddd                 Genera carpetas DDD y stubs de puertos hexagonales (interfaces).
+                        Requiere --domain=<contexto> y --port=<interfaz outbound>.
+                        Crea ./<dominio-slug>/ por defecto; usa --out=<ruta> para otra raíz.
+  --domain=<name>       Bounded context (solo con --ddd).
+  --port=<name>         Puertos driven: interfaz hacia exterior (ej. OrderRepository).
+  --out=<dir>           Directorio de salida para --ddd (opcional).
+  --actions=<list>      Acciones de dominio separadas por coma (solo con --ddd).
+                        Genera entidad, interfaz de repositorio, casos de uso e
+                        implementación HTTP (vía ApiClient de bytekit) por cada acción.
+                        Ej. --actions=create,findById,update,delete
   --method=<METHOD>     HTTP method (GET, POST, PUT, DELETE, PATCH). Default: GET.
   --body=<body>         JSON body for the request.
   --header=<key:val>    Custom HTTP header (can be used multiple times).
@@ -154,6 +238,9 @@ function printHelp(): void {
   bytekit --type https://api.example.com/users
   bytekit --swagger https://api.example.com/swagger.json
   bytekit --type --method=POST --body='{"name":"test"}' https://api.example.com/users
+  bytekit --ddd --domain=orders --port=OrderRepository
+  bytekit --ddd --domain="User Management" --port=notification-gateway --out=./apps/billing
+  bytekit --ddd --domain=Product --port=ProductRepository --actions=create,findById,update,delete
 `);
 }
 

@@ -93,9 +93,71 @@ import { retry, timeout } from "bytekit/async";
 import { UrlSlugHelper } from "bytekit/url-slug-helper";
 ```
 
-## 📚 Core Modules
+## �️ CLI
+
+Bytekit includes a command-line tool for rapid scaffolding directly from your terminal.
+
+### Type Generation from an API Endpoint
+
+```bash
+# Generates src/types/users.ts with a typed interface inferred from the JSON response
+bytekit --type https://api.example.com/users
+```
+
+### Type Generation from Swagger / OpenAPI
+
+```bash
+# Generates src/types/api-docs.ts with all DTOs from the spec
+bytekit --swagger https://api.example.com/swagger.json
+```
+
+### DDD Bounded-Context Scaffolding
+
+Generate a full **Domain-Driven Design** folder structure with hexagonal ports, entity, repository interface, use cases, and an HTTP adapter that uses `ApiClient`:
+
+```bash
+# Minimal: creates the DDD directory tree + hexagonal port stubs
+bytekit --ddd --domain=Product --port=ProductRepository
+
+# Full: also generates entity, repository interface, use cases & HTTP adapter
+bytekit --ddd --domain=Product --port=ProductRepository --actions=create,findById,update,delete
+```
+
+The generated HTTP infrastructure repository always imports `ApiClient` from `bytekit/api-client`, keeping your data layer consistent with the rest of the toolkit.
+
+<details>
+<summary>Generated file tree (with <code>--actions</code>)</summary>
+
+```text
+product/
+├── domain/
+│   ├── entities/          → ProductEntity.ts
+│   ├── value-objects/
+│   ├── aggregates/
+│   ├── events/
+│   ├── repositories/      → IProductRepository.ts
+│   └── services/
+├── application/
+│   ├── use-cases/         → CreateProductUseCase.ts, FindByIdProductUseCase.ts, …
+│   ├── dto/
+│   └── ports/
+│       ├── inbound/       → product-primary.port.ts
+│       └── outbound/      → product-repository.port.ts
+├── infrastructure/
+│   ├── persistence/       → HttpProductRepository.ts (uses ApiClient)
+│   └── config/
+└── presentation/
+    └── http/
+        ├── routes/
+        └── controllers/
+```
+
+</details>
+
+## �📚 Core Modules
 
 ### 🔧 Networking & Resilience
+
 - **`ApiClient`** - Typed HTTP client with interceptors, retries, and schema validation support.
 - **`SchemaAdapter`** - Generic adapter to plug your favorite validation library (Zod, Valibot).
 - **`RetryPolicy` & `CircuitBreaker`** - Prevent failures and handle flaky endpoints.
@@ -103,11 +165,13 @@ import { UrlSlugHelper } from "bytekit/url-slug-helper";
 - **`RateLimiter`** - Throttle your outbound requests.
 
 ### ⚡ Async Toolkit
+
 - Concurrency: **`parallel`**, **`race`**, **`allSettled`**, **`sequential`**.
 - Execution: **`retry`**, **`debounceAsync`**, **`throttleAsync`**.
 - Timing: **`sleep`**, **`timeout`**.
 
 ### 🛠️ Key Helpers
+
 - **`Logger` & `Profiler`** - Structured logs and performance monitoring.
 - **`UrlSlugHelper`** - Generate SEO-friendly URL slugs.
 - **`QueryStringHelper`** - Powerful object-to-query-string serialization.
