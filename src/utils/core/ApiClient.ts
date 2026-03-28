@@ -13,6 +13,7 @@ import {
     ValidationSchema,
 } from "#core/ResponseValidator.js";
 import { SchemaAdapter, isSchemaAdapter } from "./SchemaAdapter.js";
+import { PromisePool, PromisePoolOptions } from "../async/promise-pool.js";
 
 export type QueryParamValue = string | number | boolean | null | undefined;
 export type QueryParam =
@@ -44,6 +45,8 @@ export interface ApiClientConfig {
     logger?: Logger;
     retryPolicy?: RetryConfig;
     circuitBreaker?: CircuitBreakerConfig;
+    /** Optional pool for limiting concurrent requests. */
+    pool?: PromisePoolOptions;
 }
 
 export type RequestBody =
@@ -223,6 +226,7 @@ export class ApiClient {
     >;
     private readonly retryPolicy: RetryPolicy;
     private readonly circuitBreaker: CircuitBreaker;
+    private readonly pool?: PromisePool;
 
     /**
      * Creates a new ApiClient instance.
@@ -253,6 +257,7 @@ export class ApiClient {
         logger,
         retryPolicy,
         circuitBreaker,
+        pool,
     }: ApiClientConfig) {
         // Support both baseUrl and baseURL (common convention)
         const url = baseUrl ?? baseURL;
@@ -285,6 +290,7 @@ export class ApiClient {
         this.logger = logger;
         this.retryPolicy = new RetryPolicy(retryPolicy);
         this.circuitBreaker = new CircuitBreaker(circuitBreaker);
+        this.pool = pool ? new PromisePool(pool) : undefined;
     }
 
     // -------------------------
@@ -542,6 +548,18 @@ export class ApiClient {
     }
 
     async request<T>(
+        path: string | URL,
+        options: RequestOptions<T> = {}
+    ): Promise<T> {
+        // T026: if a pool is configured, route through it for concurrency control
+        if (this.pool) {
+            const results = await this.pool.run<T>([() => this.executeRequest(path, options)]);
+            return results[0];
+        }
+        return this.executeRequest(path, options);
+    }
+
+    private async executeRequest<T>(
         path: string | URL,
         options: RequestOptions<T> = {}
     ): Promise<T> {
