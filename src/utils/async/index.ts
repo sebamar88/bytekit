@@ -35,3 +35,5 @@ export { race } from "./race.js";
 export { allSettled } from "./allSettled.js";
 export { debounceAsync } from "./debounce.js";
 export { throttleAsync } from "./throttle.js";
+export { PromisePool, PoolTimeoutError } from "./promise-pool.js";
+export type { PromisePoolOptions } from "./promise-pool.js";

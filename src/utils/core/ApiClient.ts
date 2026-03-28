@@ -13,6 +13,7 @@ import {
     ValidationSchema,
 } from "#core/ResponseValidator.js";
 import { SchemaAdapter, isSchemaAdapter } from "./SchemaAdapter.js";
+import { PromisePool, PromisePoolOptions } from "../async/promise-pool.js";
 
 export type QueryParamValue = string | number | boolean | null | undefined;
 export type QueryParam =
@@ -44,6 +45,8 @@ export interface ApiClientConfig {
     logger?: Logger;
     retryPolicy?: RetryConfig;
     circuitBreaker?: CircuitBreakerConfig;
+    /** Optional pool for limiting concurrent requests. */
+    pool?: PromisePoolOptions;
 }
 
 export type RequestBody =
@@ -223,19 +226,20 @@ export class ApiClient {
     >;
     private readonly retryPolicy: RetryPolicy;
     private readonly circuitBreaker: CircuitBreaker;
+    private readonly pool?: PromisePool;
 
     /**
      * Creates a new ApiClient instance.
-     * 
+     *
      * The `baseUrl` can be dynamically chosen based on the environment (Node.js vs Browser).
-     * 
+     *
      * @example
      * // Dynamic configuration for Node vs Browser
      * const isBrowser = typeof window !== "undefined";
      * const api = new ApiClient({
      *   baseUrl: isBrowser ? "/api" : "http://localhost:3000/api"
      * });
-     * 
+     *
      * @param config Client configuration including baseUrl, headers, and policies.
      */
     constructor({
@@ -253,6 +257,7 @@ export class ApiClient {
         logger,
         retryPolicy,
         circuitBreaker,
+        pool,
     }: ApiClientConfig) {
         // Support both baseUrl and baseURL (common convention)
         const url = baseUrl ?? baseURL;
@@ -285,6 +290,7 @@ export class ApiClient {
         this.logger = logger;
         this.retryPolicy = new RetryPolicy(retryPolicy);
         this.circuitBreaker = new CircuitBreaker(circuitBreaker);
+        this.pool = pool ? new PromisePool(pool) : undefined;
     }
 
     // -------------------------
@@ -333,17 +339,17 @@ export class ApiClient {
 
     /**
      * Fetch a paginated list of resources.
-     * 
+     *
      * Handles standard pagination (page/limit/offset), filtering, and sorting.
      * Automatically converts options into query string parameters.
-     * 
+     *
      * @example
      * const products = await api.getList<Product>("/products", {
      *   pagination: { page: 1, limit: 10 },
      *   filters: { category: "electronics", search: "phone" },
      *   sort: { field: "price", order: "desc" }
      * });
-     * 
+     *
      * @param path The relative path to the list endpoint
      * @param options Pagination, filtering, and sorting options
      */
@@ -542,6 +548,18 @@ export class ApiClient {
     }
 
     async request<T>(
+        path: string | URL,
+        options: RequestOptions<T> = {}
+    ): Promise<T> {
+        // T026: if a pool is configured, route through it for concurrency control
+        if (this.pool) {
+            const results = await this.pool.run<T>([() => this.executeRequest(path, options)]);
+            return results[0];
+        }
+        return this.executeRequest(path, options);
+    }
+
+    private async executeRequest<T>(
         path: string | URL,
         options: RequestOptions<T> = {}
     ): Promise<T> {
