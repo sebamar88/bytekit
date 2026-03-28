@@ -12,6 +12,55 @@ export interface StreamResponse<T> {
     error?: Error;
 }
 
+// ─── fetch-based SSE types ───────────────────────────────────────────────────
+
+/**
+ * A single Server-Sent Event parsed from the stream.
+ *
+ * @template T  The type of the parsed `data` field (defaults to `unknown`).
+ */
+export interface SSEEvent<T = unknown> {
+    /** Event type — defaults to `"message"` when the server omits the `event:` field. */
+    event: string;
+    /** Parsed data payload (JSON-parsed when possible, raw string otherwise). */
+    data: T | string;
+    /** Optional `id:` field sent by the server. */
+    id?: string;
+    /** Optional `retry:` field (ms) sent by the server. */
+    retry?: number;
+}
+
+/**
+ * Options for {@link StreamingHelper.fetchSSE}.
+ */
+export interface FetchSSEOptions {
+    /** HTTP method (default `"GET"`). Use `"POST"` when sending a body. */
+    method?: string;
+    /** Request body — automatically JSON-stringified if it is an object. */
+    body?: BodyInit | Record<string, unknown> | unknown;
+    /** Custom request headers. `Accept: text/event-stream` is always set. */
+    headers?: Record<string, string>;
+    /**
+     * AbortSignal for cancellation.
+     *
+     * @example
+     * const ac = new AbortController();
+     * for await (const ev of StreamingHelper.fetchSSE(url, { signal: ac.signal })) { … }
+     * ac.abort(); // cancels the stream
+     */
+    signal?: AbortSignal;
+    /**
+     * Event types to emit. When omitted **all** event types are yielded.
+     * Pass e.g. `["data", "log", "heartbeat"]` to restrict.
+     */
+    eventTypes?: string[];
+    /**
+     * If `true`, every `data:` field is returned as a raw string.
+     * If `false` (default), the helper tries `JSON.parse` first.
+     */
+    raw?: boolean;
+}
+
 export class StreamingHelper {
     /**
      * Process remaining buffer content
@@ -213,6 +262,236 @@ export class StreamingHelper {
             },
             close,
         };
+    }
+
+    // ─── fetch-based SSE (resolves POST, AbortSignal, multi-event, async generator) ──
+
+    /**
+     * Consume a Server-Sent Events endpoint via `fetch` + `ReadableStream`.
+     *
+     * Unlike {@link streamSSE} (which wraps the native `EventSource` API and is
+     * limited to GET requests), this method supports **any HTTP method**, request
+     * **bodies**, **AbortSignal** cancellation, **multiple event types**, and
+     * returns an **`AsyncIterable`** so you can use `for await … of`.
+     *
+     * @template T  The expected shape of each event's `data` field.
+     *
+     * @example
+     * // POST with body + cancellation + multi-event
+     * const ac = new AbortController();
+     *
+     * for await (const ev of StreamingHelper.fetchSSE<PipelineChunk>(
+     *   "/bff/ai/orchestrator-stream",
+     *   {
+     *     method: "POST",
+     *     body: { prompt: "Explain DDD", model: "gpt-4o" },
+     *     signal: ac.signal,
+     *     eventTypes: ["data", "log", "heartbeat"],
+     *   }
+     * )) {
+     *   switch (ev.event) {
+     *     case "data":      renderToken(ev.data); break;
+     *     case "log":       console.debug(ev.data); break;
+     *     case "heartbeat": break; // keep-alive, ignore
+     *   }
+     * }
+     */
+    static async *fetchSSE<T = unknown>(
+        endpoint: string,
+        options: FetchSSEOptions = {}
+    ): AsyncGenerator<SSEEvent<T>, void, undefined> {
+        const {
+            method = "GET",
+            body,
+            headers = {},
+            signal,
+            eventTypes,
+            raw = false,
+        } = options;
+
+        // Build the request body
+        let requestBody: BodyInit | undefined;
+        if (body !== undefined && body !== null) {
+            if (
+                typeof body === "string" ||
+                body instanceof ArrayBuffer ||
+                body instanceof FormData ||
+                body instanceof URLSearchParams ||
+                body instanceof Blob ||
+                (typeof ReadableStream !== "undefined" && body instanceof ReadableStream)
+            ) {
+                requestBody = body as BodyInit;
+            } else {
+                // Assume JSON-serializable object
+                requestBody = JSON.stringify(body);
+                if (!headers["Content-Type"] && !headers["content-type"]) {
+                    headers["Content-Type"] = "application/json";
+                }
+            }
+        }
+
+        const response = await fetch(endpoint, {
+            method,
+            headers: {
+                Accept: "text/event-stream",
+                ...headers,
+            },
+            body: requestBody,
+            signal,
+        });
+
+        if (!response.ok) {
+            throw new Error(
+                `SSE request failed with status ${response.status}: ${response.statusText}`
+            );
+        }
+
+        if (!response.body) {
+            throw new Error("Response body is empty — cannot read SSE stream");
+        }
+
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        let buffer = "";
+
+        // Current event being assembled (SSE events are separated by blank lines)
+        let currentEvent = "";
+        let currentData: string[] = [];
+        let currentId: string | undefined;
+        let currentRetry: number | undefined;
+
+        try {
+            while (true) {
+                const { done, value } = await reader.read();
+
+                if (done) {
+                    // Flush any partial event left in the buffer
+                    const flushed = this.flushSSEEvent<T>(
+                        currentEvent,
+                        currentData,
+                        currentId,
+                        currentRetry,
+                        eventTypes,
+                        raw
+                    );
+                    if (flushed) yield flushed;
+                    break;
+                }
+
+                buffer += decoder.decode(value, { stream: true });
+
+                // SSE spec: events are separated by one or more blank lines (\n\n)
+                const segments = buffer.split("\n");
+                // Keep the last segment (may be incomplete)
+                buffer = segments.pop()!;
+
+                for (const line of segments) {
+                    if (line === "" || line === "\r") {
+                        // Blank line → dispatch current event
+                        const evt = this.flushSSEEvent<T>(
+                            currentEvent,
+                            currentData,
+                            currentId,
+                            currentRetry,
+                            eventTypes,
+                            raw
+                        );
+                        if (evt) yield evt;
+
+                        // Reset for next event
+                        currentEvent = "";
+                        currentData = [];
+                        currentId = undefined;
+                        currentRetry = undefined;
+                        continue;
+                    }
+
+                    const cleaned = line.endsWith("\r")
+                        ? line.slice(0, -1)
+                        : line;
+
+                    // Lines starting with ':' are comments (keep-alive) — skip
+                    if (cleaned.startsWith(":")) continue;
+
+                    const colonIdx = cleaned.indexOf(":");
+                    let field: string;
+                    let val: string;
+
+                    if (colonIdx === -1) {
+                        field = cleaned;
+                        val = "";
+                    } else {
+                        field = cleaned.slice(0, colonIdx);
+                        // The spec says: if the first character after ':' is a space, strip it
+                        val = cleaned[colonIdx + 1] === " "
+                            ? cleaned.slice(colonIdx + 2)
+                            : cleaned.slice(colonIdx + 1);
+                    }
+
+                    switch (field) {
+                        case "event":
+                            currentEvent = val;
+                            break;
+                        case "data":
+                            currentData.push(val);
+                            break;
+                        case "id":
+                            currentId = val;
+                            break;
+                        case "retry": {
+                            const n = parseInt(val, 10);
+                            if (!isNaN(n)) currentRetry = n;
+                            break;
+                        }
+                        // Unknown fields are ignored per spec
+                    }
+                }
+            }
+        } finally {
+            reader.releaseLock();
+        }
+    }
+
+    /**
+     * Assemble a parsed SSE event from accumulated fields.
+     * Returns `null` when the event should be skipped (no data, or filtered out).
+     * @internal
+     */
+    private static flushSSEEvent<T>(
+        eventType: string,
+        dataLines: string[],
+        id: string | undefined,
+        retry: number | undefined,
+        allowedTypes: string[] | undefined,
+        raw: boolean
+    ): SSEEvent<T> | null {
+        if (dataLines.length === 0) return null;
+
+        const type = eventType || "message";
+
+        // Filter by allowed event types
+        if (allowedTypes && allowedTypes.length > 0 && !allowedTypes.includes(type)) {
+            return null;
+        }
+
+        // Per spec, multiple `data:` lines are joined with \n
+        const rawData = dataLines.join("\n");
+
+        let parsed: T | string;
+        if (raw) {
+            parsed = rawData;
+        } else {
+            try {
+                parsed = JSON.parse(rawData) as T;
+            } catch {
+                parsed = rawData;
+            }
+        }
+
+        const evt: SSEEvent<T> = { event: type, data: parsed };
+        if (id !== undefined) evt.id = id;
+        if (retry !== undefined) evt.retry = retry;
+        return evt;
     }
 
     /**
