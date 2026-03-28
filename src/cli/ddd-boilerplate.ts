@@ -307,7 +307,7 @@ ${methods}
 function generateHttpMethod(
     c: ActionConfig,
     slug: string,
-    pascal: string
+    _pascal: string
 ): string {
     const paramStr = c.params.map((p) => `${p.name}: ${p.type}`).join(", ");
     const urlPath = c.hasIdSegment ? `/${slug}/\${id}` : `/${slug}`;

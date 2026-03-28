@@ -306,7 +306,7 @@ export class ApiClient {
      *   headers: { "X-Custom": "value" }
      * })
      */
-    async post<T>(path: string | URL, bodyOrOptions?: RequestOptions<T> | unknown) {
+    async post<T>(path: string | URL, bodyOrOptions?: RequestOptions<T> | RequestBody) {
         const options = this.normalizeBodyOrOptions<T>(bodyOrOptions);
         return this.request<T>(path, { ...options, method: "POST" });
     }
@@ -314,7 +314,7 @@ export class ApiClient {
     /**
      * PUT request - Acepta body directamente o RequestOptions
      */
-    async put<T>(path: string | URL, bodyOrOptions?: RequestOptions<T> | unknown) {
+    async put<T>(path: string | URL, bodyOrOptions?: RequestOptions<T> | RequestBody) {
         const options = this.normalizeBodyOrOptions<T>(bodyOrOptions);
         return this.request<T>(path, { ...options, method: "PUT" });
     }
@@ -322,7 +322,7 @@ export class ApiClient {
     /**
      * PATCH request - Acepta body directamente o RequestOptions
      */
-    async patch<T>(path: string | URL, bodyOrOptions?: RequestOptions<T> | unknown) {
+    async patch<T>(path: string | URL, bodyOrOptions?: RequestOptions<T> | RequestBody) {
         const options = this.normalizeBodyOrOptions<T>(bodyOrOptions);
         return this.request<T>(path, { ...options, method: "PATCH" });
     }
