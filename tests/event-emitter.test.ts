@@ -163,3 +163,55 @@ test("EventEmitter ignores errors in error handlers", async () => {
 
     assert.equal(errorCount, 1);
 });
+
+test("EventEmitter.off is a no-op when event has no registered listeners (line 189)", () => {
+    const ee = new EventEmitter();
+    const handler = () => {};
+    // Should not throw — just returns this
+    ee.off("nonexistent", handler);
+    assert.equal(ee.listenerCount("nonexistent"), 0);
+});
+
+test("EventEmitter.emitSync returns false when no listeners exist (line 189)", () => {
+    const ee = new EventEmitter();
+    const result = ee.emitSync("no-listeners", {});
+    assert.equal(result, false);
+});
+
+test("EventEmitter.emitSync re-throws when captureRejections is false and handler throws (lines 198-199)", () => {
+    const ee = new EventEmitter({ captureRejections: false });
+    ee.on("boom", () => {
+        throw new Error("emitSync re-throw");
+    });
+    assert.throws(() => ee.emitSync("boom", {}), /emitSync re-throw/);
+});
+
+test("EventEmitter.getListeners returns empty array for unknown event (line 242)", () => {
+    const ee = new EventEmitter();
+    assert.deepEqual(ee.getListeners("unknown"), []);
+});
+
+test("EventEmitter.emit with sync throw + captureRejections=true calls handleError (line 160)", async () => {
+    // Sync throw + captureRejections=true → error is captured, NOT propagated
+    const ee = new EventEmitter({ captureRejections: true });
+    const capturedErrors: Error[] = [];
+    ee.onError((_data, err) => {
+        if (err) capturedErrors.push(err);
+    });
+    ee.on("sync-fail", () => {
+        throw new Error("sync handler error");
+    });
+    // Should NOT throw when captureRejections=true
+    await ee.emit("sync-fail", {});
+    assert.equal(capturedErrors.length, 1);
+    assert.ok(capturedErrors[0]!.message.includes("sync handler error"));
+});
+
+test("EventEmitter.emit with async reject + captureRejections=false rethrows (lines 174-175)", async () => {
+    // Async handler rejects + captureRejections=false → rethrows from Promise.all catch
+    const ee = new EventEmitter({ captureRejections: false });
+    ee.on("async-fail", async () => {
+        throw new Error("async rejection");
+    });
+    await assert.rejects(() => ee.emit("async-fail", {}), /async rejection/);
+});

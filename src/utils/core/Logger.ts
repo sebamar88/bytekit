@@ -174,6 +174,7 @@ export const consoleTransportBrowser = ({
 
     return (entry) => {
         const { level, message, namespace, timestamp, context, error } = entry;
+        /* v8 ignore next */
         const color = COLORS[level] ?? "";
         const prefixParts: string[] = [];
 

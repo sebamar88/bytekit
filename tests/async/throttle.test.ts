@@ -312,6 +312,53 @@ describe("throttleAsync function", () => {
                 await throttled(3);
                 expect(fn).toHaveBeenCalledTimes(3);
             });
+
+            it("calls reject option when trailing call is superseded (lines 78-79)", async () => {
+                // When a trailing call is replaced by a newer one, the superseded promise
+                // is rejected via pendingReject (lines 78-79 in throttle.ts)
+                const fn = vi.fn(async (x: number) => x * 2);
+                const throttled = throttleAsync(fn, 100);
+
+                // First call executes immediately
+                await throttled(1);
+
+                // Queue a trailing call (promise2) — within the throttle window
+                const promise2 = throttled(2);
+
+                // Supersede promise2 with promise3 → lines 78-79: pendingReject fires for promise2
+                const promise3 = throttled(3);
+
+                // promise2 should have been rejected with the cancellation error
+                await expect(promise2).rejects.toThrow(
+                    "Throttled call cancelled"
+                );
+
+                // promise3 should eventually resolve (trailing execution after interval)
+                const result3 = await promise3;
+                expect(result3).toBe(6); // 3 * 2
+                expect(fn).toHaveBeenCalledWith(3);
+            });
+
+            it("rejects the trailing promise when the fn throws during executePending (catch block lines 78-79)", async () => {
+                // executePending's catch block fires when fn rejects during trailing execution
+                let callCount = 0;
+                const fn = vi.fn(async (_x: number) => {
+                    callCount++;
+                    if (callCount === 2)
+                        throw new Error("trailing fn exploded");
+                    return callCount;
+                });
+                const throttled = throttleAsync(fn, 50);
+
+                // First call executes immediately and succeeds
+                await throttled(1);
+
+                // Queue a trailing call — fn will throw on 2nd invocation
+                const promise2 = throttled(2);
+
+                // Trailing execution runs after ~50 ms and fn throws → catch block lines 78-79
+                await expect(promise2).rejects.toThrow("trailing fn exploded");
+            });
         });
     });
 });

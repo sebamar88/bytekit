@@ -89,6 +89,74 @@ describe("swagger-generator", () => {
         expect(content).toContain("export interface Product");
     });
 
+    it("covers trailing-slash baseUrl branch in HTML path (line 53 true branch)", async () => {
+        // When baseUrl ends with '/', the tryUrl uses p.slice(1) instead of plain concatenation
+        const htmlRes = {
+            ok: true,
+            headers: new Headers({ "content-type": "text/html" }),
+        };
+        const specRes = {
+            ok: true,
+            headers: new Headers({ "content-type": "application/json" }),
+            json: async () => ({
+                components: {
+                    schemas: {
+                        Item: {
+                            type: "object",
+                            properties: { id: { type: "integer" } },
+                        },
+                    },
+                },
+            }),
+        };
+
+        // URL "https://api.example.com/v1/" — trailing slash not matching /docs or /swagger-ui
+        // so baseUrl stays as "https://api.example.com/v1/"
+        globalThis.fetch = vi
+            .fn()
+            .mockResolvedValueOnce(htmlRes)
+            .mockResolvedValueOnce({ ok: false })
+            .mockResolvedValueOnce({ ok: false })
+            .mockResolvedValueOnce({ ok: false })
+            .mockResolvedValueOnce(specRes);
+
+        const output = "item-types.ts";
+        await generateFromSwagger({
+            url: "https://api.example.com/v1/",
+            output,
+        });
+
+        const content = await fs.readFile(path.join(tempDir, output), "utf8");
+        expect(content).toContain("export interface Item");
+    });
+
+    it("throws when HTML spec page has no resolvable JSON endpoint (line 69 !found throw)", async () => {
+        // All 4 common-path attempts fail → !found → throw
+        // Also exercises catch { continue } when a path fetch rejects
+        const htmlRes = {
+            ok: true,
+            headers: new Headers({ "content-type": "text/html" }),
+        };
+
+        globalThis.fetch = vi
+            .fn()
+            .mockResolvedValueOnce(htmlRes) // main URL → HTML
+            .mockRejectedValueOnce(new Error("net")) // first path throws → catch continue (line 69)
+            .mockResolvedValue({ ok: false }); // remaining paths return 404
+
+        const spy = vi.spyOn(console, "error").mockImplementation(() => {});
+        const exitSpy = vi.spyOn(process, "exit").mockImplementation(() => {
+            throw new Error("exit");
+        });
+
+        await expect(
+            generateFromSwagger({ url: "https://api.example.com/docs" })
+        ).rejects.toThrow();
+
+        spy.mockRestore();
+        exitSpy.mockRestore();
+    });
+
     it("should handle enum types", async () => {
         const spec = {
             components: {
@@ -169,5 +237,193 @@ describe("swagger-generator", () => {
         ).rejects.toThrow();
         expect(spy).toHaveBeenCalled();
         exitSpy.mockRestore();
+    });
+
+    it("covers mapOpenApiToTs case array, case object, and default fallbacks", async () => {
+        // Exercises the "array", "object" (with + without additionalProperties),
+        // and the default "any" branch in mapOpenApiToTs
+        const spec = {
+            components: {
+                schemas: {
+                    Order: {
+                        type: "object",
+                        properties: {
+                            // "array" case: items typed as string
+                            tags: { type: "array", items: { type: "string" } },
+                            // "object" without additionalProperties → Record<string, any>
+                            rawMeta: { type: "object" },
+                            // "object" WITH additionalProperties → Record<string, number>
+                            counts: {
+                                type: "object",
+                                additionalProperties: { type: "number" },
+                            },
+                            // no type, no $ref, no combinations → "any" fallback
+                            unknownField: {},
+                        },
+                        required: ["tags"],
+                    },
+                    // schema with BOTH properties AND additionalProperties → extends Record<> interface
+                    HybridMap: {
+                        type: "object",
+                        properties: {
+                            label: { type: "string" },
+                        },
+                        additionalProperties: { type: "boolean" },
+                    },
+                },
+            },
+        };
+
+        globalThis.fetch = vi.fn().mockResolvedValue({
+            ok: true,
+            headers: new Headers({ "content-type": "application/json" }),
+            json: async () => spec,
+        });
+
+        await generateFromSwagger({
+            url: "http://api.com/json",
+            output: "order.ts",
+        });
+        const content = await fs.readFile(
+            path.join(tempDir, "order.ts"),
+            "utf8"
+        );
+
+        expect(content).toContain("tags: string[];"); // array case
+        expect(content).toContain("rawMeta?: Record<string, any>;"); // object without additionalProperties
+        expect(content).toContain("counts?: Record<string, number>;"); // object with additionalProperties
+        expect(content).toContain("unknownField?: any;"); // default "any" fallback
+        // Hybrid: interface with both properties and additionalProperties → extends Record
+        expect(content).toContain("extends Record<string, boolean>");
+    });
+
+    it("covers string type with date/date-time format → string | Date", async () => {
+        const spec = {
+            components: {
+                schemas: {
+                    Event: {
+                        type: "object",
+                        properties: {
+                            createdAt: { type: "string", format: "date-time" },
+                            date: { type: "string", format: "date" },
+                        },
+                    },
+                },
+            },
+        };
+
+        globalThis.fetch = vi.fn().mockResolvedValue({
+            ok: true,
+            headers: new Headers({ "content-type": "application/json" }),
+            json: async () => spec,
+        });
+
+        await generateFromSwagger({
+            url: "http://api.com/json",
+            output: "event.ts",
+        });
+        const content = await fs.readFile(
+            path.join(tempDir, "event.ts"),
+            "utf8"
+        );
+        expect(content).toContain("string | Date");
+    });
+
+    it("covers anyOf schema combinations and null content-type fallback", async () => {
+        // anyOf branch in mapOpenApiToTs (schema.oneOf falsy, schema.anyOf truthy)
+        // Also: response has no content-type header → || '' fallback at line 31
+        const spec = {
+            components: {
+                schemas: {
+                    AnyUnion: {
+                        anyOf: [{ type: "string" }, { type: "number" }],
+                    },
+                },
+            },
+        };
+
+        globalThis.fetch = vi.fn().mockResolvedValue({
+            ok: true,
+            headers: new Headers(), // no content-type → null → "" fallback (line 31)
+            json: async () => spec,
+        });
+
+        await generateFromSwagger({
+            url: "http://api.com/json",
+            output: "any-union.ts",
+        });
+        const content = await fs.readFile(
+            path.join(tempDir, "any-union.ts"),
+            "utf8"
+        );
+        expect(content).toContain("AnyUnion");
+    });
+
+    it("covers enum with non-string values (line 153 FALSE ternary), !schema (line 162 TRUE), and empty refName (line 167 FALSE)", async () => {
+        // 1. schema.enum with numeric values → typeof v !== 'string' → v (not wrapped in quotes)
+        // 2. Schema with $ref: "" → refName = "" (falsy) → return "any"
+        // 3. Array without items → mapOpenApiToTs(undefined) → !schema → return "any"
+        const spec = {
+            components: {
+                schemas: {
+                    // Numeric enum — triggers FALSE branch of (typeof v === "string" ? `'${v}'` : v)
+                    Priority: { enum: [1, 2, 3] },
+                    // Object with $ref property that has empty ref name
+                    WithRef: {
+                        type: "object",
+                        properties: {
+                            item: { $ref: "" }, // empty $ref → refName = "" (falsy)
+                            arr: { type: "array" }, // array without items → mapOpenApiToTs(undefined)
+                        },
+                    },
+                },
+            },
+        };
+
+        globalThis.fetch = vi.fn().mockResolvedValue({
+            ok: true,
+            headers: new Headers({ "content-type": "application/json" }),
+            json: async () => spec,
+        });
+
+        await generateFromSwagger({
+            url: "http://api.com/json",
+            output: "edge-cases.ts",
+        });
+        const content = await fs.readFile(
+            path.join(tempDir, "edge-cases.ts"),
+            "utf8"
+        );
+
+        // Numeric enum: values 1, 2, 3 (not quoted)
+        expect(content).toContain("Priority");
+        expect(content).toMatch(/1 \| 2 \| 3/);
+
+        // Empty $ref → "any"
+        expect(content).toContain("item?: any");
+
+        // Array without items → "any[]"
+        expect(content).toContain("arr?:");
+    });
+
+    it("covers null content-type header (line 32 || fallback) with plain object headers mock", async () => {
+        // Using a plain object mock with get() returning null guarantees the null path
+        const spec = { components: { schemas: { Item: { type: "string" } } } };
+
+        globalThis.fetch = vi.fn().mockResolvedValue({
+            ok: true,
+            headers: { get: (_: string) => null }, // Always returns null → || "" taken
+            json: async () => spec,
+        });
+
+        await generateFromSwagger({
+            url: "http://api.com/json",
+            output: "null-ct.ts",
+        });
+        const content = await fs.readFile(
+            path.join(tempDir, "null-ct.ts"),
+            "utf8"
+        );
+        expect(content).toContain("Item");
     });
 });

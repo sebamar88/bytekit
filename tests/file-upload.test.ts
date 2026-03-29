@@ -459,3 +459,25 @@ test("uploadFile treats chunkSize=0 as default 5 MB (single chunk for small file
 
     globalThis.fetch = originalFetch;
 });
+
+test("FileUploadHelper.uploadFile uses 'Upload failed' when fetch throws a non-Error (line 241)", async () => {
+    // Make fetch throw a plain string (not an Error instance)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    globalThis.fetch = (): any => {
+        // eslint-disable-next-line @typescript-eslint/no-throw-literal
+        throw "network failure string";
+    };
+
+    const blob = new Blob(["data"], { type: "text/plain" });
+    const result = await FileUploadHelper.uploadFile(
+        blob,
+        "https://api.example.com/upload",
+        { chunkSize: 1024, maxRetries: 1 }
+    );
+
+    assert.equal(result.success, false);
+    // Non-Error throw → error instanceof Error is false → "Upload failed" fallback
+    assert.equal(result.error, "Upload failed");
+
+    globalThis.fetch = originalFetch;
+});

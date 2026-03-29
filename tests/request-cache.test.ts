@@ -135,3 +135,8 @@ test("RequestCache isStale returns false before expiration", () => {
 
     assert.equal(cache.isStale("/users/1"), false);
 });
+
+test("RequestCache.isStale returns false for a key that was never set (line 92 guard)", () => {
+    const cache = new RequestCache();
+    assert.equal(cache.isStale("/never-set"), false);
+});

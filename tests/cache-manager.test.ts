@@ -198,3 +198,56 @@ test("createCacheManager factory works", () => {
     const cache = createCacheManager();
     assert.ok(cache instanceof CacheManager);
 });
+
+test("CacheManager.delete removes key from both memory and storageCache (lines 143-145, 222-223)", () => {
+    globalThis.localStorage = new MockLocalStorage();
+    const cache = new CacheManager({ enableLocalStorage: true });
+    cache.set("del-key", "del-val");
+    assert.equal(cache.get("del-key"), "del-val");
+    // delete exercises storageCache.delete → LocalStorageCache.delete → localStorage.removeItem
+    cache.delete("del-key");
+    assert.equal(cache.get("del-key"), null);
+    assert.equal(globalThis.localStorage.getItem("cache:del-key"), null);
+    delete globalThis.localStorage;
+});
+
+test("LocalStorageCache.get removes expired TTL entries (lines 128-130)", async () => {
+    // Set a localStorage item that has an expired TTL → get() removes it and returns null
+    globalThis.localStorage = new MockLocalStorage();
+    const cache = new CacheManager({ enableLocalStorage: true });
+    // Set entry with 10ms TTL
+    cache.set("ttl-key", "ttl-val", 10);
+    assert.equal(cache.get("ttl-key"), "ttl-val"); // not expired yet
+
+    // Wait for TTL to expire
+    await new Promise((r) => setTimeout(r, 30));
+
+    // First get: item is expired → localStorage.removeItem called → returns null (lines 128-130)
+    assert.equal(cache.get("ttl-key"), null);
+    delete globalThis.localStorage;
+});
+
+test("MemoryCache.has is reachable via private accessor (lines 70-71)", () => {
+    // MemoryCache.has() is a private-class method not exposed through CacheManager.
+    // Access via (cache as any).memoryCache to exercise lines 70-71.
+    const cache = new CacheManager();
+    const mc = (cache as any).memoryCache;
+    assert.equal(mc.has("missing"), false);
+    mc.set("exists", "val");
+    assert.equal(mc.has("exists"), true);
+});
+test("LocalStorageCache.has is reachable via private storageCache accessor (lines 139-140)", () => {
+    globalThis.localStorage = new MockLocalStorage();
+    const cache = new CacheManager({ enableLocalStorage: true });
+    cache.set("ls-has-key", "ls-has-val");
+
+    // storageCache is the LocalStorageCache instance — call .has() directly
+    const sc = (
+        cache as unknown as { storageCache: { has: (k: string) => boolean } }
+    ).storageCache;
+    assert.ok(sc, "storageCache should be defined");
+    assert.equal(sc.has("ls-has-key"), true);
+    assert.equal(sc.has("nonexistent-key"), false);
+
+    delete (globalThis as Record<string, unknown>).localStorage;
+});

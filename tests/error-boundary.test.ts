@@ -227,3 +227,224 @@ test("Global ErrorBoundary helpers return singleton and reset", () => {
     const eb3 = getGlobalErrorBoundary();
     assert.notEqual(eb1, eb3);
 });
+// ─── Coverage gap tests ───────────────────────────────────────────────────────
+
+import {
+    UnauthorizedError,
+    ForbiddenError,
+    ConflictError,
+} from "../src/utils/core/ErrorBoundary";
+
+test("UnauthorizedError, ForbiddenError, ConflictError classes are correct", () => {
+    const unauthorized = new UnauthorizedError("Not signed in");
+    assert.equal(unauthorized.name, "UnauthorizedError");
+    assert.equal(unauthorized.statusCode, 401);
+    assert.equal(unauthorized.code, "UNAUTHORIZED");
+
+    const forbidden = new ForbiddenError("No access");
+    assert.equal(forbidden.name, "ForbiddenError");
+    assert.equal(forbidden.statusCode, 403);
+    assert.equal(forbidden.code, "FORBIDDEN");
+
+    const conflict = new ConflictError("Already exists");
+    assert.equal(conflict.name, "ConflictError");
+    assert.equal(conflict.statusCode, 409);
+    assert.equal(conflict.code, "CONFLICT");
+});
+
+test("RateLimitError without retryAfter uses context as-is (false branch)", () => {
+    // retryAfter is undefined → contextWithRetry = context = undefined
+    const rateLimit = new RateLimitError("Too many requests");
+    assert.equal(rateLimit.statusCode, 429);
+    assert.equal(rateLimit.context, undefined);
+});
+
+test("ErrorBoundary.wrapSync wraps sync error and rethrows", () => {
+    const eb = new ErrorBoundary();
+    const wrapped = eb.wrapSync(() => {
+        throw new Error("sync wrapped error");
+    });
+    assert.throws(() => wrapped(), /sync wrapped error/);
+    // Error is added to history asynchronously (fire-and-forget), so we just verify it throws
+});
+
+test("ErrorBoundary maxStackSize exceeded — oldest entry is shifted", async () => {
+    const eb = new ErrorBoundary();
+    // Force the errorStack to maxStackSize (100) then add one more
+    // Access private property via any cast
+    const stack = (eb as unknown as { errorStack: unknown[] }).errorStack;
+    // Fill stack to maxStackSize
+    for (let i = 0; i < 100; i++) {
+        stack.push({
+            error: new Error(`err${i}`),
+            context: {},
+            timestamp: Date.now(),
+        });
+    }
+    assert.equal(stack.length, 100);
+    // Trigger handle to push one more → shift should fire
+    await eb.handle(new Error("overflow"), {});
+    assert.equal(stack.length, 100); // after shift + push, still 100
+});
+
+test("ErrorBoundary.createErrorReport with non-AppError in stack uses 'UNKNOWN' code", async () => {
+    const eb = new ErrorBoundary();
+    // Push a plain Error (not AppError) directly to errorStack
+    const stack = (
+        eb as unknown as {
+            errorStack: Array<{
+                error: Error;
+                context: object;
+                timestamp: number;
+            }>;
+        }
+    ).errorStack;
+    stack.push({
+        error: new Error("plain error"),
+        context: {},
+        timestamp: Date.now(),
+    });
+
+    const report = eb.createErrorReport();
+    const unknownEntry = report.errors.find((e) => e.code === "UNKNOWN");
+    assert.ok(unknownEntry);
+    assert.equal(unknownEntry?.statusCode, 500);
+    assert.equal(unknownEntry?.message, "plain error");
+});
+
+test("ErrorBoundary.setupGlobalHandlers registers unhandledrejection when addEventListener is available", async () => {
+    const listeners: Record<string, (e: unknown) => void> = {};
+    const addEventSpy = vi.fn((type: string, listener) => {
+        listeners[type] = listener;
+    });
+
+    vi.stubGlobal("addEventListener", addEventSpy);
+
+    // Create a new ErrorBoundary — setupGlobalHandlers will run
+    const eb = new ErrorBoundary();
+
+    assert.ok(
+        addEventSpy.mock.calls.some(([type]) => type === "unhandledrejection")
+    );
+
+    // Trigger the listener with a plain reason (non-Error)
+    await listeners["unhandledrejection"]?.({ reason: "string rejection" });
+
+    assert.equal(eb.getErrorHistory().length, 1);
+    assert.match(eb.getErrorHistory()[0].error.message, /string rejection/);
+
+    vi.unstubAllGlobals();
+});
+
+test("unhandledrejection with Error reason uses the Error directly (line 131 TRUE branch)", async () => {
+    // event.reason instanceof Error → true → the Error is used as-is (not wrapped with String())
+    const listeners: Record<string, (e: unknown) => void> = {};
+    vi.stubGlobal(
+        "addEventListener",
+        vi.fn((type: string, listener) => {
+            listeners[type] = listener;
+        })
+    );
+
+    const eb = new ErrorBoundary();
+    const originalError = new Error("original rejection error");
+
+    // Trigger with an actual Error instance — covers line 131 TRUE branch
+    await listeners["unhandledrejection"]?.({ reason: originalError });
+
+    assert.equal(eb.getErrorHistory().length, 1);
+    // normalizeError wraps it as AppError but message is preserved
+    assert.match(
+        eb.getErrorHistory()[0].error.message,
+        /original rejection error/
+    );
+
+    vi.unstubAllGlobals();
+});
+
+test("ErrorBoundary.handle: onError throws non-Error → wrapped and logged", async () => {
+    let loggedErrors = 0;
+    const mockLogger = {
+        error: () => {
+            loggedErrors++;
+        },
+        warn: () => {},
+        info: () => {},
+        debug: () => {},
+    };
+    const eb = new ErrorBoundary({
+        // @ts-expect-error - Test type override
+        logger: mockLogger,
+        onError: () => {
+            // eslint-disable-next-line @typescript-eslint/only-throw-error
+            throw "non-Error onError throw";
+        },
+    });
+    await eb.handle(new Error("test"), {});
+    // Should log: 1 for the error itself, 1 for the failed onError handler
+    assert.ok(loggedErrors >= 2);
+});
+
+test("ErrorBoundary.execute: non-Error thrown is converted to Error", async () => {
+    const eb = new ErrorBoundary({ maxRetries: 0, retryDelay: 10 });
+    await assert.rejects(
+        () =>
+            eb.execute(async () => {
+                // eslint-disable-next-line @typescript-eslint/only-throw-error
+                throw "string error";
+            }),
+        (err) => {
+            assert.ok(err instanceof Error);
+            return true;
+        }
+    );
+});
+
+test("ErrorBoundary.setupGlobalHandlers patches globalThis.onerror when available (lines 143-165)", async () => {
+    // Stub onerror as a function so the code path inside setupGlobalHandlers fires
+    const originalOnError = vi.fn((..._args: unknown[]) => false);
+    vi.stubGlobal("onerror", originalOnError);
+
+    // Create a new ErrorBoundary — setupGlobalHandlers will wrap globalThis.onerror
+    const eb = new ErrorBoundary();
+
+    // The wrapped onerror should be different from the original
+    // @ts-expect-error - globalThis.onerror is the patched version
+    assert.notEqual(globalThis.onerror, originalOnError);
+
+    // Call the wrapped onerror with an Error object
+    // @ts-expect-error - globalThis.onerror is the patched version
+    globalThis.onerror(
+        "Error message",
+        "file.js",
+        10,
+        5,
+        new Error("global error")
+    );
+
+    // Wait for handle to process
+    await new Promise((r) => setTimeout(r, 10));
+
+    assert.equal(eb.getErrorHistory().length, 1);
+    assert.match(eb.getErrorHistory()[0].error.message, /global error/);
+
+    vi.unstubAllGlobals();
+});
+
+test("ErrorBoundary.setupGlobalHandlers onerror wraps non-Error message as Error (lines 143-165)", async () => {
+    const originalOnError = vi.fn((..._args: unknown[]) => false);
+    vi.stubGlobal("onerror", originalOnError);
+
+    const eb = new ErrorBoundary();
+
+    // Call wrapped onerror WITHOUT an Error object (just a message string)
+    // @ts-expect-error - globalThis.onerror is the patched version
+    globalThis.onerror("Something went wrong", "file.js", 42, 0, undefined);
+
+    await new Promise((r) => setTimeout(r, 10));
+
+    assert.equal(eb.getErrorHistory().length, 1);
+    assert.match(eb.getErrorHistory()[0].error.message, /Something went wrong/);
+
+    vi.unstubAllGlobals();
+});

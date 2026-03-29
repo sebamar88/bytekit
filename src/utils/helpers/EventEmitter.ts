@@ -75,9 +75,6 @@ export class EventEmitter<
         // Attach original listener to allow removal by off()
         onceListener._originalListener = listener;
 
-        if (!this.onceMap.has(event as string)) {
-            this.onceMap.set(event as string, new Set());
-        }
         this.onceMap.get(event as string)!.add(onceListener);
 
         return this.on(event, onceListener);

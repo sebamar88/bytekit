@@ -271,3 +271,167 @@ test("Logger with empty context is not logged", () => {
 
     console.log = originalLog;
 });
+
+test("consoleTransportBrowser uses console.warn for warn level (line 115)", () => {
+    globalThis.window = {};
+    globalThis.document = {};
+    const originalWarn = console.warn;
+    let warnCalled = false;
+    console.warn = (..._args) => {
+        warnCalled = true;
+    };
+
+    const transport = consoleTransportBrowser({ includeTimestamp: false });
+    transport({
+        level: "warn",
+        message: "browser warn",
+        timestamp: new Date(),
+    });
+
+    assert.ok(warnCalled);
+    console.warn = originalWarn;
+    delete globalThis.window;
+    delete globalThis.document;
+});
+
+test("consoleTransportBrowser uses console.error for error level (line 112)", () => {
+    globalThis.window = {};
+    globalThis.document = {};
+    const originalError = console.error;
+    let errorCalled = false;
+    console.error = (..._args) => {
+        errorCalled = true;
+    };
+
+    const transport = consoleTransportBrowser({ includeTimestamp: false });
+    transport({
+        level: "error",
+        message: "browser error",
+        timestamp: new Date(),
+    });
+
+    assert.ok(errorCalled);
+    console.error = originalError;
+    delete globalThis.window;
+    delete globalThis.document;
+});
+
+test("Logger.child without namespace uses childNamespace = namespace directly (line 158)", () => {
+    // Logger without namespace: childNamespace = namespace (false branch of ternary at line 157-158)
+    const logger = new Logger({ namespace: undefined }); // no namespace
+    const spy = vi.spyOn(console, "log").mockImplementation(() => {});
+    const child = logger.child("payments");
+    child.info("child message");
+    // child namespace should be just "payments" (no parent prefix)
+    expect(spy).toHaveBeenCalledWith(expect.stringContaining("payments"));
+    spy.mockRestore();
+});
+
+test("Logger DEFAULT_LEVEL is 'info' when NODE_ENV=production (line 37)", async () => {
+    // Reset modules to re-evaluate module-level constants with production env
+    const originalNodeEnv = process.env.NODE_ENV;
+    process.env.NODE_ENV = "production";
+    vi.resetModules();
+    const { Logger: ProdLogger } = await import("../src/utils/core/Logger");
+    const prodLogger = new ProdLogger();
+    // In production, DEFAULT_LEVEL = "info", so debug messages are suppressed
+    const spy = vi.spyOn(console, "log").mockImplementation(() => {});
+    prodLogger.debug("should be suppressed");
+    expect(spy).not.toHaveBeenCalled();
+    spy.mockRestore();
+    process.env.NODE_ENV = originalNodeEnv;
+    vi.resetModules();
+});
+
+test("Logger uses consoleTransportBrowser when isBrowser is true (line 146)", async () => {
+    // Reset modules after stubbing window/document to trigger isBrowser=true path
+    vi.stubGlobal("window", {});
+    vi.stubGlobal("document", {});
+    vi.resetModules();
+    const { Logger: BrowserLogger } = await import("../src/utils/core/Logger");
+    const spy = vi.spyOn(console, "log").mockImplementation(() => {});
+    const logger = new BrowserLogger();
+    logger.info("browser log");
+    expect(spy).toHaveBeenCalled();
+    spy.mockRestore();
+    vi.unstubAllGlobals();
+    vi.resetModules();
+});
+
+test("consoleTransportBrowser with includeTimestamp=true includes ISO timestamp (line 97 true branch)", () => {
+    // includeTimestamp=true (default) pushes timestamp — covers the TRUE branch at line ~97
+    const spy = vi.spyOn(console, "log").mockImplementation(() => {});
+    const transport = consoleTransportBrowser({ includeTimestamp: true });
+    const now = new Date("2024-01-15T10:00:00.000Z");
+    transport({ level: "debug", message: "timestamped", timestamp: now });
+    expect(spy).toHaveBeenCalled();
+    // Output contains the ISO string
+    const callArg = spy.mock.calls[0]?.[0] as string;
+    expect(callArg).toContain("2024-01-15");
+    spy.mockRestore();
+});
+
+test("consoleTransportBrowser uses console.log for info/debug levels (lines 107-108 fallthrough)", () => {
+    // For levels that are not error/warn, the ternary falls through to console.log
+    const spy = vi.spyOn(console, "log").mockImplementation(() => {});
+    const transport = consoleTransportBrowser({ includeTimestamp: false });
+    transport({ level: "info", message: "info msg", timestamp: new Date() });
+    expect(spy).toHaveBeenCalled();
+    spy.mockRestore();
+});
+
+test("consoleTransportNode ?? fallback: COLORS[level] undefined uses empty string (line 60)", () => {
+    // Calling the transport with an unknown level exercises the ?? '' fallback
+    const spy = vi.spyOn(console, "log").mockImplementation(() => {});
+    const transport = consoleTransportNode({ includeTimestamp: false });
+    // Pass an unknown level via type assertion to trigger COLORS[level] === undefined
+    (transport as any)({
+        level: "custom",
+        message: "custom level",
+        timestamp: new Date(),
+    });
+    expect(spy).toHaveBeenCalled();
+    spy.mockRestore();
+});
+
+test("consoleTransportBrowser with context object — pushes context to payload (line 107 TRUE)", () => {
+    // context with keys → Object.keys(context).length > 0 → payload.push(context)
+    const args: unknown[][] = [];
+    const originalLog = console.log;
+    console.log = (...a) => {
+        args.push(a);
+    };
+    const transport = consoleTransportBrowser({ includeTimestamp: false });
+    const ctx = { requestId: "abc-123" };
+    transport({
+        level: "info",
+        message: "with ctx",
+        timestamp: new Date(),
+        context: ctx,
+    });
+    assert.ok(args.length > 0, "console.log was called");
+    const callArgs = args[0]!;
+    assert.ok(callArgs.includes(ctx), "context should be in payload");
+    console.log = originalLog;
+});
+
+test("consoleTransportBrowser with error object — pushes error to payload (line 108 TRUE)", () => {
+    // error provided → if (error) payload.push(error)
+    const args: unknown[][] = [];
+    const originalError = console.error;
+    console.error = (...a) => {
+        args.push(a);
+    };
+    const transport = consoleTransportBrowser({ includeTimestamp: false });
+    const err = new Error("browser error object");
+    transport({
+        level: "error",
+        message: "oops",
+        timestamp: new Date(),
+        error: err,
+    });
+    assert.ok(args.length > 0, "console.error was called");
+    const callArgs = args[0]!;
+    assert.ok(callArgs.includes(err), "error should be in payload");
+    console.error = originalError;
+});

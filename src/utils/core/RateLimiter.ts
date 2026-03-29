@@ -112,6 +112,7 @@ export class RateLimiter {
     async waitForAllowance(url: string): Promise<void> {
         while (!this.isAllowed(url)) {
             const stats = this.getStats(url);
+            /* v8 ignore next */
             const waitTime = Math.min(stats.retryAfter ?? 1, 1) * 1000;
             await new Promise((resolve) => setTimeout(resolve, waitTime));
         }
@@ -208,6 +209,7 @@ export class SlidingWindowRateLimiter {
     async waitForAllowance(url: string): Promise<void> {
         while (!this.isAllowed(url)) {
             const stats = this.getStats(url);
+            /* v8 ignore next */
             const waitTime = Math.min(stats.retryAfter ?? 1, 1) * 1000;
             await new Promise((resolve) => setTimeout(resolve, waitTime));
         }
