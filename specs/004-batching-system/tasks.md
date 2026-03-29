@@ -17,7 +17,7 @@
 
 **Purpose**: Verify the build is healthy and the `PromisePool` (003) internal dependency is importable before any story work begins.
 
-- [ ] T001 Verify `npm run build` passes and `PromisePool` is importable from `src/utils/async/index.ts` (required internal dep for `RequestQueue` concurrency mechanics)
+- [X] T001 Verify `npm run build` passes and `PromisePool` is importable from `src/utils/async/index.ts` (required internal dep for `RequestQueue` concurrency mechanics)
 
 ---
 
@@ -27,9 +27,9 @@
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete.
 
-- [ ] T002 Create `src/utils/async/request-queue.ts` skeleton with `QueueAbortError extends Error`, `QueuePriority` type, `RequestQueueOptions`, `AddOptions`, `QueueItem<T>` interfaces, and an empty `RequestQueue` class stub
-- [ ] T003 Create `src/utils/async/request-batcher.ts` skeleton with `BatchOptions`, `BatchEntry<T>` interfaces and an empty `RequestBatcher` class stub
-- [ ] T004 [P] Export `RequestQueue`, `RequestBatcher`, `QueueAbortError`, `QueuePriority`, `RequestQueueOptions`, `AddOptions`, and `BatchOptions` from `src/utils/async/index.ts`
+- [X] T002 Create `src/utils/async/request-queue.ts` skeleton with `QueueAbortError extends Error`, `QueuePriority` type, `RequestQueueOptions`, `AddOptions`, `QueueItem<T>` interfaces, and an empty `RequestQueue` class stub
+- [X] T003 Create `src/utils/async/request-batcher.ts` skeleton with `BatchOptions`, `BatchEntry<T>` interfaces and an empty `RequestBatcher` class stub
+- [X] T004 [P] Export `RequestQueue`, `RequestBatcher`, `QueueAbortError`, `QueuePriority`, `RequestQueueOptions`, `AddOptions`, and `BatchOptions` from `src/utils/async/index.ts`
 
 **Checkpoint**: Build passes, all new identifiers are exported and resolvable, no TypeScript errors.
 
@@ -43,19 +43,19 @@
 
 ### Tests for User Story 1
 
-- [ ] T005 [P] [US1] Write test: 20 tasks with `concurrency=3` — max 3 run simultaneously (track with a shared counter) in `tests/async/request-queue.test.ts`
-- [ ] T006 [P] [US1] Write test: one failing task does NOT block the queue; all remaining tasks complete successfully in `tests/async/request-queue.test.ts`
-- [ ] T007 [P] [US1] Write test: `flush()` resolves only after all queued + running tasks have settled in `tests/async/request-queue.test.ts`
-- [ ] T008 [P] [US1] Write test: `size`, `running`, `pending` getters return correct values before, during, and after execution in `tests/async/request-queue.test.ts`
-- [ ] T009 [P] [US1] Write test: `concurrency < 1` constructor throws `TypeError` in `tests/async/request-queue.test.ts`
+- [X] T005 [P] [US1] Write test: 20 tasks with `concurrency=3` — max 3 run simultaneously (track with a shared counter) in `tests/async/request-queue.test.ts`
+- [X] T006 [P] [US1] Write test: one failing task does NOT block the queue; all remaining tasks complete successfully in `tests/async/request-queue.test.ts`
+- [X] T007 [P] [US1] Write test: `flush()` resolves only after all queued + running tasks have settled in `tests/async/request-queue.test.ts`
+- [X] T008 [P] [US1] Write test: `size`, `running`, `pending` getters return correct values before, during, and after execution in `tests/async/request-queue.test.ts`
+- [X] T009 [P] [US1] Write test: `concurrency < 1` constructor throws `TypeError` in `tests/async/request-queue.test.ts`
 
 ### Implementation for User Story 1
 
-- [ ] T010 [US1] Implement private priority lane arrays (`_high[]`, `_normal[]`, `_low[]`) and `_running` counter as fields in `RequestQueue` in `src/utils/async/request-queue.ts`
-- [ ] T011 [US1] Implement `add<T>()` — create internal `AbortController`, build `QueueItem<T>`, push to the appropriate lane, call `_drain()`, return the public promise in `src/utils/async/request-queue.ts`
-- [ ] T012 [US1] Implement `_drain()` private method — dequeue from high→normal→low until `_running === concurrency`, execute each task with its `AbortSignal`, call `onError` on failure, recurse from `finally` in `src/utils/async/request-queue.ts`
-- [ ] T013 [US1] Implement `size`, `running`, `pending` getters and `flush()` (resolves when all in-flight + pending tasks have settled using a `Promise.allSettled` over active promises) in `src/utils/async/request-queue.ts`
-- [ ] T014 [US1] Add `concurrency < 1` guard in `RequestQueue` constructor throwing `TypeError` in `src/utils/async/request-queue.ts`
+- [X] T010 [US1] Implement private priority lane arrays (`_high[]`, `_normal[]`, `_low[]`) and `_running` counter as fields in `RequestQueue` in `src/utils/async/request-queue.ts`
+- [X] T011 [US1] Implement `add<T>()` — create internal `AbortController`, build `QueueItem<T>`, push to the appropriate lane, call `_drain()`, return the public promise in `src/utils/async/request-queue.ts`
+- [X] T012 [US1] Implement `_drain()` private method — dequeue from high→normal→low until `_running === concurrency`, execute each task with its `AbortSignal`, call `onError` on failure, recurse from `finally` in `src/utils/async/request-queue.ts`
+- [X] T013 [US1] Implement `size`, `running`, `pending` getters and `flush()` (resolves when all in-flight + pending tasks have settled using a `Promise.allSettled` over active promises) in `src/utils/async/request-queue.ts`
+- [X] T014 [US1] Add `concurrency < 1` guard in `RequestQueue` constructor throwing `TypeError` in `src/utils/async/request-queue.ts`
 
 **Checkpoint**: `npm run test -- request-queue` passes T005–T009. Concurrency limit respected, error isolation confirmed, getters accurate.
 
@@ -69,16 +69,16 @@
 
 ### Tests for User Story 2
 
-- [ ] T015 [P] [US2] Write test: `high` priority tasks execute before `normal` and `low` when `concurrency=1` in `tests/async/request-queue.test.ts`
-- [ ] T016 [P] [US2] Write test: `cancel(id)` removes a queued task and rejects its promise with `QueueAbortError` — obtain the ID by capturing it from the task factory's `AbortController` via a test helper that wraps `add()` and exposes the internal ID (internal mechanism test) in `tests/async/request-queue.test.ts`
-- [ ] T017 [P] [US2] Write test: `cancel(id)` on an in-flight task fires its internal `AbortSignal` — verify via the `aborted` flag on the signal passed to the task factory in `tests/async/request-queue.test.ts`
-- [ ] T018 [P] [US2] Write test: `cancel(id)` returns `false` when the task ID is not found in any lane in `tests/async/request-queue.test.ts`
-- [ ] T019 [P] [US2] Write test: external `signal` in `AddOptions` cancels a queued task with `QueueAbortError` before execution starts — this is the **public consumer cancellation path** in `tests/async/request-queue.test.ts`
+- [X] T015 [P] [US2] Write test: `high` priority tasks execute before `normal` and `low` when `concurrency=1` in `tests/async/request-queue.test.ts`
+- [X] T016 [P] [US2] Write test: `cancel(id)` removes a queued task and rejects its promise with `QueueAbortError` — obtain the ID by capturing it from the task factory's `AbortController` via a test helper that wraps `add()` and exposes the internal ID (internal mechanism test) in `tests/async/request-queue.test.ts`
+- [X] T017 [P] [US2] Write test: `cancel(id)` on an in-flight task fires its internal `AbortSignal` — verify via the `aborted` flag on the signal passed to the task factory in `tests/async/request-queue.test.ts`
+- [X] T018 [P] [US2] Write test: `cancel(id)` returns `false` when the task ID is not found in any lane in `tests/async/request-queue.test.ts`
+- [X] T019 [P] [US2] Write test: external `signal` in `AddOptions` cancels a queued task with `QueueAbortError` before execution starts — this is the **public consumer cancellation path** in `tests/async/request-queue.test.ts`
 
 ### Implementation for User Story 2
 
-- [ ] T020 [US2] Implement `cancel(id)` — search all three lanes; if found queued → splice, reject with `new QueueAbortError()`, call `_drain()`; if running → call `controller.abort()`; return boolean. Note: `cancel(id)` is an internal queue-management method; the public consumer cancellation path is `AddOptions.signal` (T019/T021) in `src/utils/async/request-queue.ts`
-- [ ] T021 [US2] Wire external `signal` in `add()` — if `signal.aborted` on entry → reject immediately with `QueueAbortError`; otherwise add `abort` event listener that calls `cancel(id)` before the task executes in `src/utils/async/request-queue.ts`
+- [X] T020 [US2] Implement `cancel(id)` — search all three lanes; if found queued → splice, reject with `new QueueAbortError()`, call `_drain()`; if running → call `controller.abort()`; return boolean. Note: `cancel(id)` is an internal queue-management method; the public consumer cancellation path is `AddOptions.signal` (T019/T021) in `src/utils/async/request-queue.ts`
+- [X] T021 [US2] Wire external `signal` in `add()` — if `signal.aborted` on entry → reject immediately with `QueueAbortError`; otherwise add `abort` event listener that calls `cancel(id)` before the task executes in `src/utils/async/request-queue.ts`
 
 **Checkpoint**: `npm run test -- request-queue` passes US1 + US2 tests. Priority ordering and both cancellation paths (queued + in-flight) work correctly.
 
@@ -92,24 +92,24 @@
 
 ### Tests for User Story 3
 
-- [ ] T022 [P] [US3] Write test: 5 requests with identical key in 100ms window → fetcher called exactly once, all 5 promises resolve to same value (use `vi.useFakeTimers()`) in `tests/async/request-batcher.test.ts`
-- [ ] T023 [P] [US3] Write test: `windowMs` elapses → batch auto-dispatches without explicit `flush()` call in `tests/async/request-batcher.test.ts`
-- [ ] T024 [P] [US3] Write test: `maxSize` reached → batch flushes early before `windowMs` expires in `tests/async/request-batcher.test.ts`
-- [ ] T025 [P] [US3] Write test: `sliding: true` resets the timer on each new request (timer fires only after 200ms of inactivity, not after the first request) in `tests/async/request-batcher.test.ts`
-- [ ] T026 [P] [US3] Write test: requests with different keys (different URLs) are NOT coalesced — each bucket dispatches independently in `tests/async/request-batcher.test.ts`
-- [ ] T027 [P] [US3] Write test: custom `keyFn` override controls grouping (same URL, different body → same key when keyFn ignores body) in `tests/async/request-batcher.test.ts`
-- [ ] T028 [P] [US3] Write test: `flush()` dispatches all pending batches immediately and resolves when all settle in `tests/async/request-batcher.test.ts`
-- [ ] T029 [P] [US3] Write test: `pendingCount` getter returns correct total across all bucket keys before and after dispatch in `tests/async/request-batcher.test.ts`
-- [ ] T030 [P] [US3] Write test: `windowMs <= 0` throws `TypeError`; `maxSize < 1` throws `TypeError` in `tests/async/request-batcher.test.ts`
+- [X] T022 [P] [US3] Write test: 5 requests with identical key in 100ms window → fetcher called exactly once, all 5 promises resolve to same value (use `vi.useFakeTimers()`) in `tests/async/request-batcher.test.ts`
+- [X] T023 [P] [US3] Write test: `windowMs` elapses → batch auto-dispatches without explicit `flush()` call in `tests/async/request-batcher.test.ts`
+- [X] T024 [P] [US3] Write test: `maxSize` reached → batch flushes early before `windowMs` expires in `tests/async/request-batcher.test.ts`
+- [X] T025 [P] [US3] Write test: `sliding: true` resets the timer on each new request (timer fires only after 200ms of inactivity, not after the first request) in `tests/async/request-batcher.test.ts`
+- [X] T026 [P] [US3] Write test: requests with different keys (different URLs) are NOT coalesced — each bucket dispatches independently in `tests/async/request-batcher.test.ts`
+- [X] T027 [P] [US3] Write test: custom `keyFn` override controls grouping (same URL, different body → same key when keyFn ignores body) in `tests/async/request-batcher.test.ts`
+- [X] T028 [P] [US3] Write test: `flush()` dispatches all pending batches immediately and resolves when all settle in `tests/async/request-batcher.test.ts`
+- [X] T029 [P] [US3] Write test: `pendingCount` getter returns correct total across all bucket keys before and after dispatch in `tests/async/request-batcher.test.ts`
+- [X] T030 [P] [US3] Write test: `windowMs <= 0` throws `TypeError`; `maxSize < 1` throws `TypeError` in `tests/async/request-batcher.test.ts`
 
 ### Implementation for User Story 3
 
-- [ ] T031 [US3] Implement `defaultKeyFn` — returns `"${method}:${url}:${stableSerialize(body)}"` where `stableSerialize` handles `undefined`, primitives, and `JSON.stringify` for objects in `src/utils/async/request-batcher.ts`
-- [ ] T032 [US3] Implement `_buckets: Map<string, BatchEntry<unknown>[]>` and `_timers: Map<string, ReturnType<typeof setTimeout>>` as private fields in `RequestBatcher` in `src/utils/async/request-batcher.ts`
-- [ ] T033 [US3] Implement `add<T>()` — compute key via `keyFn`, push `BatchEntry<T>` to bucket, start timer (or reset if `sliding: true`), immediately call `_dispatch(key)` if `maxSize` is reached in `src/utils/async/request-batcher.ts`
-- [ ] T034 [US3] Implement `_dispatch(key)` private method — cancel the bucket timer, splice all entries for key, call the first entry's fetcher once, resolve or reject every entry promise with the same outcome in `src/utils/async/request-batcher.ts`
-- [ ] T035 [US3] Implement `flush()` (iterate all bucket keys, call `_dispatch(key)` for each, await all settlements) and `pendingCount` getter (sum sizes of all `_buckets` values) in `src/utils/async/request-batcher.ts`
-- [ ] T036 [US3] Add constructor guards: `windowMs <= 0` → `TypeError("windowMs must be > 0")`; `maxSize < 1` → `TypeError("maxSize must be >= 1")` in `src/utils/async/request-batcher.ts`
+- [X] T031 [US3] Implement `defaultKeyFn` — returns `"${method}:${url}:${stableSerialize(body)}"` where `stableSerialize` handles `undefined`, primitives, and `JSON.stringify` for objects in `src/utils/async/request-batcher.ts`
+- [X] T032 [US3] Implement `_buckets: Map<string, BatchEntry<unknown>[]>` and `_timers: Map<string, ReturnType<typeof setTimeout>>` as private fields in `RequestBatcher` in `src/utils/async/request-batcher.ts`
+- [X] T033 [US3] Implement `add<T>()` — compute key via `keyFn`, push `BatchEntry<T>` to bucket, start timer (or reset if `sliding: true`), immediately call `_dispatch(key)` if `maxSize` is reached in `src/utils/async/request-batcher.ts`
+- [X] T034 [US3] Implement `_dispatch(key)` private method — cancel the bucket timer, splice all entries for key, call the first entry's fetcher once, resolve or reject every entry promise with the same outcome in `src/utils/async/request-batcher.ts`
+- [X] T035 [US3] Implement `flush()` (iterate all bucket keys, call `_dispatch(key)` for each, await all settlements) and `pendingCount` getter (sum sizes of all `_buckets` values) in `src/utils/async/request-batcher.ts`
+- [X] T036 [US3] Add constructor guards: `windowMs <= 0` → `TypeError("windowMs must be > 0")`; `maxSize < 1` → `TypeError("maxSize must be >= 1")` in `src/utils/async/request-batcher.ts`
 
 **Checkpoint**: `npm run test -- request-batcher` passes T022–T030. Fixed window, sliding window, maxSize early flush, custom keyFn, and flush() all work correctly.
 
@@ -123,16 +123,16 @@
 
 ### Tests for User Story 4
 
-- [ ] T037 [P] [US4] Write integration test: `ApiClient` with `queue: { concurrency: 5 }` limits concurrent in-flight fetch calls (track with counter spy) in `tests/request-queue-api-client.test.ts`
-- [ ] T038 [P] [US4] Write integration test: `ApiClient` with `batch: { windowMs: 100 }` coalesces same-URL requests into a single fetch call (use fake timers) in `tests/request-queue-api-client.test.ts`
-- [ ] T039 [P] [US4] Write test: `ApiClient` without `queue` or `batch` options behaves exactly as before (no regression) in `tests/request-queue-api-client.test.ts`
+- [X] T037 [P] [US4] Write integration test: `ApiClient` with `queue: { concurrency: 5 }` limits concurrent in-flight fetch calls (track with counter spy) in `tests/request-queue-api-client.test.ts`
+- [X] T038 [P] [US4] Write integration test: `ApiClient` with `batch: { windowMs: 100 }` coalesces same-URL requests into a single fetch call (use fake timers) in `tests/request-queue-api-client.test.ts`
+- [X] T039 [P] [US4] Write test: `ApiClient` without `queue` or `batch` options behaves exactly as before (no regression) in `tests/request-queue-api-client.test.ts`
 
 ### Implementation for User Story 4
 
-- [ ] T040 [P] [US4] Add `queue?: RequestQueueOptions` and `batch?: BatchOptions` fields to `ApiClientConfig` interface in `src/utils/core/ApiClient.ts`
-- [ ] T041 [US4] Instantiate `RequestQueue` in `ApiClient` constructor when `config.queue` is provided; store as `private _queue: RequestQueue | undefined` in `src/utils/core/ApiClient.ts`
-- [ ] T042 [US4] Instantiate `RequestBatcher` in `ApiClient` constructor when `config.batch` is provided; store as `private _batcher: RequestBatcher | undefined` in `src/utils/core/ApiClient.ts`
-- [ ] T043 [US4] Route `ApiClient.request()` through `this._queue.add()` when queue is active, through `this._batcher.add()` when batcher is active, and unchanged when neither is configured in `src/utils/core/ApiClient.ts`
+- [X] T040 [P] [US4] Add `queue?: RequestQueueOptions` and `batch?: BatchOptions` fields to `ApiClientConfig` interface in `src/utils/core/ApiClient.ts`
+- [X] T041 [US4] Instantiate `RequestQueue` in `ApiClient` constructor when `config.queue` is provided; store as `private _queue: RequestQueue | undefined` in `src/utils/core/ApiClient.ts`
+- [X] T042 [US4] Instantiate `RequestBatcher` in `ApiClient` constructor when `config.batch` is provided; store as `private _batcher: RequestBatcher | undefined` in `src/utils/core/ApiClient.ts`
+- [X] T043 [US4] Route `ApiClient.request()` through `this._queue.add()` when queue is active, through `this._batcher.add()` when batcher is active, and unchanged when neither is configured in `src/utils/core/ApiClient.ts`
 
 **Checkpoint**: `npm run test` passes all stories. `ApiClient` queue and batch integration work transparently without regressions.
 
@@ -140,15 +140,15 @@
 
 ## Phase 7: Polish & Cross-Cutting Concerns
 
-- [ ] T044 [P] Add full JSDoc to all public members of `RequestQueue` and `QueueAbortError` in `src/utils/async/request-queue.ts`
-- [ ] T045 [P] Add full JSDoc to all public members of `RequestBatcher` in `src/utils/async/request-batcher.ts`
-- [ ] T046 [P] Create usage examples matching the `quickstart.md` scenarios: `examples/request-queue.ts` (TypeScript) and `examples/request-queue.js` (JavaScript CJS/ESM) covering priority queue + batching + cancellation (constitution requires both TS and JS)
-- [ ] T047 [P] Document `RequestQueue` and `RequestBatcher` in `docs/api-reference/async.mdx` (API table, constructor options, method signatures, error types)
-- [ ] T048 [P] Add `RequestQueue` and `RequestBatcher` sections to `bytekit.wiki/Async-Toolkit.md` with API table, comparison table, and examples
-- [ ] T049 Verify test coverage ≥95% with `npm run coverage`; fix any gaps in `src/utils/async/request-queue.ts` and `src/utils/async/request-batcher.ts`
-- [ ] T050 Validate all TypeScript quickstart scenarios from `specs/004-batching-system/quickstart.md` run without errors
-- [ ] T051 [P] Measure bundle size delta: assert `request-queue.ts` and `request-batcher.ts` each add <2KB gzipped (run `npm run build` and inspect dist output)
-- [ ] T052 [P] Add JavaScript (CJS + ESM) usage examples to `specs/004-batching-system/quickstart.md` (constitution requirement: TS and JS examples)
+- [X] T044 [P] Add full JSDoc to all public members of `RequestQueue` and `QueueAbortError` in `src/utils/async/request-queue.ts`
+- [X] T045 [P] Add full JSDoc to all public members of `RequestBatcher` in `src/utils/async/request-batcher.ts`
+- [X] T046 [P] Create usage examples matching the `quickstart.md` scenarios: `examples/request-queue.ts` (TypeScript) and `examples/request-queue.js` (JavaScript CJS/ESM) covering priority queue + batching + cancellation (constitution requires both TS and JS)
+- [X] T047 [P] Document `RequestQueue` and `RequestBatcher` in `docs/api-reference/async.mdx` (API table, constructor options, method signatures, error types)
+- [X] T048 [P] Add `RequestQueue` and `RequestBatcher` sections to `bytekit.wiki/Async-Toolkit.md` with API table, comparison table, and examples
+- [X] T049 Verify test coverage ≥95% with `npm run coverage`; fix any gaps in `src/utils/async/request-queue.ts` and `src/utils/async/request-batcher.ts`
+- [X] T050 Validate all TypeScript quickstart scenarios from `specs/004-batching-system/quickstart.md` run without errors
+- [X] T051 [P] Measure bundle size delta: assert `request-queue.ts` and `request-batcher.ts` each add <2KB gzipped (run `npm run build` and inspect dist output)
+- [X] T052 [P] Add JavaScript (CJS + ESM) usage examples to `specs/004-batching-system/quickstart.md` (constitution requirement: TS and JS examples)
 
 ---
 
