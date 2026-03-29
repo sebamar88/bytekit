@@ -1,4 +1,3 @@
-
 import { Logger } from "#core/Logger.js";
 import { UrlHelper } from "#helpers/UrlHelper.js";
 import { retry as retryFn } from "../async/retry.js";
@@ -330,7 +329,10 @@ export class ApiClient {
      *   headers: { "X-Custom": "value" }
      * })
      */
-    async post<T>(path: string | URL, bodyOrOptions?: RequestOptions<T> | RequestBody) {
+    async post<T>(
+        path: string | URL,
+        bodyOrOptions?: RequestOptions<T> | RequestBody
+    ) {
         const options = this.normalizeBodyOrOptions<T>(bodyOrOptions);
         return this.request<T>(path, { ...options, method: "POST" });
     }
@@ -338,7 +340,10 @@ export class ApiClient {
     /**
      * PUT request - Acepta body directamente o RequestOptions
      */
-    async put<T>(path: string | URL, bodyOrOptions?: RequestOptions<T> | RequestBody) {
+    async put<T>(
+        path: string | URL,
+        bodyOrOptions?: RequestOptions<T> | RequestBody
+    ) {
         const options = this.normalizeBodyOrOptions<T>(bodyOrOptions);
         return this.request<T>(path, { ...options, method: "PUT" });
     }
@@ -346,7 +351,10 @@ export class ApiClient {
     /**
      * PATCH request - Acepta body directamente o RequestOptions
      */
-    async patch<T>(path: string | URL, bodyOrOptions?: RequestOptions<T> | RequestBody) {
+    async patch<T>(
+        path: string | URL,
+        bodyOrOptions?: RequestOptions<T> | RequestBody
+    ) {
         const options = this.normalizeBodyOrOptions<T>(bodyOrOptions);
         return this.request<T>(path, { ...options, method: "PATCH" });
     }
@@ -571,7 +579,9 @@ export class ApiClient {
     ): Promise<T> {
         // US4: RequestQueue — concurrency-limited, priority-aware queue
         if (this._queue) {
-            return this._queue.add<T>((_signal) => this.executeRequest(path, options));
+            return this._queue.add<T>((_signal) =>
+                this.executeRequest(path, options)
+            );
         }
 
         // US4: RequestBatcher — time-window deduplication
@@ -579,16 +589,16 @@ export class ApiClient {
             const pathStr = String(path);
             const method = (options.method ?? "GET").toUpperCase();
             const proxyInit: RequestInit = { method };
-            return this._batcher.add<T>(
-                pathStr,
-                proxyInit,
-                (_url, _init) => this.executeRequest(path, options)
+            return this._batcher.add<T>(pathStr, proxyInit, (_url, _init) =>
+                this.executeRequest(path, options)
             );
         }
 
         // T026: legacy pool support (003) — if a pool is configured, route through it
         if (this.pool) {
-            const results = await this.pool.run<T>([() => this.executeRequest(path, options)]);
+            const results = await this.pool.run<T>([
+                () => this.executeRequest(path, options),
+            ]);
             return results[0];
         }
         return this.executeRequest(path, options);

@@ -24,31 +24,33 @@ describe("UrlHelper", () => {
         const qs = UrlHelper.stringify(params);
         expect(qs).toBe("a=1&b=2&b=3&c%5Bd%5D=4&f=");
 
-        expect(
-            UrlHelper.stringify(params, { arrayFormat: "bracket" })
-        ).toBe("a=1&b%5B%5D=2&b%5B%5D=3&c%5Bd%5D=4&f=");
+        expect(UrlHelper.stringify(params, { arrayFormat: "bracket" })).toBe(
+            "a=1&b%5B%5D=2&b%5B%5D=3&c%5Bd%5D=4&f="
+        );
 
-        expect(
-            UrlHelper.stringify(params, { arrayFormat: "comma" })
-        ).toBe("a=1&b=2%2C3&c%5Bd%5D=4&f=");
+        expect(UrlHelper.stringify(params, { arrayFormat: "comma" })).toBe(
+            "a=1&b=2%2C3&c%5Bd%5D=4&f="
+        );
 
-        expect(
-            UrlHelper.stringify(params, { skipEmptyString: true })
-        ).toBe("a=1&b=2&b=3&c%5Bd%5D=4");
+        expect(UrlHelper.stringify(params, { skipEmptyString: true })).toBe(
+            "a=1&b=2&b=3&c%5Bd%5D=4"
+        );
     });
 
     it("should return empty string with no params", () => {
         expect(UrlHelper.stringify(null)).toBe("");
         expect(UrlHelper.stringify({})).toBe("");
     });
-    
+
     describe("slugify", () => {
         it("should convert an object into an SEO string", () => {
-            const slug = UrlHelper.slugify({ 
-                category: "Zapatos Deporte", 
-                brand: ["Nike", "Adidas"]
+            const slug = UrlHelper.slugify({
+                category: "Zapatos Deporte",
+                brand: ["Nike", "Adidas"],
             });
-            expect(slug).toBe("brand-nike-brand-adidas-category-zapatos-deporte");
+            expect(slug).toBe(
+                "brand-nike-brand-adidas-category-zapatos-deporte"
+            );
         });
 
         it("should handle raw strings correctly", () => {

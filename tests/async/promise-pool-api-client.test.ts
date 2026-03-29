@@ -55,10 +55,13 @@ function makeFetchWithErrors(
             setTimeout(() => {
                 if (errorPaths.has(path)) {
                     resolve(
-                        new Response(JSON.stringify({ error: "server error" }), {
-                            status: errorStatus,
-                            headers: { "Content-Type": "application/json" },
-                        })
+                        new Response(
+                            JSON.stringify({ error: "server error" }),
+                            {
+                                status: errorStatus,
+                                headers: { "Content-Type": "application/json" },
+                            }
+                        )
                     );
                 } else {
                     resolve(
@@ -77,7 +80,6 @@ function makeFetchWithErrors(
 // ─────────────────────────────────────────────────────────────────────────────
 
 describe("ApiClient — PromisePool integration (US3)", () => {
-
     // T022 — pool limits concurrent in-flight fetch calls
     it("T022 — limits concurrent requests when pool option is configured", async () => {
         const { fetchImpl, getMaxConcurrent } = makeMockFetch(30);
@@ -97,7 +99,8 @@ describe("ApiClient — PromisePool integration (US3)", () => {
 
     // T023 — no pool option = no restriction (regression guard)
     it("T023 — ApiClient without pool option works as before (no regression)", async () => {
-        const { fetchImpl, getTotalCalls, getMaxConcurrent } = makeMockFetch(10);
+        const { fetchImpl, getTotalCalls, getMaxConcurrent } =
+            makeMockFetch(10);
         const client = new ApiClient({
             baseUrl: "http://example.com",
             fetchImpl,
@@ -115,7 +118,8 @@ describe("ApiClient — PromisePool integration (US3)", () => {
 
     // pool: { concurrency: 1 } — fully sequential
     it("pool concurrency=1 — all requests run sequentially (maxConcurrent === 1)", async () => {
-        const { fetchImpl, getMaxConcurrent, getTotalCalls } = makeMockFetch(20);
+        const { fetchImpl, getMaxConcurrent, getTotalCalls } =
+            makeMockFetch(20);
         const client = new ApiClient({
             baseUrl: "http://example.com",
             fetchImpl,
@@ -197,6 +201,8 @@ describe("ApiClient — PromisePool integration (US3)", () => {
         ]);
 
         expect(goodResult.status).toBe("fulfilled");
-        expect((goodResult as PromiseFulfilledResult<{ ok: boolean }>).value.ok).toBe(true);
+        expect(
+            (goodResult as PromiseFulfilledResult<{ ok: boolean }>).value.ok
+        ).toBe(true);
     });
 });

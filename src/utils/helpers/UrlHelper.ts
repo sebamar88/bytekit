@@ -137,11 +137,12 @@ export class UrlHelper {
         options: string | SlugifyOptions = {}
     ): string {
         if (!params) return "";
-        
+
         // Mantener compatibilidad con el parámetro 'separator' como string si se envía así
-        const opts: SlugifyOptions = typeof options === "string" ? { separator: options } : options;
+        const opts: SlugifyOptions =
+            typeof options === "string" ? { separator: options } : options;
         const { separator = "-", lowercase = true } = opts;
-        
+
         let rawString = "";
 
         if (typeof params === "string") {
@@ -150,11 +151,17 @@ export class UrlHelper {
             const queryOptions = { ...DEFAULT_QUERY_OPTIONS };
             const pairs: QueryPair[] = [];
             const entries = Object.entries(params);
-            if (queryOptions.sortKeys) entries.sort(([a], [b]) => a.localeCompare(b));
+            if (queryOptions.sortKeys)
+                entries.sort(([a], [b]) => a.localeCompare(b));
 
             for (const [key, value] of entries) {
                 // We use the same deep flattening logic as stringify but we skip encoding
-                buildQueryPairs(key, value, { ...queryOptions, encode: false }, pairs);
+                buildQueryPairs(
+                    key,
+                    value,
+                    { ...queryOptions, encode: false },
+                    pairs
+                );
             }
 
             // Combine keys and values

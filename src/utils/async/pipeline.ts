@@ -101,9 +101,7 @@ export class Pipeline<TIn, TOut> {
  * );
  * // Inferred: Pipeline<number[], number>
  */
-export function pipe<T, A>(
-    op1: PipelineOp<T, A>
-): Pipeline<T, A>;
+export function pipe<T, A>(op1: PipelineOp<T, A>): Pipeline<T, A>;
 
 export function pipe<T, A, B>(
     op1: PipelineOp<T, A>,

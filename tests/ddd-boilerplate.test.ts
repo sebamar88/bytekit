@@ -50,7 +50,13 @@ describe("generateDddBoilerplate", () => {
         expect(slug).toBe("billing");
 
         const inbound = await fs.readFile(
-            path.join(tmp, "application", "ports", "inbound", "billing-primary.port.ts"),
+            path.join(
+                tmp,
+                "application",
+                "ports",
+                "inbound",
+                "billing-primary.port.ts"
+            ),
             "utf8"
         );
         expect(inbound).toContain("export interface BillingPrimaryPort");

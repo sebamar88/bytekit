@@ -42,16 +42,15 @@ describe("RequestQueue", () => {
 
             const tasks = Array.from(
                 { length: 20 },
-                () =>
-                    (_signal: AbortSignal) =>
-                        new Promise<void>((resolve) => {
-                            running++;
-                            maxObserved = Math.max(maxObserved, running);
-                            setTimeout(() => {
-                                running--;
-                                resolve();
-                            }, 5);
-                        })
+                () => (_signal: AbortSignal) =>
+                    new Promise<void>((resolve) => {
+                        running++;
+                        maxObserved = Math.max(maxObserved, running);
+                        setTimeout(() => {
+                            running--;
+                            resolve();
+                        }, 5);
+                    })
             );
 
             await Promise.all(tasks.map((t) => queue.add(t)));
@@ -64,9 +63,21 @@ describe("RequestQueue", () => {
 
             await Promise.allSettled([
                 queue.add(failing()),
-                queue.add((_s) => Promise.resolve().then(() => { completed++; })),
-                queue.add((_s) => Promise.resolve().then(() => { completed++; })),
-                queue.add((_s) => Promise.resolve().then(() => { completed++; })),
+                queue.add((_s) =>
+                    Promise.resolve().then(() => {
+                        completed++;
+                    })
+                ),
+                queue.add((_s) =>
+                    Promise.resolve().then(() => {
+                        completed++;
+                    })
+                ),
+                queue.add((_s) =>
+                    Promise.resolve().then(() => {
+                        completed++;
+                    })
+                ),
             ]);
 
             expect(completed).toBe(3);
@@ -76,19 +87,34 @@ describe("RequestQueue", () => {
             const queue = new RequestQueue({ concurrency: 2 });
             let settled = 0;
 
-            const p1 = queue.add((_s) =>
-                new Promise<void>((r) =>
-                    setTimeout(() => { settled++; r(); }, 20)
-            ));
-            const p2 = queue.add((_s) =>
-                new Promise<void>((r) =>
-                    setTimeout(() => { settled++; r(); }, 10)
-            ));
+            const p1 = queue.add(
+                (_s) =>
+                    new Promise<void>((r) =>
+                        setTimeout(() => {
+                            settled++;
+                            r();
+                        }, 20)
+                    )
+            );
+            const p2 = queue.add(
+                (_s) =>
+                    new Promise<void>((r) =>
+                        setTimeout(() => {
+                            settled++;
+                            r();
+                        }, 10)
+                    )
+            );
             // Third task queued (concurrency=2, first two are running)
-            const p3 = queue.add((_s) =>
-                new Promise<void>((_, j) =>
-                    setTimeout(() => { settled++; j(new Error("boom")); }, 15)
-            ));
+            const p3 = queue.add(
+                (_s) =>
+                    new Promise<void>((_, j) =>
+                        setTimeout(() => {
+                            settled++;
+                            j(new Error("boom"));
+                        }, 15)
+                    )
+            );
 
             // Attach handlers before tasks settle to prevent unhandled rejection warnings
             const settlement = Promise.allSettled([p1, p2, p3]);
@@ -106,7 +132,10 @@ describe("RequestQueue", () => {
 
             let resolveTask!: () => void;
             queue.add(
-                (_s) => new Promise<void>((r) => { resolveTask = r; })
+                (_s) =>
+                    new Promise<void>((r) => {
+                        resolveTask = r;
+                    })
             );
 
             // _drain() runs synchronously inside add() → task starts immediately
@@ -132,9 +161,15 @@ describe("RequestQueue", () => {
         });
 
         it("T009: constructor throws TypeError when concurrency < 1", () => {
-            expect(() => new RequestQueue({ concurrency: 0 })).toThrow(TypeError);
-            expect(() => new RequestQueue({ concurrency: -1 })).toThrow(TypeError);
-            expect(() => new RequestQueue({ concurrency: 0.5 })).toThrow(TypeError);
+            expect(() => new RequestQueue({ concurrency: 0 })).toThrow(
+                TypeError
+            );
+            expect(() => new RequestQueue({ concurrency: -1 })).toThrow(
+                TypeError
+            );
+            expect(() => new RequestQueue({ concurrency: 0.5 })).toThrow(
+                TypeError
+            );
             expect(() => new RequestQueue({ concurrency: 1 })).not.toThrow();
         });
 
@@ -180,20 +215,32 @@ describe("RequestQueue", () => {
             // Block the queue with an initial task
             let releaseBlocker!: () => void;
             const blocker = queue.add(
-                (_s) => new Promise<void>((r) => { releaseBlocker = r; })
+                (_s) =>
+                    new Promise<void>((r) => {
+                        releaseBlocker = r;
+                    })
             );
 
             // Enqueue out-of-priority order; high should win
             queue.add(
-                (_s) => Promise.resolve().then(() => { order.push("low"); }),
+                (_s) =>
+                    Promise.resolve().then(() => {
+                        order.push("low");
+                    }),
                 { priority: "low" }
             );
             queue.add(
-                (_s) => Promise.resolve().then(() => { order.push("normal"); }),
+                (_s) =>
+                    Promise.resolve().then(() => {
+                        order.push("normal");
+                    }),
                 { priority: "normal" }
             );
             queue.add(
-                (_s) => Promise.resolve().then(() => { order.push("high"); }),
+                (_s) =>
+                    Promise.resolve().then(() => {
+                        order.push("high");
+                    }),
                 { priority: "high" }
             );
 
@@ -209,7 +256,10 @@ describe("RequestQueue", () => {
 
             let releaseBlocker!: () => void;
             const blocker = queue.add(
-                (_s) => new Promise<void>((r) => { releaseBlocker = r; })
+                (_s) =>
+                    new Promise<void>((r) => {
+                        releaseBlocker = r;
+                    })
             );
 
             const taskSpy = vi.fn((_s: AbortSignal) => Promise.resolve());
@@ -239,7 +289,9 @@ describe("RequestQueue", () => {
 
             queue.add((signal) => {
                 capturedSignal = signal;
-                return new Promise<void>((r) => { resolveTask = r; });
+                return new Promise<void>((r) => {
+                    resolveTask = r;
+                });
             });
 
             // Task is running — obtain its ID from the active set
@@ -265,12 +317,17 @@ describe("RequestQueue", () => {
             // Block the queue so the second task is queued
             let releaseBlocker!: () => void;
             const blocker = queue.add(
-                (_s) => new Promise<void>((r) => { releaseBlocker = r; })
+                (_s) =>
+                    new Promise<void>((r) => {
+                        releaseBlocker = r;
+                    })
             );
 
             const controller = new AbortController();
             const taskSpy = vi.fn((_s: AbortSignal) => Promise.resolve());
-            const taskPromise = queue.add(taskSpy, { signal: controller.signal });
+            const taskPromise = queue.add(taskSpy, {
+                signal: controller.signal,
+            });
 
             // Abort via external signal before task starts
             controller.abort();
@@ -296,7 +353,12 @@ describe("RequestQueue", () => {
             const queue = new RequestQueue({ concurrency: 1 });
 
             let resolveTask!: () => void;
-            queue.add((_s) => new Promise<void>((r) => { resolveTask = r; }));
+            queue.add(
+                (_s) =>
+                    new Promise<void>((r) => {
+                        resolveTask = r;
+                    })
+            );
 
             const [runningId] = queue._runningIds();
             expect(queue.cancel(runningId)).toBe(true);

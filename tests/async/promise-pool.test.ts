@@ -1,26 +1,36 @@
 import { describe, it, expect, vi, afterEach } from "vitest";
-import { PromisePool, PoolTimeoutError } from "../../src/utils/async/promise-pool";
+import {
+    PromisePool,
+    PoolTimeoutError,
+} from "../../src/utils/async/promise-pool";
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
 /** Task that resolves with `value` after `ms` milliseconds. */
 function delayed<T>(value: T, ms: number): () => Promise<T> {
-    return () => new Promise<T>((resolve) => setTimeout(() => resolve(value), ms));
+    return () =>
+        new Promise<T>((resolve) => setTimeout(() => resolve(value), ms));
 }
 
 /** Task that rejects with `error` after `ms` milliseconds (default: 0). */
 function failing(error: Error, ms = 0): () => Promise<never> {
-    return () => new Promise<never>((_, reject) => setTimeout(() => reject(error), ms));
+    return () =>
+        new Promise<never>((_, reject) => setTimeout(() => reject(error), ms));
 }
 
 /** Task that throws synchronously before returning a Promise. */
 function syncThrowing(error: Error): () => Promise<never> {
-    return () => { throw error; };
+    return () => {
+        throw error;
+    };
 }
 
 /** Task that never resolves (use with fake timers). */
 function hanging(): () => Promise<never> {
-    return () => new Promise<never>(() => { /* intentionally hangs */ });
+    return () =>
+        new Promise<never>(() => {
+            /* intentionally hangs */
+        });
 }
 
 /**
@@ -52,15 +62,18 @@ function withConcurrencyTracker<T>(tasks: Array<() => Promise<T>>) {
 function countdownLatch(n: number) {
     let remaining = n;
     let resolve!: () => void;
-    const latch = new Promise<void>((r) => { resolve = r; });
-    const tick = () => { if (--remaining <= 0) resolve(); };
+    const latch = new Promise<void>((r) => {
+        resolve = r;
+    });
+    const tick = () => {
+        if (--remaining <= 0) resolve();
+    };
     return { latch, tick };
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
 
 describe("PromisePool", () => {
-
     // =========================================================================
     // 1. Constructor validation
     // =========================================================================
@@ -75,25 +88,39 @@ describe("PromisePool", () => {
         });
 
         it("throws TypeError when concurrency = 0", () => {
-            expect(() => new PromisePool({ concurrency: 0 })).toThrow(TypeError);
+            expect(() => new PromisePool({ concurrency: 0 })).toThrow(
+                TypeError
+            );
         });
 
         it("throws TypeError when concurrency is negative", () => {
-            expect(() => new PromisePool({ concurrency: -1 })).toThrow(TypeError);
-            expect(() => new PromisePool({ concurrency: -999 })).toThrow(TypeError);
+            expect(() => new PromisePool({ concurrency: -1 })).toThrow(
+                TypeError
+            );
+            expect(() => new PromisePool({ concurrency: -999 })).toThrow(
+                TypeError
+            );
         });
 
         it("accepts timeout = Infinity (valid: Infinity > 0)", () => {
-            expect(() => new PromisePool({ concurrency: 1, timeout: Infinity })).not.toThrow();
+            expect(
+                () => new PromisePool({ concurrency: 1, timeout: Infinity })
+            ).not.toThrow();
         });
 
         it("throws TypeError when timeout = 0", () => {
-            expect(() => new PromisePool({ concurrency: 1, timeout: 0 })).toThrow(TypeError);
+            expect(
+                () => new PromisePool({ concurrency: 1, timeout: 0 })
+            ).toThrow(TypeError);
         });
 
         it("throws TypeError when timeout is negative", () => {
-            expect(() => new PromisePool({ concurrency: 1, timeout: -1 })).toThrow(TypeError);
-            expect(() => new PromisePool({ concurrency: 1, timeout: -100 })).toThrow(TypeError);
+            expect(
+                () => new PromisePool({ concurrency: 1, timeout: -1 })
+            ).toThrow(TypeError);
+            expect(
+                () => new PromisePool({ concurrency: 1, timeout: -100 })
+            ).toThrow(TypeError);
         });
 
         it("onError is optional — omitting it does not throw", () => {
@@ -126,7 +153,9 @@ describe("PromisePool", () => {
         });
 
         it("throws TypeError for a string input", async () => {
-            await expect(pool.run("not-array" as never)).rejects.toThrow(TypeError);
+            await expect(pool.run("not-array" as never)).rejects.toThrow(
+                TypeError
+            );
         });
 
         it("throws TypeError for null input", async () => {
@@ -134,7 +163,9 @@ describe("PromisePool", () => {
         });
 
         it("throws TypeError for undefined input", async () => {
-            await expect(pool.run(undefined as never)).rejects.toThrow(TypeError);
+            await expect(pool.run(undefined as never)).rejects.toThrow(
+                TypeError
+            );
         });
 
         it("throws TypeError when a number appears at index 0", async () => {
@@ -142,7 +173,9 @@ describe("PromisePool", () => {
         });
 
         it("throws TypeError when a non-function appears at a non-zero index", async () => {
-            await expect(pool.run([delayed(1, 0), "bad" as never])).rejects.toThrow(TypeError);
+            await expect(
+                pool.run([delayed(1, 0), "bad" as never])
+            ).rejects.toThrow(TypeError);
         });
 
         it("TypeError message includes the offending element's index", async () => {
@@ -173,9 +206,16 @@ describe("PromisePool", () => {
             const pool = new PromisePool({ concurrency: 1 });
 
             await pool.run([
-                async () => { order.push(0); await new Promise<void>((r) => setTimeout(r, 20)); },
-                async () => { order.push(1); },
-                async () => { order.push(2); },
+                async () => {
+                    order.push(0);
+                    await new Promise<void>((r) => setTimeout(r, 20));
+                },
+                async () => {
+                    order.push(1);
+                },
+                async () => {
+                    order.push(2);
+                },
             ]);
 
             expect(order).toEqual([0, 1, 2]);
@@ -214,9 +254,17 @@ describe("PromisePool", () => {
             const pool = new PromisePool({ concurrency: 1 });
 
             await pool.run([
-                async () => { starts.push(0); await new Promise<void>((r) => setTimeout(r, 20)); },
-                async () => { starts.push(1); await new Promise<void>((r) => setTimeout(r, 20)); },
-                async () => { starts.push(2); },
+                async () => {
+                    starts.push(0);
+                    await new Promise<void>((r) => setTimeout(r, 20));
+                },
+                async () => {
+                    starts.push(1);
+                    await new Promise<void>((r) => setTimeout(r, 20));
+                },
+                async () => {
+                    starts.push(2);
+                },
             ]);
 
             expect(starts).toEqual([0, 1, 2]);
@@ -280,7 +328,9 @@ describe("PromisePool", () => {
 
         it("preserves undefined as a result value", async () => {
             const pool = new PromisePool({ concurrency: 1 });
-            const results = await pool.run([async () => undefined as unknown as string]);
+            const results = await pool.run([
+                async () => undefined as unknown as string,
+            ]);
             expect(results).toEqual([undefined]);
         });
 
@@ -318,8 +368,11 @@ describe("PromisePool", () => {
             const pool = new PromisePool({ concurrency: 1 });
             const original = new TypeError("original");
             let caught: unknown;
-            try { await pool.run([failing(original)]); }
-            catch (e) { caught = e; }
+            try {
+                await pool.run([failing(original)]);
+            } catch (e) {
+                caught = e;
+            }
             expect(caught).toBe(original);
         });
 
@@ -357,7 +410,9 @@ describe("PromisePool", () => {
                 onError: (error, index) => calls.push({ error, index }),
             });
             const err = new Error("boom");
-            await pool.run([async () => "ok", failing(err), async () => "ok"]).catch(() => { });
+            await pool
+                .run([async () => "ok", failing(err), async () => "ok"])
+                .catch(() => {});
             expect(calls).toHaveLength(1);
             expect(calls[0].error).toBe(err);
             expect(calls[0].index).toBe(1);
@@ -366,12 +421,18 @@ describe("PromisePool", () => {
         // T018
         it("T018 — pool continues executing remaining tasks after onError fires", async () => {
             const completed: number[] = [];
-            const pool = new PromisePool({ concurrency: 1, onError: () => { } });
-            await pool.run([
-                async () => { completed.push(0); },
-                failing(new Error("fail")),
-                async () => { completed.push(2); },
-            ]).catch(() => { });
+            const pool = new PromisePool({ concurrency: 1, onError: () => {} });
+            await pool
+                .run([
+                    async () => {
+                        completed.push(0);
+                    },
+                    failing(new Error("fail")),
+                    async () => {
+                        completed.push(2);
+                    },
+                ])
+                .catch(() => {});
             expect(completed).toContain(0);
             expect(completed).toContain(2);
         });
@@ -380,33 +441,48 @@ describe("PromisePool", () => {
         it("T020 — onError receives the original error reference (not a wrapper)", async () => {
             const original = new TypeError("original");
             const received: Error[] = [];
-            const pool = new PromisePool({ concurrency: 2, onError: (err) => received.push(err) });
-            await pool.run([failing(original)]).catch(() => { });
+            const pool = new PromisePool({
+                concurrency: 2,
+                onError: (err) => received.push(err),
+            });
+            await pool.run([failing(original)]).catch(() => {});
             expect(received[0]).toBe(original);
             expect(received[0]).toBeInstanceOf(TypeError);
         });
 
         it("run() STILL rejects even when onError is configured", async () => {
-            const pool = new PromisePool({ concurrency: 1, onError: () => { } });
+            const pool = new PromisePool({ concurrency: 1, onError: () => {} });
             const err = new Error("fail");
             await expect(pool.run([failing(err)])).rejects.toBe(err);
         });
 
         it("onError is NOT called for successful tasks", async () => {
             let callCount = 0;
-            const pool = new PromisePool({ concurrency: 3, onError: () => callCount++ });
-            await pool.run([delayed("a", 10), delayed("b", 10), delayed("c", 10)]);
+            const pool = new PromisePool({
+                concurrency: 3,
+                onError: () => callCount++,
+            });
+            await pool.run([
+                delayed("a", 10),
+                delayed("b", 10),
+                delayed("c", 10),
+            ]);
             expect(callCount).toBe(0);
         });
 
         it("onError index matches original array position, not execution order", async () => {
             const indices: number[] = [];
-            const pool = new PromisePool({ concurrency: 3, onError: (_, i) => indices.push(i) });
-            await pool.run([
-                delayed("slow", 50),
-                delayed("medium", 25),
-                failing(new Error("fast fail"), 0), // index 2, but fails first
-            ]).catch(() => { });
+            const pool = new PromisePool({
+                concurrency: 3,
+                onError: (_, i) => indices.push(i),
+            });
+            await pool
+                .run([
+                    delayed("slow", 50),
+                    delayed("medium", 25),
+                    failing(new Error("fast fail"), 0), // index 2, but fails first
+                ])
+                .catch(() => {});
             expect(indices).toContain(2);
         });
 
@@ -418,7 +494,10 @@ describe("PromisePool", () => {
 
             const pool = new PromisePool({
                 concurrency: N, // all tasks start simultaneously
-                onError: (_, i) => { erroredIndices.push(i); tick(); },
+                onError: (_, i) => {
+                    erroredIndices.push(i);
+                    tick();
+                },
             });
 
             await Promise.allSettled([
@@ -435,17 +514,27 @@ describe("PromisePool", () => {
 
         it("all tasks succeed — onError never called, run() resolves", async () => {
             let callCount = 0;
-            const pool = new PromisePool({ concurrency: 5, onError: () => callCount++ });
-            const results = await pool.run([delayed(1, 5), delayed(2, 10), delayed(3, 5)]);
+            const pool = new PromisePool({
+                concurrency: 5,
+                onError: () => callCount++,
+            });
+            const results = await pool.run([
+                delayed(1, 5),
+                delayed(2, 10),
+                delayed(3, 5),
+            ]);
             expect(callCount).toBe(0);
             expect(results).toEqual([1, 2, 3]);
         });
 
         it("synchronously throwing task also triggers onError", async () => {
             const errors: Error[] = [];
-            const pool = new PromisePool({ concurrency: 2, onError: (err) => errors.push(err) });
+            const pool = new PromisePool({
+                concurrency: 2,
+                onError: (err) => errors.push(err),
+            });
             const syncErr = new Error("sync");
-            await pool.run([syncThrowing(syncErr)]).catch(() => { });
+            await pool.run([syncThrowing(syncErr)]).catch(() => {});
             expect(errors).toHaveLength(1);
             expect(errors[0]).toBe(syncErr);
         });
@@ -461,22 +550,30 @@ describe("PromisePool", () => {
         // T015
         it("T015 — task exceeding timeout rejects with PoolTimeoutError", async () => {
             const pool = new PromisePool({ concurrency: 1, timeout: 50 });
-            await expect(pool.run([delayed("slow", 500)])).rejects.toBeInstanceOf(PoolTimeoutError);
+            await expect(
+                pool.run([delayed("slow", 500)])
+            ).rejects.toBeInstanceOf(PoolTimeoutError);
         });
 
         it("PoolTimeoutError.name === 'PoolTimeoutError'", async () => {
             const pool = new PromisePool({ concurrency: 1, timeout: 50 });
             let name = "";
-            try { await pool.run([delayed("slow", 500)]); }
-            catch (err) { name = (err as Error).name; }
+            try {
+                await pool.run([delayed("slow", 500)]);
+            } catch (err) {
+                name = (err as Error).name;
+            }
             expect(name).toBe("PoolTimeoutError");
         });
 
         it("PoolTimeoutError is an instance of Error", async () => {
             const pool = new PromisePool({ concurrency: 1, timeout: 50 });
             let caught: unknown;
-            try { await pool.run([delayed("slow", 500)]); }
-            catch (err) { caught = err; }
+            try {
+                await pool.run([delayed("slow", 500)]);
+            } catch (err) {
+                caught = err;
+            }
             expect(caught).toBeInstanceOf(Error);
             expect(caught).toBeInstanceOf(PoolTimeoutError);
         });
@@ -484,8 +581,11 @@ describe("PromisePool", () => {
         it("PoolTimeoutError.message contains the configured timeout value", async () => {
             const pool = new PromisePool({ concurrency: 1, timeout: 123 });
             let message = "";
-            try { await pool.run([delayed("slow", 500)]); }
-            catch (err) { message = (err as Error).message; }
+            try {
+                await pool.run([delayed("slow", 500)]);
+            } catch (err) {
+                message = (err as Error).message;
+            }
             expect(message).toContain("123");
         });
 
@@ -506,12 +606,25 @@ describe("PromisePool", () => {
         // T016
         it("T016 — pool continues executing after a task times out (with onError)", async () => {
             const completed: number[] = [];
-            const pool = new PromisePool({ concurrency: 2, timeout: 50, onError: () => { } });
-            await pool.run([
-                async () => { await new Promise<void>((r) => setTimeout(r, 500)); completed.push(0); },
-                async () => { completed.push(1); },
-                async () => { completed.push(2); },
-            ]).catch(() => { });
+            const pool = new PromisePool({
+                concurrency: 2,
+                timeout: 50,
+                onError: () => {},
+            });
+            await pool
+                .run([
+                    async () => {
+                        await new Promise<void>((r) => setTimeout(r, 500));
+                        completed.push(0);
+                    },
+                    async () => {
+                        completed.push(1);
+                    },
+                    async () => {
+                        completed.push(2);
+                    },
+                ])
+                .catch(() => {});
             expect(completed).toContain(1);
             expect(completed).toContain(2);
         });
@@ -526,11 +639,15 @@ describe("PromisePool", () => {
         });
 
         it("US2 guard — timeout=0 throws TypeError in constructor", () => {
-            expect(() => new PromisePool({ concurrency: 1, timeout: 0 })).toThrow(TypeError);
+            expect(
+                () => new PromisePool({ concurrency: 1, timeout: 0 })
+            ).toThrow(TypeError);
         });
 
         it("US2 guard — timeout=-1 throws TypeError in constructor", () => {
-            expect(() => new PromisePool({ concurrency: 1, timeout: -1 })).toThrow(TypeError);
+            expect(
+                () => new PromisePool({ concurrency: 1, timeout: -1 })
+            ).toThrow(TypeError);
         });
 
         it("[fake timers] never-resolving task times out at exactly the configured ms", async () => {
@@ -571,7 +688,9 @@ describe("PromisePool", () => {
             const pool = new PromisePool({ concurrency: 3 });
             for (let batch = 0; batch < 5; batch++) {
                 const expected = [0, 1, 2].map((i) => batch * 10 + i);
-                const results = await pool.run(expected.map((v) => delayed(v, 5)));
+                const results = await pool.run(
+                    expected.map((v) => delayed(v, 5))
+                );
                 expect(results).toEqual(expected);
             }
         });
@@ -584,8 +703,8 @@ describe("PromisePool", () => {
         });
 
         it("pool is reusable after a single-task failure", async () => {
-            const pool = new PromisePool({ concurrency: 2, onError: () => { } });
-            await pool.run([failing(new Error("fail"))]).catch(() => { });
+            const pool = new PromisePool({ concurrency: 2, onError: () => {} });
+            await pool.run([failing(new Error("fail"))]).catch(() => {});
             // Allow the event loop to drain any background tasks from the failed run
             await new Promise<void>((r) => setTimeout(r, 30));
             const results = await pool.run([delayed("recovered", 10)]);
@@ -611,13 +730,17 @@ describe("PromisePool", () => {
     describe("edge cases", () => {
         it("single task resolving immediately with Promise.resolve()", async () => {
             const pool = new PromisePool({ concurrency: 1 });
-            await expect(pool.run([() => Promise.resolve(42)])).resolves.toEqual([42]);
+            await expect(
+                pool.run([() => Promise.resolve(42)])
+            ).resolves.toEqual([42]);
         });
 
         it("single task rejecting immediately with Promise.reject()", async () => {
             const pool = new PromisePool({ concurrency: 1 });
             const err = new Error("immediate reject");
-            await expect(pool.run([() => Promise.reject(err)])).rejects.toBe(err);
+            await expect(pool.run([() => Promise.reject(err)])).rejects.toBe(
+                err
+            );
         });
 
         it("concurrency=100 with 100 tasks — all start simultaneously, results ordered", async () => {
@@ -638,15 +761,24 @@ describe("PromisePool", () => {
 
             const pool = new PromisePool({
                 concurrency: 4,
-                onError: (_, i) => { errorIndices.push(i); tick(); },
+                onError: (_, i) => {
+                    errorIndices.push(i);
+                    tick();
+                },
             });
 
             await Promise.allSettled([
                 pool.run([
-                    async () => { successIndices.push(0); return "ok"; },       // success
-                    failing(new Error("async reject"), 5),                       // index 1: async fail
-                    syncThrowing(new Error("sync throw")),                       // index 2: sync fail
-                    async () => { successIndices.push(3); return "also ok"; },  // success
+                    async () => {
+                        successIndices.push(0);
+                        return "ok";
+                    }, // success
+                    failing(new Error("async reject"), 5), // index 1: async fail
+                    syncThrowing(new Error("sync throw")), // index 2: sync fail
+                    async () => {
+                        successIndices.push(3);
+                        return "also ok";
+                    }, // success
                 ]),
                 latch,
             ]);

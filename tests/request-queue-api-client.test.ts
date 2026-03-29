@@ -55,7 +55,9 @@ describe("ApiClient — RequestQueue & RequestBatcher integration (US4)", () => 
 
         // Fire 10 concurrent requests
         await Promise.all(
-            Array.from({ length: 10 }, () => client.get<{ id: number }>("/items"))
+            Array.from({ length: 10 }, () =>
+                client.get<{ id: number }>("/items")
+            )
         );
 
         expect(mock.getMaxConcurrent()).toBeLessThanOrEqual(3);
@@ -123,7 +125,9 @@ describe("ApiClient — RequestQueue & RequestBatcher integration (US4)", () => 
         });
 
         await Promise.all(
-            Array.from({ length: 6 }, () => client.get<{ ok: boolean }>("/ping"))
+            Array.from({ length: 6 }, () =>
+                client.get<{ ok: boolean }>("/ping")
+            )
         );
 
         expect(mock.getMaxConcurrent()).toBeLessThanOrEqual(2);

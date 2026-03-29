@@ -13,21 +13,61 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [2.2.3] - 2026-03-29
 
-### Changed
+### Added
 
-- No changes yet.
+- **Pipeline** (`bytekit/pipeline`): Typed functional data-pipeline builder with lazy evaluation.
+  - `Pipeline<TIn, TOut>` class — immutable `.pipe(op)` builder, lazy `.process(input)` executor.
+  - `pipe()` factory with 7 typed overloads (1-op to 7-op) plus variadic escape hatch.
+  - `map()`, `filter()`, `reduce()` operator factories with full JSDoc and `@example` blocks.
+    - `map` / `filter`: concurrent via `Promise.all` (order preserved).
+    - `reduce`: sequential for deterministic accumulation.
+  - New `bytekit/pipeline` package export entry.
+  - `ApiClient.RequestOptions` extended with optional `pipeline` field (non-breaking).
+  - 20 new tests — 100% statement/branch/function/line coverage on `pipeline.ts`.
 
 ## [2.2.2] - 2026-03-29
 
-### Changed
+### Added
 
-- No changes yet.
+- **WebSocketHelper** — advanced reconnection and validation features:
+  - Configurable back-off strategies: `"linear"`, `"exponential"`, or a custom `(attempt) => number` function.
+  - Full Jitter option for exponential back-off (`jitter: true`).
+  - `maxReconnectDelayMs` cap for exponential delays.
+  - Per-message-type schema validation via `schemas: Record<string, SchemaAdapter>` — invalid messages are dropped and `onValidationError` fires.
+  - Pong / heartbeat timeout detection: forces reconnect if no message arrives within `heartbeatTimeoutMs` after a ping.
+  - New event handlers: `onReconnect()`, `onMaxRetriesReached()`, `onValidationError()`.
+  - 15 new tests (30 total for WebSocketHelper).
+- **RequestQueue** (`bytekit/async`): Priority-aware concurrency-limited task queue.
+  - Three fixed priority lanes: `high > normal > low`.
+  - `AbortSignal`-based task cancellation.
+  - `onError` callback for per-task error isolation.
+  - `size`, `running`, `pending` observable state getters.
+  - `flush()` waiter that resolves when all queued tasks settle.
+- **RequestBatcher** (`bytekit/async`): Time-window HTTP request deduplication.
+  - Fixed and sliding window modes.
+  - `maxSize` early-flush trigger.
+  - Custom `keyFn` override for request identity.
+  - Shared result delivery to all same-key callers within a window.
+- `ApiClient` extended with `queue?: RequestQueueOptions` and `batch?: BatchOptions` (non-breaking; legacy `pool` option continues to work).
+- 47 new tests (request-queue, request-batcher, ApiClient integration).
 
 ## [2.2.1] - 2026-03-28
 
-### Changed
+### Added
 
-- No changes yet.
+- **FileUploadHelper** — resumable and concurrent chunked uploads:
+  - `resumeFrom?: number` option: 0-based chunk index to start from, skipping all prior chunks. Pass `uploadedChunks` from a previous failed response to resume without re-uploading.
+  - `concurrency?: number` option: upload up to N chunks in parallel (windowed `Promise.all` batching). Defaults to `1` (sequential, fully backward-compatible).
+  - `UploadResponse.uploadedChunks`: absolute count of chunks successfully sent; safe to use as `resumeFrom` on retry.
+  - `UploadResponse.totalChunks`: total chunk count for the file at the given `chunkSize`.
+  - Edge-case clamping: `chunkSize ≤ 0` → 5 MB default; `concurrency < 1` → 1; `resumeFrom < 0` → 0; `resumeFrom ≥ totalChunks` → immediate success with zero fetch calls.
+  - `onProgress` baseline pre-initialized from skipped chunks so `percentage` reflects total-file progress when resuming.
+  - 12 new tests (21 total for FileUploadHelper).
+- **PromisePool** (`bytekit/async`): Concurrency-limited async task pool with configurable limits and timeout handling.
+
+### Fixed
+
+- **ApiClient**: `post()`, `put()`, and `patch()` methods now accept `RequestBody` type for `bodyOrOptions`, resolving a TypeScript type narrowing regression.
 
 ## [2.1.3] - 2026-03-20
 
