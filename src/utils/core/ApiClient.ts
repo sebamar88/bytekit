@@ -72,6 +72,12 @@ export interface RequestOptions<TResponse = unknown> extends Omit<
     errorLocale?: Locale;
     timeoutMs?: number;
     validateResponse?: ValidationSchema | SchemaAdapter<TResponse>;
+    /**
+     * Optional post-processing pipeline applied to the response body after parsing
+     * and validation. Applied after `validateResponse` (if present) has already run.
+     * If `pipeline.process()` throws, the error propagates as a request error.
+     */
+    pipeline?: { process(data: TResponse): Promise<unknown> };
     skipRetry?: boolean;
     skipInterceptors?: boolean;
     logHeaders?: boolean;
@@ -594,6 +600,7 @@ export class ApiClient {
     ): Promise<T> {
         const {
             validateResponse,
+            pipeline,
             skipRetry,
             skipInterceptors,
             logHeaders,
@@ -647,10 +654,15 @@ export class ApiClient {
                     }
 
                     // Process response
-                    const data = await this.processResponse<T>(
+                    let data: unknown = await this.processResponse<T>(
                         finalResponse,
                         validateResponse
                     );
+
+                    // Apply optional pipeline post-processing
+                    if (pipeline) {
+                        data = await pipeline.process(data as T);
+                    }
 
                     this.logger?.debug("HTTP Response", {
                         status: finalResponse.status,
@@ -658,7 +670,7 @@ export class ApiClient {
                         data,
                     });
 
-                    return data;
+                    return data as T;
                 } catch (err: unknown) {
                     this.handleRequestError(err, path, rest.method);
                 }

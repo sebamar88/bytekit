@@ -38,6 +38,10 @@
             "types": "./dist/utils/async/index.d.ts",
             "import": "./dist/utils/async/index.js"
         },
+        "./pipeline": {
+            "types": "./dist/utils/async/pipeline.d.ts",
+            "import": "./dist/utils/async/pipeline.js"
+        },
         "./logger": {
             "types": "./dist/utils/core/Logger.d.ts",
             "import": "./dist/utils/core/Logger.js"

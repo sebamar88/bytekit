@@ -48,3 +48,5 @@ export type {
 } from "./request-queue.js";
 export { RequestBatcher } from "./request-batcher.js";
 export type { BatchOptions } from "./request-batcher.js";
+export { Pipeline, pipe, map, filter, reduce } from "./pipeline.js";
+export type { PipelineOp } from "./pipeline.js";
