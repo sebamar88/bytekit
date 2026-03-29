@@ -285,7 +285,9 @@ describe("generateDddBoilerplate", () => {
                 // sin outDir → usa el slug como directorio de salida
             });
             expect(slug).toBe("widget");
-            expect(realpathSync(rootDir)).toBe(realpathSync(path.resolve(tmp, "widget")));
+            expect(realpathSync(rootDir)).toBe(
+                realpathSync(path.resolve(tmp, "widget"))
+            );
         } finally {
             process.chdir(originalCwd);
         }
