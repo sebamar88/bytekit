@@ -1,8 +1,19 @@
+/** Options for {@link UrlHelper.stringify}. */
 export interface QueryStringOptions {
+    /**
+     * How arrays are serialised in the query string.
+     * - `"repeat"` (default): `a=1&a=2`
+     * - `"bracket"`: `a[]=1&a[]=2`
+     * - `"comma"`: `a=1,2`
+     */
     arrayFormat?: "repeat" | "bracket" | "comma";
+    /** When `true`, keys whose value is `null` are omitted. Defaults to `true`. */
     skipNull?: boolean;
+    /** When `true`, keys with an empty-string value are omitted. Defaults to `false`. */
     skipEmptyString?: boolean;
+    /** When `true`, keys and values are percent-encoded. Defaults to `true`. */
     encode?: boolean;
+    /** When `true`, query parameters are sorted alphabetically by key. Defaults to `true`. */
     sortKeys?: boolean;
 }
 
@@ -104,6 +115,25 @@ const removeDiacritics = (value: string) =>
     value.normalize("NFD").replace(DIACRITICS_REGEX, "");
 
 export class UrlHelper {
+    /**
+     * Serialises a plain object into a URL query string.
+     *
+     * Supports nested objects, arrays, `Date` values, and booleans. Returns
+     * an empty string when `params` is `null` or `undefined`.
+     *
+     * @param params - Object whose own enumerable properties are serialised.
+     * @param customOptions - Optional overrides for serialisation behaviour.
+     * @returns A percent-encoded query string without a leading `?`.
+     *
+     * @example
+     * ```typescript
+     * UrlHelper.stringify({ page: 1, tags: ['a', 'b'] });
+     * // "page=1&tags=a&tags=b"
+     *
+     * UrlHelper.stringify({ ids: [1, 2] }, { arrayFormat: 'bracket' });
+     * // "ids%5B%5D=1&ids%5B%5D=2"
+     * ```
+     */
     static stringify(
         params: Record<string, unknown> | null | undefined,
         customOptions: QueryStringOptions = {}

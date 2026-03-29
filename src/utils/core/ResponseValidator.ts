@@ -1,20 +1,48 @@
+/** Schema definition used by {@link ResponseValidator.validate}. */
 export interface ValidationSchema {
+    /** Expected data type of the value being validated. */
     type?: "object" | "array" | "string" | "number" | "boolean";
+    /** When `true`, a `null` or `undefined` value is reported as an error. */
     required?: boolean;
+    /**
+     * Schemas for named properties of an object. Only evaluated when
+     * `type` is `"object"`.
+     */
     properties?: Record<string, ValidationSchema>;
+    /**
+     * Schema applied to every element of an array. Only evaluated when
+     * `type` is `"array"`.
+     */
     items?: ValidationSchema;
+    /** Minimum string length (inclusive). Only evaluated when `type` is `"string"`. */
     minLength?: number;
+    /** Maximum string length (inclusive). Only evaluated when `type` is `"string"`. */
     maxLength?: number;
+    /** Minimum numeric value (inclusive). Only evaluated when `type` is `"number"`. */
     minimum?: number;
+    /** Maximum numeric value (inclusive). Only evaluated when `type` is `"number"`. */
     maximum?: number;
+    /**
+     * Regular expression (or pattern string) that string values must match.
+     * Only evaluated when `type` is `"string"`.
+     */
     pattern?: RegExp | string;
+    /** Set of allowed values; validated using strict equality (`===`). */
     enum?: unknown[];
+    /**
+     * Custom validation function. Return `true` to pass, `false` to fail with
+     * a generic message, or a `string` to fail with that message.
+     */
     custom?: (value: unknown) => boolean | string;
 }
 
+/** Describes a single validation failure produced by {@link ResponseValidator.validate}. */
 export interface ValidationError {
+    /** Dot-notation path to the invalid field (e.g., `"root.user.email"`). */
     path: string;
+    /** Human-readable description of why the value failed validation. */
     message: string;
+    /** The actual value that failed validation, if captured. */
     value?: unknown;
 }
 
@@ -81,6 +109,34 @@ export class ResponseValidator {
         return errors;
     }
 
+    /**
+     * Validates `data` against a {@link ValidationSchema} and returns all
+     * validation errors found.
+     *
+     * Performs a recursive deep validation of objects and arrays. Returns an
+     * empty array when `data` is fully valid.
+     *
+     * @param data - The value to validate (any type).
+     * @param schema - Schema describing the expected shape and constraints.
+     * @param path - Dot-notation path prefix used in error messages.
+     *   Defaults to `"root"`.
+     * @returns An array of {@link ValidationError} objects; empty when valid.
+     *
+     * @example
+     * ```typescript
+     * const errors = ResponseValidator.validate(
+     *     { name: 'Alice', age: -1 },
+     *     {
+     *         type: 'object',
+     *         properties: {
+     *             name: { type: 'string', required: true },
+     *             age: { type: 'number', minimum: 0 },
+     *         },
+     *     },
+     * );
+     * // [{ path: 'root.age', message: 'Number must be at least 0', value: -1 }]
+     * ```
+     */
     static validate(
         data: unknown,
         schema: ValidationSchema,
