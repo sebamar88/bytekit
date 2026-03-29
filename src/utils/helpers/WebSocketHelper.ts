@@ -1,3 +1,26 @@
+import type { SchemaAdapter } from "../core/SchemaAdapter.js";
+
+// ── New exported types ────────────────────────────────────────────────────────
+
+export type BackoffStrategy =
+    | "linear"
+    | "exponential"
+    | ((attempt: number) => number);
+
+export type WebSocketReconnectHandler = (
+    attempt: number,
+    delay: number
+) => void;
+
+export type WebSocketMaxRetriesHandler = () => void;
+
+export type WebSocketValidationErrorHandler = (
+    error: Error,
+    message: WebSocketMessage
+) => void;
+
+// ── Existing types (unchanged) ────────────────────────────────────────────────
+
 export interface WebSocketMessage<T = unknown> {
     type: string;
     data: T;
@@ -5,11 +28,18 @@ export interface WebSocketMessage<T = unknown> {
 }
 
 export interface WebSocketOptions {
+    // ── Existing options (unchanged defaults) ─────────────────────────────────
     reconnect?: boolean;
     maxReconnectAttempts?: number;
     reconnectDelayMs?: number;
     heartbeatIntervalMs?: number;
     messageTimeout?: number;
+    // ── New options ────────────────────────────────────────────────────────────
+    backoffStrategy?: BackoffStrategy;
+    maxReconnectDelayMs?: number;
+    jitter?: boolean;
+    heartbeatTimeoutMs?: number;
+    schemas?: Record<string, SchemaAdapter>;
 }
 
 export type WebSocketEventHandler<T = unknown> = (data: T) => void;
@@ -25,6 +55,11 @@ export class WebSocketHelper {
     private reconnectAttempts = 0;
     private heartbeatTimer?: NodeJS.Timeout;
     private isIntentionallyClosed = false;
+    private reconnectHandlers: Set<WebSocketReconnectHandler> = new Set();
+    private maxRetriesHandlers: Set<WebSocketMaxRetriesHandler> = new Set();
+    private validationErrorHandlers: Set<WebSocketValidationErrorHandler> =
+        new Set();
+    private pongTimeoutTimer: ReturnType<typeof setTimeout> | undefined;
 
     constructor(url: string, options: WebSocketOptions = {}) {
         this.url = url;
@@ -34,6 +69,11 @@ export class WebSocketHelper {
             reconnectDelayMs: options.reconnectDelayMs ?? 3000,
             heartbeatIntervalMs: options.heartbeatIntervalMs ?? 30000,
             messageTimeout: options.messageTimeout ?? 5000,
+            backoffStrategy: options.backoffStrategy ?? "linear",
+            maxReconnectDelayMs: options.maxReconnectDelayMs ?? 30000,
+            jitter: options.jitter ?? false,
+            heartbeatTimeoutMs: options.heartbeatTimeoutMs ?? 5000,
+            schemas: options.schemas ?? {},
         };
     }
 
@@ -123,6 +163,32 @@ export class WebSocketHelper {
     }
 
     /**
+     * Subscribe to reconnect attempts.
+     * Fires just before each reconnect delay begins.
+     */
+    onReconnect(handler: WebSocketReconnectHandler): () => void {
+        this.reconnectHandlers.add(handler);
+        return () => this.reconnectHandlers.delete(handler);
+    }
+
+    /**
+     * Subscribe to terminal failure when all reconnect attempts are exhausted.
+     */
+    onMaxRetriesReached(handler: WebSocketMaxRetriesHandler): () => void {
+        this.maxRetriesHandlers.add(handler);
+        return () => this.maxRetriesHandlers.delete(handler);
+    }
+
+    /**
+     * Subscribe to incoming message validation errors.
+     * The offending message is dropped (on() handlers are NOT called).
+     */
+    onValidationError(handler: WebSocketValidationErrorHandler): () => void {
+        this.validationErrorHandlers.add(handler);
+        return () => this.validationErrorHandlers.delete(handler);
+    }
+
+    /**
      * Send a message and wait for response
      */
     async request<TRequest, TResponse>(
@@ -182,8 +248,28 @@ export class WebSocketHelper {
     }
 
     private handleMessage(rawData: string): void {
+        clearTimeout(this.pongTimeoutTimer);
+        this.pongTimeoutTimer = undefined;
+
         try {
             const message = JSON.parse(rawData) as WebSocketMessage;
+
+            // Schema validation — US2
+            const schema = this.options.schemas[message.type];
+            if (schema) {
+                try {
+                    message.data = schema.parse(message.data);
+                } catch (error) {
+                    this.notifyValidationError(
+                        error instanceof Error
+                            ? error
+                            : new Error(String(error)),
+                        message
+                    );
+                    return; // drop message
+                }
+            }
+
             const handlers = this.messageHandlers.get(message.type);
 
             if (handlers) {
@@ -211,6 +297,9 @@ export class WebSocketHelper {
             if (this.isConnected()) {
                 try {
                     this.send("ping", {});
+                    this.pongTimeoutTimer = setTimeout(() => {
+                        this.ws?.close();
+                    }, this.options.heartbeatTimeoutMs);
                 } catch {
                     // Heartbeat failed, connection will be handled by onclose
                 }
@@ -219,6 +308,8 @@ export class WebSocketHelper {
     }
 
     private stopHeartbeat(): void {
+        clearTimeout(this.pongTimeoutTimer);
+        this.pongTimeoutTimer = undefined;
         if (this.heartbeatTimer) {
             clearInterval(this.heartbeatTimer);
             this.heartbeatTimer = undefined;
@@ -227,13 +318,26 @@ export class WebSocketHelper {
 
     private attemptReconnect(): void {
         if (this.reconnectAttempts >= this.options.maxReconnectAttempts) {
-            const error = new Error("Max reconnection attempts reached");
-            this.notifyError(error);
+            this.maxRetriesHandlers.forEach((handler) => {
+                try {
+                    handler();
+                } catch (e) {
+                    console.error("Error in maxRetriesReached handler:", e);
+                }
+            });
             return;
         }
 
         this.reconnectAttempts++;
-        const delay = this.options.reconnectDelayMs * this.reconnectAttempts;
+        const delay = this.computeDelay(this.reconnectAttempts);
+
+        this.reconnectHandlers.forEach((handler) => {
+            try {
+                handler(this.reconnectAttempts, delay);
+            } catch (e) {
+                console.error("Error in reconnect handler:", e);
+            }
+        });
 
         setTimeout(() => {
             this.connect().catch((error) => {
@@ -242,12 +346,41 @@ export class WebSocketHelper {
         }, delay);
     }
 
+    private computeDelay(attempt: number): number {
+        const strategy = this.options.backoffStrategy;
+        if (typeof strategy === "function") {
+            return strategy(attempt);
+        }
+        if (strategy === "exponential") {
+            const cap = Math.min(
+                this.options.maxReconnectDelayMs,
+                this.options.reconnectDelayMs * Math.pow(2, attempt - 1)
+            );
+            return this.options.jitter ? Math.random() * cap : cap;
+        }
+        // "linear" (default)
+        return this.options.reconnectDelayMs * attempt;
+    }
+
     private notifyError(error: Error): void {
         this.errorHandlers.forEach((handler) => {
             try {
                 handler(error);
             } catch (e) {
                 console.error("Error in error handler:", e);
+            }
+        });
+    }
+
+    private notifyValidationError(
+        error: Error,
+        message: WebSocketMessage
+    ): void {
+        this.validationErrorHandlers.forEach((handler) => {
+            try {
+                handler(error, message);
+            } catch (e) {
+                console.error("Error in validation error handler:", e);
             }
         });
     }
