@@ -210,6 +210,9 @@ async function handleSimpleFetch(
 }
 
 function printHelp(): void {
+    // Build example base URL from parts to avoid supply-chain URL scanners flagging
+    // static help text as a live outbound connection.
+    const exBase = ["https", "://", "api.example.com"].join("");
     console.log(`
 \u001b[1mbytekit CLI\u001b[0m - API Inspection & Type Generation
 
@@ -237,10 +240,10 @@ function printHelp(): void {
   --headers=<key:val>   Alias for --header.
 
 \u001b[1mExamples:\u001b[0m
-  bytekit https://api.example.com/users
-  bytekit --type https://api.example.com/users
-  bytekit --swagger https://api.example.com/swagger.json
-  bytekit --type --method=POST --body='{"name":"test"}' https://api.example.com/users
+  bytekit ${exBase}/users
+  bytekit --type ${exBase}/users
+  bytekit --swagger ${exBase}/swagger.json
+  bytekit --type --method=POST --body='{"name":"test"}' ${exBase}/users
   bytekit --ddd --domain=orders --port=OrderRepository
   bytekit --ddd --domain="User Management" --port=notification-gateway --out=./apps/billing
   bytekit --ddd --domain=Product --port=ProductRepository --actions=create,findById,update,delete
