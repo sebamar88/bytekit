@@ -31,7 +31,7 @@ Como desarrollador, quiero reanudar upload desde último chunk exitoso.
 
 **Acceptance Scenarios**:
 
-1. **Given** upload interrumpido en chunk 5, **When** resume, **Then** continúa desde chunk 6.
+1. **Given** 5 chunks successfully uploaded (indices 0–4, i.e. `uploadedChunks=5`), **When** `resumeFrom=5`, **Then** only chunks at indices 5..N−1 are sent and no previously uploaded chunk is duplicated.
 
 ---
 
