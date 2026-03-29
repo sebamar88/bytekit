@@ -17,22 +17,25 @@ Como desarrollador, quiero que el WebSocket se reconecte automáticamente si se 
 
 **Acceptance Scenarios**:
 
-1. **Given** conexión perdida, **When** se intenta enviar mensaje, **Then** se reconecta automáticamente.
-2. **Given** reconexión fallida, **When** se alcanza maxAttempts, **Then** emite error.
+1. **Given** conexión perdida (cierre inesperado del socket), **When** `onclose` se dispara, **Then** el WebSocket inicia reconexión automática con el backoff configurado.
+2. **Given** reconexión fallida, **When** se alcanza `maxReconnectAttempts`, **Then** dispara el callback `onMaxRetriesReached` (no `onError`).
 
 ---
 
 ### User Story 2 - Validación de Mensajes (Priority: P2)
 
-Como desarrollador, quiero validar mensajes entrantes/salientes con schemas.
+Como desarrollador, quiero validar mensajes **entrantes** con schemas.
 
-**Why this priority**: Asegura integridad de datos en WebSocket.
+**Why this priority**: Asegura integridad de datos recibidos del servidor.
 
-**Independent Test**: Puede probarse enviando mensaje inválido y verificando que se rechace.
+**Independent Test**: Puede probarse simulando un mensaje entrante inválido y verificando que se rechace.
 
 **Acceptance Scenarios**:
 
-1. **Given** schema para mensajes, **When** llega mensaje inválido, **Then** se emite error de validación.
+1. **Given** schema registrado para un tipo de mensaje, **When** llega mensaje inválido, **Then** se llama `onValidationError(error, rawMessage)` y el mensaje es descartado (los handlers `on()` no se invocan).
+2. **Given** schema registrado para un tipo de mensaje, **When** llega mensaje válido, **Then** `on()` recibe el valor ya parseado/transformado por el schema.
+
+> **Nota**: La validación de mensajes salientes queda fuera de scope — el desarrollador controla los datos que envía con `send()`.
 
 ---
 
@@ -54,8 +57,19 @@ Como desarrollador, quiero heartbeats para detectar desconexiones silenciosas.
 
 ### API Design
 
-- Extender `WebSocketHelper` con opciones: `reconnect: { maxAttempts, backoff }, heartbeat, schemas`.
-- Eventos: `onReconnect`, `onValidationError`.
+Nuevas opciones planas en `WebSocketOptions` (todas opcionales, backward-compatible):
+
+- `backoffStrategy?: "linear" | "exponential" | ((attempt: number) => number)` — default `"linear"`
+- `maxReconnectDelayMs?: number` — tope máximo del delay de reconexión (default `30000`)
+- `jitter?: boolean` — Full Jitter sobre backoff exponencial (default `false`)
+- `heartbeatTimeoutMs?: number` — ms de espera para recibir `pong` tras cada `ping` (default `5000`)
+- `schemas?: Record<string, SchemaAdapter>` — validación por tipo de mensaje entrante
+
+Nuevos métodos de suscripción (todos retornan `() => void` para desuscribirse):
+
+- `onReconnect(handler: (attempt: number, delay: number) => void): () => void`
+- `onMaxRetriesReached(handler: () => void): () => void`
+- `onValidationError(handler: (error: Error, message: WebSocketMessage) => void): () => void`
 
 ### Constraints
 
