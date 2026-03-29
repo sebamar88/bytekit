@@ -151,7 +151,10 @@ export class FileUploadHelper {
         const resolvedConcurrency = Math.max(1, concurrency);
         const totalSize = file.size;
         const totalChunks = Math.ceil(totalSize / resolvedChunkSize);
-        const resolvedResumeFrom = Math.max(0, Math.min(resumeFrom, totalChunks));
+        const resolvedResumeFrom = Math.max(
+            0,
+            Math.min(resumeFrom, totalChunks)
+        );
         const uploadId = this.generateUploadId();
 
         // Nothing left to upload — all chunks already on the server
@@ -165,7 +168,10 @@ export class FileUploadHelper {
         }
 
         // Pre-initialize progress baseline from already-uploaded (skipped) chunks
-        let loadedBytes = Math.min(resolvedResumeFrom * resolvedChunkSize, totalSize);
+        let loadedBytes = Math.min(
+            resolvedResumeFrom * resolvedChunkSize,
+            totalSize
+        );
         let uploadedChunksCount = resolvedResumeFrom;
 
         try {
@@ -174,7 +180,10 @@ export class FileUploadHelper {
                 batchStart < totalChunks;
                 batchStart += resolvedConcurrency
             ) {
-                const batchEnd = Math.min(batchStart + resolvedConcurrency, totalChunks);
+                const batchEnd = Math.min(
+                    batchStart + resolvedConcurrency,
+                    totalChunks
+                );
                 const batchPromises: Promise<void>[] = [];
 
                 for (let i = batchStart; i < batchEnd; i++) {
@@ -206,7 +215,10 @@ export class FileUploadHelper {
                                     loaded: loadedBytes,
                                     total: totalSize,
                                     percentage: parseFloat(
-                                        ((loadedBytes / totalSize) * 100).toFixed(2)
+                                        (
+                                            (loadedBytes / totalSize) *
+                                            100
+                                        ).toFixed(2)
                                     ),
                                 });
                             }
