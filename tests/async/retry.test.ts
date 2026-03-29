@@ -317,6 +317,29 @@ describe("retry function", () => {
                 ).rejects.toThrow(RetryError);
                 expect(fn).toHaveBeenCalledTimes(2);
             });
+
+            it("re-throws AbortError when abort fires during sleep between retries (lines 106-107)", async () => {
+                // fn always fails; abort fires after first failure so next sleep throws AbortError
+                const controller = new AbortController();
+                let calls = 0;
+                const fn = vi.fn(async () => {
+                    calls++;
+                    // Abort on the first attempt so sleep on the next retry will throw
+                    controller.abort();
+                    throw new Error("fail");
+                });
+
+                await expect(
+                    retry(fn, {
+                        maxAttempts: 3,
+                        baseDelay: 50,
+                        signal: controller.signal,
+                    })
+                ).rejects.toBeInstanceOf(AbortError);
+
+                // Only one attempt before the abort during sleep
+                expect(calls).toBe(1);
+            });
         });
     });
 });

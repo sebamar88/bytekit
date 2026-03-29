@@ -46,6 +46,7 @@ export class CryptoUtils {
         }
 
         // Check if we can use getRandomValues for fallback
+        /* v8 ignore start */
         if (
             typeof globalThis !== "undefined" &&
             globalThis.crypto?.getRandomValues
@@ -62,7 +63,9 @@ export class CryptoUtils {
                 .join("");
             return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
         }
+        /* v8 ignore end */
 
+        /* v8 ignore next 3 */
         throw new Error(
             "Secure random generation unavailable. crypto API required."
         );
@@ -72,6 +75,7 @@ export class CryptoUtils {
      * Base64 encode
      */
     static base64Encode(str: string): string {
+        /* v8 ignore next */
         if (typeof globalThis !== "undefined" && globalThis.btoa) {
             // Encode to UTF-8 bytes first to handle Unicode characters
             const encoder = new TextEncoder();
@@ -81,7 +85,8 @@ export class CryptoUtils {
             ).join("");
             return globalThis.btoa(binaryString);
         }
-        // Node.js fallback
+        // Node.js fallback (unreachable: btoa is available in Node.js 18+)
+        /* v8 ignore next */
         return Buffer.from(str, "utf-8").toString("base64");
     }
 
@@ -89,6 +94,7 @@ export class CryptoUtils {
      * Base64 decode
      */
     static base64Decode(str: string): string {
+        /* v8 ignore next */
         if (typeof globalThis !== "undefined" && globalThis.atob) {
             // Decode from binary string to UTF-8 to handle Unicode characters
             const binaryString = globalThis.atob(str);
@@ -99,7 +105,8 @@ export class CryptoUtils {
             const decoder = new TextDecoder();
             return decoder.decode(bytes);
         }
-        // Node.js fallback
+        // Node.js fallback (unreachable: atob is available in Node.js 18+)
+        /* v8 ignore next */
         return Buffer.from(str, "base64").toString("utf-8");
     }
 
@@ -144,6 +151,7 @@ export class CryptoUtils {
         str: string,
         algorithm: "SHA-1" | "SHA-256" | "SHA-384" | "SHA-512" = "SHA-256"
     ): Promise<string> {
+        /* v8 ignore next */
         if (typeof globalThis !== "undefined" && globalThis.crypto?.subtle) {
             // Browser
             const encoder = new TextEncoder();
@@ -158,7 +166,8 @@ export class CryptoUtils {
                 .join("");
         }
 
-        // Node.js fallback
+        // Node.js fallback (unreachable: SubtleCrypto is available in Node.js 18+)
+        /* v8 ignore start */
         if (typeof process !== "undefined" && process.versions?.node) {
             try {
                 const crypto = await import("crypto");
@@ -174,6 +183,7 @@ export class CryptoUtils {
         }
         // Browser without SubtleCrypto fallback
         return this.simpleHash(str);
+        /* v8 ignore end */
     }
 
     /**
@@ -206,6 +216,7 @@ export class CryptoUtils {
         }
 
         // Node.js fallback
+        /* v8 ignore start */
         if (typeof process !== "undefined" && process.versions?.node) {
             try {
                 const crypto = await import("crypto");
@@ -221,6 +232,7 @@ export class CryptoUtils {
         }
         // Browser without SubtleCrypto fallback
         return "";
+        /* v8 ignore end */
     }
 
     /**

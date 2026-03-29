@@ -40,3 +40,10 @@ test("EnvManager.get uses import.meta.env in browser mode", () => {
     // @ts-expect-error - Testing error handling
     delete globalThis.document;
 });
+
+test("EnvManager.require returns value when key is set (line 17)", () => {
+    process.env.EXISTING_TEST_KEY = "value123";
+    const env = new EnvManager();
+    assert.equal(env.require("EXISTING_TEST_KEY"), "value123");
+    delete process.env.EXISTING_TEST_KEY;
+});

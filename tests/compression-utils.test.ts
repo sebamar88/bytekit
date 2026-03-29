@@ -198,3 +198,32 @@ test("CompressionUtils gzip with non-string input", async () => {
     const restored = await CompressionUtils.gunzip(gzipped);
     assert.deepEqual(JSON.parse(restored), obj);
 });
+
+test("CompressionUtils.inflate falls back gracefully when zlib throws on invalid Buffer (lines 228-232)", async () => {
+    // Pass a Buffer that is NOT valid deflate data — zlib.inflate will throw
+    const invalidData = Buffer.from("this is not deflate data");
+    const result = await CompressionUtils.inflate(invalidData);
+    // The catch block returns data.toString() for Buffer input
+    assert.equal(typeof result, "string");
+});
+
+test("CompressionUtils.inflate catch: string input falls back to decompress (lines 229-230)", async () => {
+    // Pass a plain string that is NOT valid deflate/zlib data
+    // zlib.inflate will throw → catch block → typeof data === "string" → this.decompress(data)
+    // Use a simple repeated-char string that is valid RLE (the custom decompress format)
+    // compress('aaa') → e.g. '3a' ; decompress('3a') → 'aaa'
+    const compressed = CompressionUtils.compress("aaabbb");
+    // Pass it directly to inflate (which expects zlib data) → zlib throws → decompress fallback
+    const result = await CompressionUtils.inflate(compressed);
+    // decompress on the custom RLE-compressed string returns the original
+    assert.equal(typeof result, "string");
+});
+
+test("CompressionUtils.getSize uses Buffer.byteLength when Blob is unavailable (line 249)", () => {
+    const originalBlob = globalThis.Blob;
+    vi.stubGlobal("Blob", undefined);
+    const size = CompressionUtils.getSize("hello");
+    assert.ok(size > 0);
+    vi.unstubAllGlobals();
+    globalThis.Blob = originalBlob;
+});

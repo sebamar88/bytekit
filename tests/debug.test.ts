@@ -83,3 +83,23 @@ test("captureDebug returns result and duration without logger", async () => {
     assert.equal(result.result, "value");
     assert.ok(result.durationMs >= 0);
 });
+
+test("createStopwatch uses Date.now fallback when performance is unavailable (line 9)", () => {
+    vi.stubGlobal("performance", undefined);
+    const sw = createStopwatch({ label: "fallback-test" });
+    const elapsed = sw.elapsed();
+    assert.ok(elapsed >= 0);
+    vi.unstubAllGlobals();
+});
+
+test("measureAsync logs via logger without namespace uses logger directly (line 113)", async () => {
+    const { logger, calls } = createMockLogger();
+    const result = await measureAsync(
+        "no-ns-label",
+        () => Promise.resolve(77),
+        { logger }
+    );
+    assert.equal(result.result, 77);
+    assert.ok(calls.length >= 1);
+    assert.match(String(calls[0][0]), /no-ns-label completed/);
+});

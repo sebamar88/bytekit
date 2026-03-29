@@ -206,3 +206,32 @@ test("ResponseValidator reports type mismatch", () => {
     assert.equal(errors.length, 1);
     assert.match(errors[0].message, /Expected type number/);
 });
+
+test("ResponseValidator returns empty errors when data is null and schema is not required (lines 102-103)", () => {
+    const schema = { type: "string" }; // no required: true
+    const errors = ResponseValidator.validate(null, schema);
+    assert.equal(errors.length, 0);
+});
+
+test("ResponseValidator reports error when number is below schema.minimum (validateNumber)", () => {
+    const schema = { type: "number", minimum: 10 };
+    const errors = ResponseValidator.validate(5, schema);
+    assert.equal(errors.length, 1);
+    assert.match(errors[0].message, /at least 10/);
+});
+
+test("ResponseValidator custom() returning false uses 'Custom validation failed' message (line 75)", () => {
+    // custom() returns false (not a string, not true) → message = "Custom validation failed"
+    const schema = {
+        type: "object",
+        properties: {
+            score: {
+                type: "number",
+                custom: (_value: unknown) => false, // returns false, not a string
+            },
+        },
+    };
+    const errors = ResponseValidator.validate({ score: 99 }, schema);
+    assert.equal(errors.length, 1);
+    assert.equal(errors[0].message, "Custom validation failed");
+});

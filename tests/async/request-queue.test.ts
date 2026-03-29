@@ -366,5 +366,24 @@ describe("RequestQueue", () => {
             resolveTask();
             await queue.flush();
         });
+
+        it("onError receives a proper Error when task rejects with a non-Error value (line 176)", async () => {
+            // Rejecting with a plain string exercises the `err instanceof Error ? err : new Error(String(err))` branch
+            const receivedErrors: Error[] = [];
+            const queue = new RequestQueue({
+                concurrency: 1,
+                onError: (err) => receivedErrors.push(err),
+            });
+
+            queue
+                .add((_signal) => Promise.reject("plain string error"))
+                .catch(() => {});
+
+            await queue.flush();
+
+            expect(receivedErrors).toHaveLength(1);
+            expect(receivedErrors[0]).toBeInstanceOf(Error);
+            expect(receivedErrors[0].message).toBe("plain string error");
+        });
     });
 });

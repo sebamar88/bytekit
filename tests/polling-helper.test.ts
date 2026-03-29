@@ -118,3 +118,64 @@ test("createPoller returns a PollingHelper instance", () => {
     const poller = createPoller(async () => "ok");
     assert.ok(poller instanceof PollingHelper);
 });
+
+test("PollingHelper.poll static method successfully polls and resolves (T025 static)", async () => {
+    const result = await PollingHelper.poll(async () => "done", {
+        interval: 1,
+        maxAttempts: 3,
+        stopCondition: (r) => r === "done",
+    });
+    assert.equal(result.success, true);
+    assert.equal(result.result, "done");
+});
+
+test("PollingHelper.pollWithBackoff static method works (T025 backoff)", async () => {
+    const result = await PollingHelper.pollWithBackoff(async () => "ok", {
+        interval: 1,
+        maxAttempts: 3,
+        stopCondition: (r) => r === "ok",
+    });
+    assert.equal(result.success, true);
+});
+
+test("PollingHelper.pollWithLinearBackoff static method works (T025 linear)", async () => {
+    const result = await PollingHelper.pollWithLinearBackoff(async () => "ok", {
+        interval: 1,
+        maxAttempts: 3,
+        stopCondition: (r) => r === "ok",
+    });
+    assert.equal(result.success, true);
+});
+
+test("PollingHelper applies numeric jitter on retries (lines ~293-310)", async () => {
+    let attempt = 0;
+    const result = await PollingHelper.poll(
+        async () => {
+            attempt++;
+            return attempt >= 2 ? "done" : "pending";
+        },
+        {
+            interval: 5,
+            maxAttempts: 3,
+            stopCondition: (r) => r === "done",
+            jitter: 10, // numeric jitter — exercises applyJitter body
+        }
+    );
+    assert.equal(result.success, true);
+    assert.equal(result.result, "done");
+    assert.equal(result.attempts, 2);
+});
+
+test("PollingHelper normalises non-Error throw into Error (line 126)", async () => {
+    const poller = new PollingHelper(
+        async () => {
+            // eslint-disable-next-line @typescript-eslint/only-throw-error
+            throw "raw string error";
+        },
+        { interval: 1, maxAttempts: 1, retryOnError: false }
+    );
+    const result = await poller.start();
+    assert.equal(result.success, false);
+    assert.ok(result.error instanceof Error);
+    assert.equal(result.error.message, "raw string error");
+});

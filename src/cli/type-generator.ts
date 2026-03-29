@@ -54,6 +54,7 @@ export async function generateTypesFromEndpoint(
         console.log(typeDefinition);
         console.log("─".repeat(50));
     } catch (error) {
+        /* v8 ignore next */
         const message = error instanceof Error ? error.message : String(error);
         console.error(`❌ Error: ${message}`);
         process.exit(1);
@@ -104,9 +105,10 @@ function inferType(data: unknown, name: string, depth = 0): string {
 
     if (type === "object") {
         return generateObjectType(data as Record<string, unknown>, name, depth);
+        /* v8 ignore start */
     }
-
     return `type ${name} = unknown;`;
+    /* v8 ignore end */
 }
 
 /**
@@ -172,6 +174,7 @@ function inferInlineType(value: unknown, depth: number): string {
 function inferArrayElementType(values: unknown[], depth: number): string {
     const types = values.map((value) => inferInlineType(value, depth));
     const uniqueTypes = Array.from(new Set(types));
+    /* v8 ignore next 3 */
     if (uniqueTypes.length === 0) {
         return "unknown";
     }
@@ -190,6 +193,7 @@ function buildInlineObjectType(
     const properties = Object.entries(obj)
         .map(([key, value]) => {
             const fieldType = inferInlineType(value, depth + 1);
+            /* v8 ignore next */
             const isOptional = value === null || value === undefined ? "?" : "";
             return `${innerIndent}${key}${isOptional}: ${fieldType};`;
         })

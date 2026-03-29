@@ -129,4 +129,35 @@ describe("ApiClient Coverage", () => {
         const response = await client.get("/text");
         assert.equal(response, "Simple text response");
     });
+
+    it("body is null when JSON parse fails in toApiError catch block (lines 878-881)", async () => {
+        const mockFetch = vi.fn(() =>
+            Promise.resolve({
+                ok: false,
+                status: 500,
+                statusText: "Internal Server Error",
+                headers: new Headers({ "content-type": "application/json" }),
+                json: () => Promise.reject(new Error("parse error")),
+                text: () => Promise.reject(new Error("parse error")),
+            })
+        );
+        const client = new ApiClient({
+            baseUrl: "https://api.example.com",
+            fetchImpl: (...args) => mockFetch(...args),
+            retryPolicy: { maxAttempts: 1, shouldRetry: () => false },
+        });
+        await assert.rejects(
+            () => client.get("/boom"),
+            (err) => {
+                return err instanceof ApiError && err.body === null;
+            }
+        );
+    });
+
+    it("createApiClient factory returns a working ApiClient instance (line 926)", async () => {
+        const { createApiClient } =
+            await import("../src/utils/core/ApiClient.js");
+        const client = createApiClient({ baseUrl: "https://api.example.com" });
+        assert.ok(client instanceof ApiClient);
+    });
 });
