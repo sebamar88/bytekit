@@ -1,4 +1,5 @@
 import fs from "node:fs/promises";
+import { realpathSync } from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { afterEach, describe, expect, it, vi } from "vitest";
@@ -284,7 +285,7 @@ describe("generateDddBoilerplate", () => {
                 // sin outDir → usa el slug como directorio de salida
             });
             expect(slug).toBe("widget");
-            expect(rootDir).toBe(path.resolve(tmp, "widget"));
+            expect(realpathSync(rootDir)).toBe(realpathSync(path.resolve(tmp, "widget")));
         } finally {
             process.chdir(originalCwd);
         }
