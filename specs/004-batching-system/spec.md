@@ -1,6 +1,6 @@
 # Feature Specification: Request Queue & Batching System
 
-**Feature Branch**: `004-request-queue-batching`  
+**Feature Branch**: `004-batching-system`  
 **Created**: 28 de marzo de 2026  
 **Status**: Draft  
 **Input**: Fusión de Parallel Queue (002) y Batching System. Un sistema unificado para encolar requests HTTP con concurrencia controlada, priorización, cancelación y agrupación inteligente de requests similares.
@@ -49,8 +49,8 @@ Como desarrollador, quiero que requests similares a la misma URL se agrupen en u
 **Acceptance Scenarios**:
 
 1. **Given** 5 requests GET a la misma endpoint en 100ms, **When** batching activo, **Then** se envían en 1 request.
-2. **Given** delay=200ms, **When** llegan requests en intervalos de 50ms, **Then** se acumulan hasta el delay.
-3. **Given** requests con diferentes payloads, **When** se intenta batch, **Then** no se agrupan si no son compatibles.
+2. **Given** `windowMs=200ms`, **When** llegan requests en intervalos de 50ms, **Then** se acumulan hasta el final de la ventana.
+3. **Given** requests con diferentes claves (URL+method+body), **When** se intenta batch, **Then** no se coalescen — cada bucket despacha independientemente en su propia ventana.
 
 ---
 
@@ -65,7 +65,7 @@ Como usuario de Bytekit, quiero que la cola y el batching se integren transparen
 **Acceptance Scenarios**:
 
 1. **Given** ApiClient con `queue: { concurrency: 5 }`, **When** se hacen requests, **Then** se respeta el límite automáticamente.
-2. **Given** ApiClient con `batch: { delay: 100 }`, **When** requests simultáneos a la misma URL, **Then** se agrupan sin intervención manual.
+2. **Given** ApiClient con `batch: { windowMs: 100 }`, **When** requests simultáneos a la misma URL, **Then** se agrupan sin intervención manual.
 
 ---
 
@@ -73,17 +73,28 @@ Como usuario de Bytekit, quiero que la cola y el batching se integren transparen
 
 ### API Design
 
-- Clase `RequestQueue` con constructor: `new RequestQueue(options: { concurrency: number, batch?: { delay: number, maxSize?: number } })`
-- Método `add(request: () => Promise<T>, options?: { priority?: 'high' | 'normal' | 'low' }): { promise: Promise<T>, cancel: () => void }`
-- Método `flush(): Promise<void>` para forzar envío de batches pendientes.
-- Integración con `PromisePool` internamente para concurrencia.
-- Integración con `ApiClient` via opción `queue`.
+Dos clases separadas expuestas desde `bytekit/async`:
+
+**`RequestQueue`** — `new RequestQueue({ concurrency: number, onError? })`
+
+- `add<T>(task: (signal: AbortSignal) => Promise<T>, options?: AddOptions): Promise<T>` — retorna el resultado directamente; la cancelación por parte del consumidor se hace pasando `AbortSignal` en `AddOptions.signal`
+- `cancel(id: string): boolean` — método interno de gestión de cola; no forma parte de la API pública de consumo
+- `flush(): Promise<void>` — resuelve cuando todas las tareas en cola + en ejecución terminan
+- `size / running / pending` — getters observables del estado de la cola
+
+**`RequestBatcher`** — `new RequestBatcher({ windowMs: number, maxSize?, sliding?, keyFn? })`
+
+- `add<T>(url, init, fetcher): Promise<T>` — agrupa requests con la misma clave (`method:url:body`) dentro de la ventana; todos los callers reciben el mismo resultado
+- `flush(): Promise<void>` — fuerza dispatch inmediato de todos los batches pendientes
+- `pendingCount` — total de requests pendientes en todos los buckets
+
+**`ApiClient`** — acepta `queue?: RequestQueueOptions` y `batch?: BatchOptions` como opciones de constructor
 
 ### Constraints
 
 - Zero dependencies: Usar `AbortController`, timers y `Map` built-in.
 - Isomórfico: Funciona en Node.js 18+ y browsers modernos.
-- Construido sobre `PromisePool` (003) para reutilizar lógica de concurrencia.
+- `RequestQueue` implementa su propia lógica de concurrencia (`_drain()`) sin acoplamiento a `PromisePool`; `PromisePool` (003) es un export sibling independiente.
 
 ### Implementation Notes
 
@@ -100,6 +111,6 @@ Como usuario de Bytekit, quiero que la cola y el batching se integren transparen
 
 ## Success Metrics
 
-- Reducción de requests >50% en escenarios de alta frecuencia con batching.
-- Cancelación funciona en >99% de casos antes de ejecución.
-- Tests passing con >95% coverage.
+- Tests passing con >95% coverage. *(testable — T049)*
+- Reducción de requests >50% en escenarios de alta frecuencia con batching. *(post-launch KPI — no buildable task)*
+- Cancelación funciona en >99% de casos antes de ejecución. *(post-launch KPI — no buildable task)*

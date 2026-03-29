@@ -14,6 +14,8 @@ import {
 } from "#core/ResponseValidator.js";
 import { SchemaAdapter, isSchemaAdapter } from "./SchemaAdapter.js";
 import { PromisePool, PromisePoolOptions } from "../async/promise-pool.js";
+import { RequestQueue, RequestQueueOptions } from "../async/request-queue.js";
+import { RequestBatcher, BatchOptions } from "../async/request-batcher.js";
 
 export type QueryParamValue = string | number | boolean | null | undefined;
 export type QueryParam =
@@ -47,6 +49,10 @@ export interface ApiClientConfig {
     circuitBreaker?: CircuitBreakerConfig;
     /** Optional pool for limiting concurrent requests. */
     pool?: PromisePoolOptions;
+    /** Optional request queue for concurrency-limited, priority-aware request execution. */
+    queue?: RequestQueueOptions;
+    /** Optional request batcher for time-window deduplication of identical requests. */
+    batch?: BatchOptions;
 }
 
 export type RequestBody =
@@ -227,6 +233,8 @@ export class ApiClient {
     private readonly retryPolicy: RetryPolicy;
     private readonly circuitBreaker: CircuitBreaker;
     private readonly pool?: PromisePool;
+    private readonly _queue?: RequestQueue;
+    private readonly _batcher?: RequestBatcher;
 
     /**
      * Creates a new ApiClient instance.
@@ -258,6 +266,8 @@ export class ApiClient {
         retryPolicy,
         circuitBreaker,
         pool,
+        queue,
+        batch,
     }: ApiClientConfig) {
         // Support both baseUrl and baseURL (common convention)
         const url = baseUrl ?? baseURL;
@@ -291,6 +301,8 @@ export class ApiClient {
         this.retryPolicy = new RetryPolicy(retryPolicy);
         this.circuitBreaker = new CircuitBreaker(circuitBreaker);
         this.pool = pool ? new PromisePool(pool) : undefined;
+        this._queue = queue ? new RequestQueue(queue) : undefined;
+        this._batcher = batch ? new RequestBatcher(batch) : undefined;
     }
 
     // -------------------------
@@ -551,7 +563,24 @@ export class ApiClient {
         path: string | URL,
         options: RequestOptions<T> = {}
     ): Promise<T> {
-        // T026: if a pool is configured, route through it for concurrency control
+        // US4: RequestQueue — concurrency-limited, priority-aware queue
+        if (this._queue) {
+            return this._queue.add<T>((_signal) => this.executeRequest(path, options));
+        }
+
+        // US4: RequestBatcher — time-window deduplication
+        if (this._batcher) {
+            const pathStr = String(path);
+            const method = (options.method ?? "GET").toUpperCase();
+            const proxyInit: RequestInit = { method };
+            return this._batcher.add<T>(
+                pathStr,
+                proxyInit,
+                (_url, _init) => this.executeRequest(path, options)
+            );
+        }
+
+        // T026: legacy pool support (003) — if a pool is configured, route through it
         if (this.pool) {
             const results = await this.pool.run<T>([() => this.executeRequest(path, options)]);
             return results[0];
