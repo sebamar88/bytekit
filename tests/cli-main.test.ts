@@ -66,4 +66,42 @@ describe("CLI main entry", () => {
         spy.mockRestore();
         exitSpy.mockRestore();
     });
+
+    it("should exit with error when --ddd is given without --domain", async () => {
+        const errorSpy = vi
+            .spyOn(console, "error")
+            .mockImplementation(() => {});
+        const exitSpy = vi.spyOn(process, "exit").mockImplementation(() => {
+            throw new Error("process.exit");
+        });
+        try {
+            await runCli(["--ddd", "--port=SomeRepo"]);
+        } catch {
+            // swallow the mocked exit throw
+        }
+        expect(errorSpy).toHaveBeenCalledWith(
+            expect.stringContaining("--domain")
+        );
+        errorSpy.mockRestore();
+        exitSpy.mockRestore();
+    });
+
+    it("should exit with error when --ddd is given without --port", async () => {
+        const errorSpy = vi
+            .spyOn(console, "error")
+            .mockImplementation(() => {});
+        const exitSpy = vi.spyOn(process, "exit").mockImplementation(() => {
+            throw new Error("process.exit");
+        });
+        try {
+            await runCli(["--ddd", "--domain=Foo"]);
+        } catch {
+            // swallow the mocked exit throw
+        }
+        expect(errorSpy).toHaveBeenCalledWith(
+            expect.stringContaining("--port")
+        );
+        errorSpy.mockRestore();
+        exitSpy.mockRestore();
+    });
 });

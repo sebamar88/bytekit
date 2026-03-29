@@ -326,5 +326,15 @@ describe("RequestBatcher", () => {
             await vi.advanceTimersByTimeAsync(100);
             await expect(p).resolves.toBe("circular");
         });
+
+        it("flush() on a batcher with no pending requests is a no-op (line 166 guard)", async () => {
+            vi.useFakeTimers();
+            const fetcher = makeFetcher("noop");
+            const batcher = new RequestBatcher({ windowMs: 100 });
+
+            // flush() with empty buckets must not throw and returns immediately
+            await expect(batcher.flush()).resolves.toBeUndefined();
+            expect(fetcher).not.toHaveBeenCalled();
+        });
     });
 });

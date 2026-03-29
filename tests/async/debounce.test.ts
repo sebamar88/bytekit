@@ -318,6 +318,51 @@ describe("debounceAsync function", () => {
                 const result = await promise;
                 expect(result).toBe("result");
             });
+
+            it("flush() returns undefined when pendingArgs is null (line 57 guard)", async () => {
+                // Calling flush() with no pending call exercises the `if (pendingArgs === null) return` guard
+                const fn = vi.fn(async (x: number) => x * 2);
+                const debounced = debounceAsync(fn, 100);
+
+                // No call made — pendingArgs is null
+                const result = await debounced.flush();
+                expect(result).toBeUndefined();
+                expect(fn).not.toHaveBeenCalled();
+
+                // Cancel then flush — pendingArgs is null after cancel
+                const promise = debounced(5);
+                promise.catch(() => {});
+                debounced.cancel();
+                const result2 = await debounced.flush();
+                expect(result2).toBeUndefined();
+                expect(fn).not.toHaveBeenCalled();
+            });
+
+            it("execute() guard (line 57) fires when trailing timer fires after leading already cleared pendingArgs", async () => {
+                // leading=true + trailing=true: first call executes immediately (leading)
+                // then the trailing timer fires and calls execute() when pendingArgs===null → line 57
+                vi.useFakeTimers();
+                try {
+                    const fn = vi.fn(async (x: number) => x * 2);
+                    const debounced = debounceAsync(fn, 50, {
+                        leading: true,
+                        trailing: true,
+                    });
+
+                    // Call once → leading fires immediately, trailing timer scheduled
+                    const resultPromise = debounced(5);
+
+                    // Advance timers so the trailing call fires (and hits line 57 guard)
+                    await vi.advanceTimersByTimeAsync(100);
+
+                    // The leading execution already resolved the promise with fn(5) = 10
+                    expect(await resultPromise).toBe(10);
+                    // fn was only called once (leading) — trailing saw pendingArgs===null and returned
+                    expect(fn).toHaveBeenCalledTimes(1);
+                } finally {
+                    vi.useRealTimers();
+                }
+            });
         });
     });
 });

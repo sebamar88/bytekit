@@ -331,3 +331,29 @@ test("CryptoUtils.encrypt with long key", async () => {
 
     assert.equal(decrypted, original);
 });
+
+test("CryptoUtils.encrypt/decrypt uses btoa/atob browser paths when Buffer is undefined (lines 373-376, 386-391)", async () => {
+    // Stub Buffer as undefined to force the browser (btoa/atob) fallback paths
+    // in uint8ArrayToBase64 and base64ToUint8Array
+    vi.stubGlobal("Buffer", undefined);
+    try {
+        const original = "browser-path-test";
+        const key = "browser-key-xyz";
+        const encrypted = await CryptoUtils.encrypt(original, key);
+        const decrypted = await CryptoUtils.decrypt(encrypted, key);
+        assert.equal(decrypted, original);
+    } finally {
+        vi.unstubAllGlobals();
+    }
+});
+
+test("CryptoUtils.decrypt throws 'too short' when encrypted data is fewer than 13 bytes (lines 288-289)", async () => {
+    // Base64-encode a string that is fewer than 13 bytes when decoded
+    // "short" = 5 bytes → well under 13
+    const tooShort = Buffer.from("short").toString("base64");
+
+    await assert.rejects(
+        () => CryptoUtils.decrypt(tooShort, "any-key"),
+        /Invalid encrypted data: too short/
+    );
+});

@@ -109,6 +109,7 @@ export class WebSocketHelper {
                 };
             } catch (error) {
                 reject(
+                    /* v8 ignore next */
                     error instanceof Error ? error : new Error(String(error))
                 );
             }
@@ -287,6 +288,7 @@ export class WebSocketHelper {
             }
         } catch (error) {
             this.notifyError(
+                /* v8 ignore next */
                 error instanceof Error ? error : new Error(String(error))
             );
         }

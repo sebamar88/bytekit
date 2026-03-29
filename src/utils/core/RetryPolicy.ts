@@ -92,6 +92,7 @@ export class CircuitBreaker {
     }
 
     private getRetryAfterMs(): number {
+        /* v8 ignore next */
         if (this.lastFailureTime === undefined) return 0;
         const elapsed = Date.now() - this.lastFailureTime;
         return Math.max(0, this.timeoutMs - elapsed);

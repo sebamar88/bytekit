@@ -107,3 +107,61 @@ test("Testing private nested value helpers (via any cast)", () => {
     // @ts-expect-error - Testing private method
     assert.deepEqual(target, { user: { name: "John" } });
 });
+
+test("DiffUtils.reversePatch reverses a remove patch (lines 164-168)", () => {
+    // Create a diff where a key is removed
+    const oldObj = { a: 1, b: 2 };
+    const newObj = { a: 1 }; // b removed
+    const patches = DiffUtils.createPatch(oldObj, newObj);
+    // reversePatch must handle the 'remove' case (lines 164-168)
+    const reversePatches = DiffUtils.reversePatch(patches);
+    const restored = DiffUtils.applyPatch(
+        newObj as Record<string, unknown>,
+        reversePatches
+    );
+    assert.equal(restored.b, 2);
+});
+
+test("DiffUtils.deepDiff detects removed keys (line 205)", () => {
+    const oldObj = { a: 1, b: 2, nested: { x: 1 } };
+    const newObj = { a: 1, nested: { x: 1 } }; // b removed
+    const result = DiffUtils.deepDiff(oldObj, newObj);
+    assert.deepEqual(result.removed, ["b"]);
+    assert.deepEqual(result.changed, []);
+    assert.deepEqual(result.added, []);
+});
+
+test("DiffUtils.setNestedValue skips object creation when key already exists (line 205 else branch)", () => {
+    const target = { user: { name: "existing" } } as Record<string, unknown>;
+    // @ts-expect-error - Testing private method
+    DiffUtils.setNestedValue(target, "user.name", "updated");
+    assert.equal((target.user as Record<string, unknown>).name, "updated");
+});
+
+// ─── Coverage gap tests ───────────────────────────────────────────────────────
+
+test("getNestedValue returns undefined when intermediate value is null (line 187)", () => {
+    // current = { a: null }, then key="b" → current == null → return undefined
+    // @ts-expect-error - Testing private method
+    const result = DiffUtils.getNestedValue({ a: null }, "a.b");
+    assert.equal(result, undefined);
+});
+
+test("deepDiff: new key added in nested object has prefixed path (line 263 true branch)", () => {
+    // deepDiff recurses into 'a' with prefix="a"
+    // 'y' is a new key inside 'a' → path = "a.y" (prefix true branch)
+    const result = DiffUtils.deepDiff({ a: { x: 1 } }, { a: { x: 1, y: 2 } });
+    assert.deepEqual(result.added, ["a.y"]);
+    assert.deepEqual(result.changed, []);
+    assert.deepEqual(result.removed, []);
+});
+
+test("getSummary includes 'removed' count when diff has removed keys (line 315 true branch)", () => {
+    // The existing test always uses removed:[] — this exercises removed.length > 0
+    const diff = { changed: [], added: [], removed: ["x", "y"] };
+    assert.equal(DiffUtils.getSummary(diff), "2 removed");
+
+    // All three parts
+    const full = { changed: ["a"], added: ["b"], removed: ["c"] };
+    assert.equal(DiffUtils.getSummary(full), "1 changed, 1 added, 1 removed");
+});

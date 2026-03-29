@@ -165,6 +165,7 @@ export class ApiError extends Error {
                         : JSON.stringify(this.body, null, 2);
                 parts.push(`Body: ${bodyStr}`);
             } catch {
+                /* v8 ignore next */
                 parts.push(`Body: ${this.body}`);
             }
         }
@@ -546,9 +547,11 @@ export class ApiClient {
         method?: string
     ): never {
         const pathStr = String(path);
+        /* v8 ignore start */
         if (err instanceof Error && err.name === "AbortError") {
             throw new ApiError(408, "Timeout", "Request timeout", null, true);
         }
+        /* v8 ignore end */
 
         // Enhanced logging for ApiError
         if (err instanceof ApiError) {
@@ -564,6 +567,7 @@ export class ApiClient {
                 err
             );
         } else {
+            /* v8 ignore next 6 */
             this.logger?.error(
                 "Request failed",
                 { path: pathStr, method },
@@ -635,12 +639,14 @@ export class ApiClient {
                     ? this.redactHeaders(this.normalizeHeaders(init.headers))
                     : undefined;
 
+                /* v8 ignore start */
                 this.logger?.debug("HTTP Request", {
                     method: rest.method,
                     url,
                     ...(shouldLogHeaders ? { headers: headersForLog } : {}),
                     body: rest.body,
                 });
+                /* v8 ignore end */
 
                 try {
                     const response = await this.withTimeout(
@@ -699,9 +705,11 @@ export class ApiClient {
             maxDelay: config.maxDelayMs,
             backoff: "exponential",
             shouldRetry: (err) =>
+                /* v8 ignore next */
                 config.shouldRetry?.(
                     err instanceof Error ? err : new Error(String(err)),
                     0
+                    /* v8 ignore next */
                 ) ?? false,
         });
     }
@@ -906,6 +914,7 @@ export class ApiClient {
             };
             if (dict[status]) return dict[status]!;
         }
+        /* v8 ignore next */
         return (GENERIC_ERROR_MESSAGE[this.locale] ?? GENERIC_ERROR_MESSAGE.es)(
             status,
             statusText

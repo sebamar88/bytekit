@@ -80,4 +80,32 @@ describe("ErrorBoundary Exhaustive", () => {
         boundary.clearErrorHistory();
         expect(boundary.getErrorHistory().length).toBe(0);
     });
+
+    it("wrapSync .catch path runs when handle rejects (lines 299-304)", async () => {
+        const handleSpy = vi
+            .spyOn(boundary, "handle")
+            .mockRejectedValueOnce(new Error("handle fail"));
+        const wrapped = boundary.wrapSync<() => void>(() => {
+            throw new Error("sync");
+        });
+        expect(() => wrapped()).toThrow();
+        await new Promise((r) => setTimeout(r, 20));
+        handleSpy.mockRestore();
+    });
+
+    it("createErrorReport uses UNKNOWN code and 500 for plain Error in errorStack (lines 425, 430)", () => {
+        // Push a plain Error (not AppError) directly to the private stack to cover the
+        // ternary false branches in createErrorReport()
+        // @ts-expect-error - accessing private errorStack for coverage
+        boundary.errorStack.push({
+            error: new Error("plain error"),
+            context: {},
+            timestamp: Date.now(),
+        });
+        const report = boundary.createErrorReport();
+        const entry = report.errors.find((e) => e.message === "plain error");
+        expect(entry).toBeDefined();
+        expect(entry!.code).toBe("UNKNOWN");
+        expect(entry!.statusCode).toBe(500);
+    });
 });

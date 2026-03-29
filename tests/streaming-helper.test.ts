@@ -728,3 +728,230 @@ test("fetchSSE: string body is sent as-is without Content-Type override", async 
 
     globalThis.fetch = originalFetch;
 });
+
+test("fetchSSE: strips trailing \\r from CRLF line endings (line 411)", async () => {
+    globalThis.fetch = async () => ({
+        ok: true,
+        status: 200,
+        statusText: "OK",
+        // CRLF line endings: each line ends with \r\n
+        body: createSSEStream(['data: {"v":1}\r\n\r\n']),
+    });
+
+    const events: SSEEvent[] = [];
+    for await (const ev of StreamingHelper.fetchSSE(
+        "https://api.example.com/stream"
+    )) {
+        events.push(ev);
+    }
+
+    assert.equal(events.length, 1);
+    assert.deepStrictEqual(events[0].data, { v: 1 });
+
+    globalThis.fetch = originalFetch;
+});
+
+test("fetchSSE: handles field line with no colon (field name only, lines 422-423)", async () => {
+    globalThis.fetch = async () => ({
+        ok: true,
+        status: 200,
+        statusText: "OK",
+        // 'data' with no colon — field = 'data', val = ''
+        body: createSSEStream(['data\ndata: {"ok":true}\n\n']),
+    });
+
+    const events: SSEEvent[] = [];
+    for await (const ev of StreamingHelper.fetchSSE(
+        "https://api.example.com/stream",
+        { raw: true }
+    )) {
+        events.push(ev);
+    }
+
+    // Both lines go into currentData: ['', '{"ok":true}']
+    assert.equal(events.length, 1);
+
+    globalThis.fetch = originalFetch;
+});
+
+test("fetchSSE: parses value immediately after colon with no leading space (line 430)", async () => {
+    globalThis.fetch = async () => ({
+        ok: true,
+        status: 200,
+        statusText: "OK",
+        // No space after colon: 'data:{"v":2}'
+        body: createSSEStream(['data:{"v":2}\n\n']),
+    });
+
+    const events: SSEEvent[] = [];
+    for await (const ev of StreamingHelper.fetchSSE(
+        "https://api.example.com/stream"
+    )) {
+        events.push(ev);
+    }
+
+    assert.equal(events.length, 1);
+    assert.deepStrictEqual(events[0].data, { v: 2 });
+
+    globalThis.fetch = originalFetch;
+});
+
+// ─── Coverage gap tests ───────────────────────────────────────────────────────
+
+test("processRemainingBuffer warns on invalid JSON in final buffer without newline (lines 79-80)", async () => {
+    // Stream ends with data that has NO trailing newline → stays in buffer until done=true
+    // buffer.trim() is non-empty, JSON.parse throws → console.warn fires
+    const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const encoder = new TextEncoder();
+
+    globalThis.fetch = async () => ({
+        ok: true,
+        status: 200,
+        body: new ReadableStream({
+            start(controller) {
+                // Invalid JSON, no newline → never processed as a line, stays in buffer
+                controller.enqueue(encoder.encode("not-valid-{json}"));
+                controller.close();
+            },
+        }),
+    });
+
+    const result = await StreamingHelper.streamJsonLines(
+        "http://example.com/stream"
+    );
+
+    expect(warnSpy).toHaveBeenCalledWith(
+        "Failed to parse final buffer:",
+        "not-valid-{json}"
+    );
+    expect(result.complete).toBe(true);
+    expect(result.data).toHaveLength(0);
+
+    warnSpy.mockRestore();
+    globalThis.fetch = originalFetch;
+});
+
+test("streamSSE.connect() catch: EventSource constructor throws an Error calls onError (lines 242-244)", async () => {
+    class ThrowingEventSource {
+        constructor(_url: string) {
+            throw new Error("EventSource construction failed");
+        }
+        addEventListener() {}
+        close() {}
+    }
+
+    // @ts-expect-error – test override
+    globalThis.EventSource = ThrowingEventSource;
+
+    let capturedError: Error | null = null;
+    const stream = StreamingHelper.streamSSE("https://api.example.com/sse", {
+        onError: (err) => {
+            capturedError = err;
+        },
+    });
+
+    // connect() is synchronous (the constructor throws synchronously)
+    assert.ok(capturedError instanceof Error);
+    assert.match(capturedError!.message, /EventSource construction failed/);
+
+    stream.close();
+    delete (globalThis as Record<string, unknown>).EventSource;
+});
+
+test("streamSSE.connect() catch: EventSource constructor throws non-Error wraps it (lines 242-244)", async () => {
+    class ThrowingNonErrorEventSource {
+        constructor(_url: string) {
+            // eslint-disable-next-line @typescript-eslint/only-throw-error
+            throw "plain string error from EventSource";
+        }
+        addEventListener() {}
+        close() {}
+    }
+
+    // @ts-expect-error – test override
+    globalThis.EventSource = ThrowingNonErrorEventSource;
+
+    let capturedError: Error | null = null;
+    StreamingHelper.streamSSE("https://api.example.com/sse", {
+        onError: (err) => {
+            capturedError = err;
+        },
+    });
+
+    assert.ok(capturedError instanceof Error);
+    assert.equal(capturedError!.message, "plain string error from EventSource");
+
+    delete (globalThis as Record<string, unknown>).EventSource;
+});
+
+test("downloadStream: response without content-length header — total=0 (line 539 FALSE)", async () => {
+    // No Content-Length header → contentLength is null → total = 0 (FALSE branch of ternary)
+    const encoder = new TextEncoder();
+    const chunks = [encoder.encode("hello")];
+    let chunkIdx = 0;
+    const mockReader = {
+        async read() {
+            if (chunkIdx < chunks.length)
+                return { done: false, value: chunks[chunkIdx++]! };
+            return { done: true, value: undefined };
+        },
+        releaseLock() {},
+    };
+    globalThis.fetch = vi.fn().mockResolvedValue({
+        ok: true,
+        headers: { get: () => null }, // No content-length header
+        body: { getReader: () => mockReader },
+    });
+
+    const blob = await StreamingHelper.downloadStream(
+        "https://example.com/file.bin"
+    );
+    assert.ok(blob instanceof Blob);
+    // Cleanup
+    delete (globalThis as any).fetch;
+});
+
+test("downloadStream: fetch error without onError handler — throws directly (line 566 FALSE)", async () => {
+    // When the request fails and no onError is provided, onError?.() is undefined → no call
+    globalThis.fetch = vi.fn().mockRejectedValue(new Error("network failure"));
+
+    await assert.rejects(
+        () => StreamingHelper.downloadStream("https://example.com/fail.bin"),
+        /network failure/
+    );
+    delete (globalThis as any).fetch;
+});
+test("fetchSSE: stream ends with no pending event — flushed is null, no yield (line 378 FALSE)", async () => {
+    // SSE stream: a complete event is dispatched on the blank line,
+    // then stream ends with empty currentData. flushSSEEvent returns null → if (flushed) is FALSE
+    const encoder = new TextEncoder();
+    const chunks = [encoder.encode('data: {"msg":"hello"}\n\n')];
+    let idx = 0;
+    const mockReader = {
+        async read() {
+            if (idx < chunks.length)
+                return { done: false as const, value: chunks[idx++]! };
+            return { done: true as const, value: undefined };
+        },
+        releaseLock() {},
+    };
+    globalThis.fetch = vi.fn().mockResolvedValue({
+        ok: true,
+        status: 200,
+        statusText: "OK",
+        body: { getReader: () => mockReader },
+    });
+
+    const events: unknown[] = [];
+    for await (const evt of StreamingHelper.fetchSSE(
+        "https://api.example.com/sse"
+    )) {
+        events.push(evt);
+    }
+
+    // Event was dispatched when blank line was encountered, so flushed at stream-end=null
+    assert.equal(events.length, 1);
+    assert.deepEqual((events[0] as any).data, { msg: "hello" });
+
+    delete (globalThis as any).fetch;
+});

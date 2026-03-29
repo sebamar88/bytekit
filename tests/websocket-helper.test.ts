@@ -739,3 +739,181 @@ test("US3 [T028] close() clears pong timer — no reconnect after intentional di
         vi.useRealTimers();
     }
 });
+
+test("WebSocketHelper reconnect handler throw is caught and logged (lines 338-339)", async () => {
+    const errSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+
+    const wsh = new WebSocketHelper("ws://localhost", {
+        reconnect: true,
+        maxReconnectAttempts: 1,
+        reconnectDelayMs: 10,
+    });
+
+    await wsh.connect();
+
+    wsh.onReconnect(() => {
+        throw new Error("reconnect handler throw");
+    });
+
+    // Force unexpected close to trigger attemptReconnect
+    // @ts-expect-error - accessing internal ws
+    wsh.ws.close();
+
+    await new Promise((r) => setTimeout(r, 50));
+
+    assert.ok(
+        errSpy.mock.calls.some((args) =>
+            String(args[0]).includes("Error in reconnect handler:")
+        )
+    );
+
+    errSpy.mockRestore();
+    wsh.close();
+});
+
+test("WebSocketHelper.request() catch: send() throws → clearTimeout + unsubscribe + reject (lines 217-220)", async () => {
+    const wsh = new WebSocketHelper("ws://localhost");
+    await wsh.connect();
+
+    // Close the connection BEFORE calling request() so that send() will throw
+    // "WebSocket is not connected"
+    wsh.close();
+
+    // request() internally calls send() which throws, then clears timeout, unsubscribes, and rejects
+    await assert.rejects(
+        () => wsh.request("ping", {}, "pong"),
+        /WebSocket is not connected/
+    );
+});
+// ─── Coverage gap tests ───────────────────────────────────────────────────────
+
+test("schema.parse throws a non-Error string — wrapped as Error (line 266)", async () => {
+    // schema.parse throws a plain string, not an Error.
+    // The catch: `new Error(String(error))` should be called.
+    const wsh = new WebSocketHelper("ws://localhost", {
+        schemas: {
+            "non-err-type": {
+                parse: () => {
+                    // eslint-disable-next-line @typescript-eslint/only-throw-error
+                    throw "schema validation string error";
+                },
+            },
+        },
+    });
+    await wsh.connect();
+
+    let receivedError: Error | null = null;
+    wsh.onValidationError((err) => {
+        receivedError = err;
+    });
+
+    // @ts-expect-error - Test type override
+    wsh.ws._receive({ type: "non-err-type", data: { x: 1 } });
+
+    assert.ok(receivedError instanceof Error);
+    assert.equal(receivedError!.message, "schema validation string error");
+
+    wsh.close();
+});
+
+test("heartbeat send() throws — empty catch silences it (line 305)", async () => {
+    vi.useFakeTimers();
+    try {
+        const wsh = new WebSocketHelper("ws://localhost", {
+            heartbeatIntervalMs: 50,
+            reconnect: false,
+        });
+
+        const connectPromise = wsh.connect();
+        await vi.advanceTimersByTimeAsync(15); // MockWebSocket._open fires at 10ms
+        await connectPromise;
+
+        // Make the underlying ws.send throw — heartbeat catches silently
+        // @ts-expect-error - accessing internal ws
+        vi.spyOn(wsh.ws, "send").mockImplementation(() => {
+            throw new Error("ws.send failed in heartbeat");
+        });
+
+        // Advance past heartbeat interval — startHeartbeat fires, send throws, catch catches
+        await vi.advanceTimersByTimeAsync(60);
+
+        // No unhandled errors — still "connected" (readyState hasn't changed)
+        assert.equal(wsh.isConnected(), true);
+
+        wsh.close();
+    } finally {
+        vi.useRealTimers();
+    }
+});
+
+test("maxRetriesReached handler throws — caught and logged (lines 325-326)", async () => {
+    const errSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+
+    const wsh = new WebSocketHelper("ws://localhost", {
+        reconnect: true,
+        maxReconnectAttempts: 0, // already at limit → maxRetriesHandlers fires immediately on close
+    });
+
+    wsh.onMaxRetriesReached(() => {
+        throw new Error("maxRetries handler explosion");
+    });
+
+    await wsh.connect();
+
+    // Force unexpected close → attemptReconnect → maxRetriesHandlers.forEach → handler throws → catch logs
+    // @ts-expect-error - accessing internal ws
+    wsh.ws.close();
+
+    await new Promise((r) => setTimeout(r, 20));
+
+    assert.ok(
+        errSpy.mock.calls.some((args) =>
+            String(args[0]).includes("Error in maxRetriesReached handler:")
+        )
+    );
+
+    errSpy.mockRestore();
+    wsh.close();
+});
+test("WebSocketHelper validation error handler throw is caught and logged (lines 383-384)", async () => {
+    const errSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+
+    const wsh = new WebSocketHelper("ws://localhost", {
+        schemas: {
+            "bad-message": {
+                // Schema that always fails during parse
+                parse: () => {
+                    throw new Error("schema parse error");
+                },
+            },
+        },
+    });
+
+    await wsh.connect();
+
+    wsh.onValidationError(() => {
+        throw new Error("validation handler throw");
+    });
+
+    // Send a message that triggers schema validation failure
+    // @ts-expect-error - Test type override
+    wsh.ws._receive({ type: "bad-message", data: {} });
+
+    await new Promise((r) => setTimeout(r, 20));
+
+    assert.ok(
+        errSpy.mock.calls.some((args) =>
+            String(args[0]).includes("Error in validation error handler:")
+        )
+    );
+
+    errSpy.mockRestore();
+    wsh.close();
+});
+
+test("WebSocketHelper.getState() returns WebSocket.CLOSED when ws is null (line 247 ?? branch)", () => {
+    // When ws is null (never connected), getState() hits the ?? WebSocket.CLOSED fallback
+    const wsh = new WebSocketHelper("ws://localhost:9999");
+    // ws is null by default (never connected)
+    assert.equal(wsh.getState(), WebSocket.CLOSED);
+});

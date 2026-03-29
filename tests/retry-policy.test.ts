@@ -108,3 +108,68 @@ test("CircuitBreaker uses custom error message formatter", async () => {
         }
     );
 });
+
+test("CircuitBreaker.reset() returns circuit to closed state and allows execution (lines 105-109)", async () => {
+    const breaker = new CircuitBreaker({
+        failureThreshold: 1,
+        timeoutMs: 60000,
+    });
+    await assert.rejects(() =>
+        breaker.execute(async () => {
+            throw new Error("fail");
+        })
+    );
+    assert.equal(breaker.getState(), "open");
+    breaker.reset();
+    assert.equal(breaker.getState(), "closed");
+    const result = await breaker.execute(async () => "recovered");
+    assert.equal(result, "recovered");
+});
+
+test("CircuitBreaker falls back to default message when errorMessageFormatter throws (line 48)", async () => {
+    const breaker = new CircuitBreaker({
+        failureThreshold: 1,
+        timeoutMs: 60000,
+        errorMessageFormatter: () => {
+            throw new Error("formatter crash");
+        },
+    });
+    await assert.rejects(() =>
+        breaker.execute(async () => {
+            throw new Error("fail");
+        })
+    );
+    await assert.rejects(
+        () => breaker.execute(async () => "ok"),
+        (err: any) => {
+            assert.match(err.message, /Circuit breaker is open/);
+            return true;
+        }
+    );
+});
+
+test("RetryPolicy with maxAttempts 0 throws fallback error (line 150)", async () => {
+    const policy = new RetryPolicy({ maxAttempts: 0, initialDelayMs: 0 });
+    await assert.rejects(
+        () => policy.execute(async () => "never"),
+        (err: any) => {
+            assert.equal(err.message, "Retry policy failed");
+            return true;
+        }
+    );
+});
+
+test("RetryPolicy converts non-Error throw to Error (line 136 false branch)", async () => {
+    // When fn() throws a non-Error value (e.g., a string), it wraps with new Error(String(value))
+    const policy = new RetryPolicy({ maxAttempts: 1, initialDelayMs: 0 });
+    await assert.rejects(
+        () =>
+            policy.execute(async () => {
+                throw "plain string error";
+            }),
+        (err: any) => {
+            assert.equal(err.message, "plain string error");
+            return true;
+        }
+    );
+});

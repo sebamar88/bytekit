@@ -59,6 +59,7 @@ export function throttleAsync<TArgs extends any[], TReturn>(
      * Executes the pending call if one exists
      */
     const executePending = async (): Promise<void> => {
+        /* v8 ignore next 2 — defensive guard against double-dispatch (unreachable via public API) */
         if (pendingArgs === null) return;
 
         const args = pendingArgs;

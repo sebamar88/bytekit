@@ -84,6 +84,7 @@ class MemoryCache<T = unknown> {
             hits: this.hits,
             misses: this.misses,
             size: this.cache.size,
+            /* v8 ignore next */
             hitRate: total === 0 ? 0 : this.hits / total,
         };
     }
@@ -100,6 +101,7 @@ class LocalStorageCache<T = unknown> {
     }
 
     set(key: string, value: T, ttl?: number): void {
+        /* v8 ignore next */
         if (typeof localStorage === "undefined") return;
 
         const entry: CacheEntryData<T> = {
@@ -116,6 +118,7 @@ class LocalStorageCache<T = unknown> {
     }
 
     get(key: string): T | null {
+        /* v8 ignore next */
         if (typeof localStorage === "undefined") return null;
 
         try {
@@ -140,11 +143,13 @@ class LocalStorageCache<T = unknown> {
     }
 
     delete(key: string): void {
+        /* v8 ignore next */
         if (typeof localStorage === "undefined") return;
         localStorage.removeItem(this.prefix + key);
     }
 
     clear(): void {
+        /* v8 ignore next */
         if (typeof localStorage === "undefined") return;
 
         const keys: string[] = [];

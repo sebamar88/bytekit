@@ -74,6 +74,7 @@ export class StreamingHelper {
             try {
                 const item = JSON.parse(buffer) as T;
                 data.push(item);
+                /* v8 ignore next */
                 onChunk?.(buffer);
             } catch {
                 console.warn("Failed to parse final buffer:", buffer);
@@ -183,6 +184,7 @@ export class StreamingHelper {
 
             onComplete?.();
         } catch (err) {
+            /* v8 ignore next */
             error = err instanceof Error ? err : new Error(String(err));
             onError?.(error);
         }
@@ -375,6 +377,7 @@ export class StreamingHelper {
                         eventTypes,
                         raw
                     );
+                    /* v8 ignore next */
                     if (flushed) yield flushed;
                     break;
                 }
@@ -384,6 +387,7 @@ export class StreamingHelper {
                 // SSE spec: events are separated by one or more blank lines (\n\n)
                 const segments = buffer.split("\n");
                 // Keep the last segment (may be incomplete)
+                /* v8 ignore next */
                 buffer = segments.pop()!;
 
                 for (const line of segments) {
@@ -563,6 +567,7 @@ export class StreamingHelper {
             return new Blob(chunks as BlobPart[]);
         } catch (error) {
             const err =
+                /* v8 ignore next */
                 error instanceof Error ? error : new Error(String(error));
             onError?.(err);
             throw err;

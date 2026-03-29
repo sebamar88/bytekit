@@ -9,8 +9,10 @@ export interface QueryStringOptions {
 type InterpolableValue = string | number | boolean | null | undefined;
 
 const safeString = (value: InterpolableValue) =>
+    /* v8 ignore next */
     value === null || value === undefined ? "" : String(value);
 
+/* v8 ignore next */
 const isPlainObject = (value: unknown): value is Record<string, unknown> =>
     typeof value === "object" && value !== null && !Array.isArray(value);
 

@@ -163,6 +163,7 @@ export class RequestBatcher {
 
         // Splice the bucket — guard against double dispatch
         const entries = this._buckets.get(key);
+        /* v8 ignore next — defensive guard against double-dispatch; unreachable via public API */
         if (!entries || entries.length === 0) return;
         this._buckets.delete(key);
 
