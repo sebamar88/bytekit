@@ -93,10 +93,7 @@ function inferHttpVerb(action: string): HttpVerb {
     return "GET";
 }
 
-function resolveActionConfig(
-    action: string,
-    pascal: string
-): ActionConfig {
+function resolveActionConfig(action: string, pascal: string): ActionConfig {
     const verb = inferHttpVerb(action);
     const isList = /all|many|list|search/.test(action.toLowerCase());
 
@@ -274,7 +271,10 @@ function generateHttpRepoSource(
     const needsProps = configs.some((c) =>
         c.params.some((p) => p.type.includes("Props"))
     );
-    const entityImportParts = [`${pascal}Entity`, needsProps ? `${pascal}EntityProps` : ""]
+    const entityImportParts = [
+        `${pascal}Entity`,
+        needsProps ? `${pascal}EntityProps` : "",
+    ]
         .filter(Boolean)
         .join(", ");
 
@@ -343,10 +343,7 @@ export async function generateDddBoilerplate(
         );
     }
 
-    const rootDir = path.resolve(
-        process.cwd(),
-        options.outDir?.trim() || slug
-    );
+    const rootDir = path.resolve(process.cwd(), options.outDir?.trim() || slug);
 
     const contextPascal = pascalFromKebabSlug(slug);
     const outboundSlug = slugifyDomain(portLabel);
@@ -434,7 +431,11 @@ export interface ${outboundPascal} {
             "entities",
             `${slug}.entity.ts`
         );
-        await fs.writeFile(entityFile, generateEntitySource(slug, contextPascal), "utf8");
+        await fs.writeFile(
+            entityFile,
+            generateEntitySource(slug, contextPascal),
+            "utf8"
+        );
 
         // 2. Repository interface
         const repoInterfaceFile = path.join(

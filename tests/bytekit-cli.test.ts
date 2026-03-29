@@ -156,7 +156,13 @@ describe("bytekit CLI Integration", () => {
 
         // Entity
         const entityFile = await fs.readFile(
-            path.join(tempDir, "product", "domain", "entities", "product.entity.ts"),
+            path.join(
+                tempDir,
+                "product",
+                "domain",
+                "entities",
+                "product.entity.ts"
+            ),
             "utf8"
         );
         expect(entityFile).toContain("export class ProductEntity");

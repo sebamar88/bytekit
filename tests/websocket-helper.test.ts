@@ -347,7 +347,7 @@ test("US1 [T009] linear backoff — onReconnect receives correct (attempt, delay
     wsh.ws.close(); // fires onReconnect synchronously before setTimeout
 
     assert.equal(pairs.length, 1);
-    assert.equal(pairs[0][0], 1);   // attempt 1
+    assert.equal(pairs[0][0], 1); // attempt 1
     assert.equal(pairs[0][1], 500); // delay = 500 × 1
 
     wsh.close();
@@ -442,7 +442,7 @@ test("US1 [T012] custom backoffStrategy function — receives 1-based attempt, r
     wsh.ws.close();
     assert.equal(customFn.mock.calls.length, 1);
     assert.equal(customFn.mock.calls[0][0], 1); // 1-based attempt
-    assert.equal(capturedDelay, 50);            // 1 × 50
+    assert.equal(capturedDelay, 50); // 1 × 50
     wsh.close();
 });
 

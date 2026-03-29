@@ -397,8 +397,8 @@ test("fetchSSE: basic GET with default event type ('message')", async () => {
         status: 200,
         statusText: "OK",
         body: createSSEStream([
-            "data: {\"token\":\"hello\"}\n\n",
-            "data: {\"token\":\" world\"}\n\n",
+            'data: {"token":"hello"}\n\n',
+            'data: {"token":" world"}\n\n',
         ]),
     });
 
@@ -426,7 +426,7 @@ test("fetchSSE: POST with JSON body", async () => {
             ok: true,
             status: 200,
             statusText: "OK",
-            body: createSSEStream(["data: {\"ok\":true}\n\n"]),
+            body: createSSEStream(['data: {"ok":true}\n\n']),
         };
     };
 
@@ -515,10 +515,10 @@ test("fetchSSE: multiple event types (data, log, heartbeat)", async () => {
         status: 200,
         statusText: "OK",
         body: createSSEStream([
-            "event: data\ndata: {\"token\":\"hi\"}\n\n",
-            "event: log\ndata: {\"level\":\"info\"}\n\n",
+            'event: data\ndata: {"token":"hi"}\n\n',
+            'event: log\ndata: {"level":"info"}\n\n',
             "event: heartbeat\ndata: {}\n\n",
-            "event: data\ndata: {\"token\":\"bye\"}\n\n",
+            'event: data\ndata: {"token":"bye"}\n\n',
         ]),
     });
 
@@ -544,10 +544,10 @@ test("fetchSSE: eventTypes filter restricts yielded events", async () => {
         status: 200,
         statusText: "OK",
         body: createSSEStream([
-            "event: data\ndata: {\"token\":\"hi\"}\n\n",
-            "event: log\ndata: {\"msg\":\"debug info\"}\n\n",
+            'event: data\ndata: {"token":"hi"}\n\n',
+            'event: log\ndata: {"msg":"debug info"}\n\n',
             "event: heartbeat\ndata: {}\n\n",
-            "event: data\ndata: {\"token\":\"bye\"}\n\n",
+            'event: data\ndata: {"token":"bye"}\n\n',
         ]),
     });
 
@@ -571,7 +571,7 @@ test("fetchSSE: parses id and retry fields", async () => {
         status: 200,
         statusText: "OK",
         body: createSSEStream([
-            "id: evt-42\nretry: 5000\nevent: update\ndata: {\"v\":1}\n\n",
+            'id: evt-42\nretry: 5000\nevent: update\ndata: {"v":1}\n\n',
         ]),
     });
 
@@ -595,7 +595,7 @@ test("fetchSSE: raw mode returns unparsed strings", async () => {
         ok: true,
         status: 200,
         statusText: "OK",
-        body: createSSEStream(["data: {\"token\":\"hi\"}\n\n"]),
+        body: createSSEStream(['data: {"token":"hi"}\n\n']),
     });
 
     const events: SSEEvent[] = [];
@@ -621,16 +621,13 @@ test("fetchSSE: throws on non-ok response", async () => {
         body: null,
     });
 
-    await assert.rejects(
-        async () => {
-            for await (const _ev of StreamingHelper.fetchSSE(
-                "https://api.example.com/stream"
-            )) {
-                // should not reach here
-            }
-        },
-        /status 401/
-    );
+    await assert.rejects(async () => {
+        for await (const _ev of StreamingHelper.fetchSSE(
+            "https://api.example.com/stream"
+        )) {
+            // should not reach here
+        }
+    }, /status 401/);
 
     globalThis.fetch = originalFetch;
 });
@@ -643,16 +640,13 @@ test("fetchSSE: throws on empty body", async () => {
         body: null,
     });
 
-    await assert.rejects(
-        async () => {
-            for await (const _ev of StreamingHelper.fetchSSE(
-                "https://api.example.com/stream"
-            )) {
-                // should not reach here
-            }
-        },
-        /Response body is empty/
-    );
+    await assert.rejects(async () => {
+        for await (const _ev of StreamingHelper.fetchSSE(
+            "https://api.example.com/stream"
+        )) {
+            // should not reach here
+        }
+    }, /Response body is empty/);
 
     globalThis.fetch = originalFetch;
 });
@@ -688,7 +682,7 @@ test("fetchSSE: skips SSE comment lines (starting with ':')", async () => {
         statusText: "OK",
         body: createSSEStream([
             ": this is a keep-alive comment\n",
-            "data: {\"ok\":true}\n\n",
+            'data: {"ok":true}\n\n',
         ]),
     });
 

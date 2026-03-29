@@ -84,7 +84,9 @@ export class PromisePool {
         }
 
         const results: T[] = new Array(tasks.length);
-        await Promise.all(tasks.map((task, index) => this.addTask(task, index, results)));
+        await Promise.all(
+            tasks.map((task, index) => this.addTask(task, index, results))
+        );
         return results;
     }
 
@@ -105,7 +107,10 @@ export class PromisePool {
     }
 
     private processQueue(results: unknown[]): void {
-        while (this.running < this.options.concurrency && this.queue.length > 0) {
+        while (
+            this.running < this.options.concurrency &&
+            this.queue.length > 0
+        ) {
             const item = this.queue.shift()!;
             this.running++;
             this.executeTask(item, results);
@@ -113,7 +118,12 @@ export class PromisePool {
     }
 
     private async executeTask(
-        item: { task: () => Promise<unknown>; resolve: (v: unknown) => void; reject: (r: unknown) => void; index: number },
+        item: {
+            task: () => Promise<unknown>;
+            resolve: (v: unknown) => void;
+            reject: (r: unknown) => void;
+            index: number;
+        },
         results: unknown[]
     ): Promise<void> {
         try {

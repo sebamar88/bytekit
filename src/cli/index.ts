@@ -46,7 +46,10 @@ function parseDddArgs(argv: string[]): DddCliArgs | null {
             outDir = arg.slice("--out=".length);
         } else if (arg.startsWith("--actions=")) {
             const raw = arg.slice("--actions=".length);
-            actions = raw.split(",").map((a) => a.trim()).filter(Boolean);
+            actions = raw
+                .split(",")
+                .map((a) => a.trim())
+                .filter(Boolean);
         }
     }
 

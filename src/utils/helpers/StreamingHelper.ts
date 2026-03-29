@@ -105,16 +105,16 @@ export class StreamingHelper {
 
     /**
      * Stream JSON lines from an endpoint (NDJSON).
-     * 
+     *
      * Use this method to process large JSON datasets without loading the entire response into memory.
      * Each line in the response must be a valid JSON object.
-     * 
+     *
      * @example
      * await StreamingHelper.streamJsonLines("https://api.example.com/large-data", {
      *   onChunk: (item) => console.log("Processed item:", item),
      *   onComplete: () => console.log("Done!")
      * });
-     * 
+     *
      * @param endpoint The URL to fetch from
      * @param options Stream options including callbacks and timeout
      */
@@ -192,19 +192,19 @@ export class StreamingHelper {
 
     /**
      * Stream Server-Sent Events (SSE).
-     * 
+     *
      * Establishes a persistent connection to receive real-time updates from the server.
      * Automatically parses incoming data as JSON.
-     * 
+     *
      * @example
      * const stream = StreamingHelper.streamSSE("https://api.example.com/events");
      * const unsubscribe = stream.subscribe((data) => {
      *   console.log("New real-time data:", data);
      * });
-     * 
+     *
      * // To close:
      * // stream.close();
-     * 
+     *
      * @param endpoint The SSE endpoint URL
      * @param options Subscription options and custom event type
      */
@@ -318,7 +318,8 @@ export class StreamingHelper {
                 body instanceof FormData ||
                 body instanceof URLSearchParams ||
                 body instanceof Blob ||
-                (typeof ReadableStream !== "undefined" && body instanceof ReadableStream)
+                (typeof ReadableStream !== "undefined" &&
+                    body instanceof ReadableStream)
             ) {
                 requestBody = body as BodyInit;
             } else {
@@ -423,9 +424,10 @@ export class StreamingHelper {
                     } else {
                         field = cleaned.slice(0, colonIdx);
                         // The spec says: if the first character after ':' is a space, strip it
-                        val = cleaned[colonIdx + 1] === " "
-                            ? cleaned.slice(colonIdx + 2)
-                            : cleaned.slice(colonIdx + 1);
+                        val =
+                            cleaned[colonIdx + 1] === " "
+                                ? cleaned.slice(colonIdx + 2)
+                                : cleaned.slice(colonIdx + 1);
                     }
 
                     switch (field) {
@@ -470,7 +472,11 @@ export class StreamingHelper {
         const type = eventType || "message";
 
         // Filter by allowed event types
-        if (allowedTypes && allowedTypes.length > 0 && !allowedTypes.includes(type)) {
+        if (
+            allowedTypes &&
+            allowedTypes.length > 0 &&
+            !allowedTypes.includes(type)
+        ) {
             return null;
         }
 

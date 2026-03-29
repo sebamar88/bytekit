@@ -8,8 +8,9 @@ function makeFetcher<T>(result: T) {
 }
 
 function makeFailingFetcher(error: Error) {
-    return vi.fn((_url: string, _init: RequestInit) =>
-        Promise.reject(error) as Promise<never>
+    return vi.fn(
+        (_url: string, _init: RequestInit) =>
+            Promise.reject(error) as Promise<never>
     );
 }
 
@@ -74,7 +75,10 @@ describe("RequestBatcher", () => {
         it("T025: sliding=true resets the timer on each new request", async () => {
             vi.useFakeTimers();
             const fetcher = makeFetcher("slid");
-            const batcher = new RequestBatcher({ windowMs: 200, sliding: true });
+            const batcher = new RequestBatcher({
+                windowMs: 200,
+                sliding: true,
+            });
 
             const p1 = batcher.add("/api", { method: "GET" }, fetcher);
             // 150ms in — timer hasn't fired yet
@@ -89,7 +93,10 @@ describe("RequestBatcher", () => {
             // Now 200ms from last request → fires
             await vi.advanceTimersByTimeAsync(50);
             expect(fetcher).toHaveBeenCalledTimes(1);
-            await expect(Promise.all([p1, p2])).resolves.toEqual(["slid", "slid"]);
+            await expect(Promise.all([p1, p2])).resolves.toEqual([
+                "slid",
+                "slid",
+            ]);
         });
 
         it("T026: requests with different keys dispatch as independent buckets", async () => {
@@ -166,8 +173,12 @@ describe("RequestBatcher", () => {
         });
 
         it("T030: windowMs <= 0 throws TypeError; maxSize < 1 throws TypeError", () => {
-            expect(() => new RequestBatcher({ windowMs: 0 })).toThrow(TypeError);
-            expect(() => new RequestBatcher({ windowMs: -1 })).toThrow(TypeError);
+            expect(() => new RequestBatcher({ windowMs: 0 })).toThrow(
+                TypeError
+            );
+            expect(() => new RequestBatcher({ windowMs: -1 })).toThrow(
+                TypeError
+            );
             expect(
                 () => new RequestBatcher({ windowMs: 100, maxSize: 0 })
             ).toThrow(TypeError);
@@ -186,8 +197,16 @@ describe("RequestBatcher", () => {
             const err = new Error("fetch failed");
             const batcher = new RequestBatcher({ windowMs: 100 });
 
-            const p1 = batcher.add("/api", { method: "GET" }, makeFailingFetcher(err));
-            const p2 = batcher.add("/api", { method: "GET" }, makeFailingFetcher(err));
+            const p1 = batcher.add(
+                "/api",
+                { method: "GET" },
+                makeFailingFetcher(err)
+            );
+            const p2 = batcher.add(
+                "/api",
+                { method: "GET" },
+                makeFailingFetcher(err)
+            );
 
             // Attach handlers before timer fires so rejections are never unhandled
             const settlement = Promise.allSettled([p1, p2]);
@@ -205,8 +224,16 @@ describe("RequestBatcher", () => {
             const fetcher = makeFetcher("ok");
             const batcher = new RequestBatcher({ windowMs: 100 });
 
-            const p1 = batcher.add("/api", { method: "POST", body: '{"a":1}' }, fetcher);
-            const p2 = batcher.add("/api", { method: "POST", body: '{"b":2}' }, fetcher);
+            const p1 = batcher.add(
+                "/api",
+                { method: "POST", body: '{"a":1}' },
+                fetcher
+            );
+            const p2 = batcher.add(
+                "/api",
+                { method: "POST", body: '{"b":2}' },
+                fetcher
+            );
 
             await vi.advanceTimersByTimeAsync(100);
 
@@ -222,12 +249,23 @@ describe("RequestBatcher", () => {
             // Pass a number as body (unconventional but exercises the stableSerialize number branch)
             const batcher = new RequestBatcher({ windowMs: 100 });
 
-            const p1 = batcher.add("/api", { method: "POST", body: 42 as unknown as BodyInit }, fetcher);
-            const p2 = batcher.add("/api", { method: "POST", body: 42 as unknown as BodyInit }, fetcher);
+            const p1 = batcher.add(
+                "/api",
+                { method: "POST", body: 42 as unknown as BodyInit },
+                fetcher
+            );
+            const p2 = batcher.add(
+                "/api",
+                { method: "POST", body: 42 as unknown as BodyInit },
+                fetcher
+            );
             // Same numeric body → same key → coalesced
             await vi.advanceTimersByTimeAsync(100);
             expect(fetcher).toHaveBeenCalledTimes(1);
-            await expect(Promise.all([p1, p2])).resolves.toEqual(["num", "num"]);
+            await expect(Promise.all([p1, p2])).resolves.toEqual([
+                "num",
+                "num",
+            ]);
         });
 
         it("stableSerialize: boolean body produces distinct key (covers boolean branch)", async () => {
@@ -236,8 +274,16 @@ describe("RequestBatcher", () => {
             const fetcherF = makeFetcher("false-result");
             const batcher = new RequestBatcher({ windowMs: 100 });
 
-            const p1 = batcher.add("/api", { method: "POST", body: true as unknown as BodyInit }, fetcherT);
-            const p2 = batcher.add("/api", { method: "POST", body: false as unknown as BodyInit }, fetcherF);
+            const p1 = batcher.add(
+                "/api",
+                { method: "POST", body: true as unknown as BodyInit },
+                fetcherT
+            );
+            const p2 = batcher.add(
+                "/api",
+                { method: "POST", body: false as unknown as BodyInit },
+                fetcherF
+            );
             // true vs false → different keys → dispatch independently
             await vi.advanceTimersByTimeAsync(100);
             expect(fetcherT).toHaveBeenCalledTimes(1);

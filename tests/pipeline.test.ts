@@ -1,4 +1,10 @@
-import { Pipeline, pipe, map, filter, reduce } from "../src/utils/async/pipeline";
+import {
+    Pipeline,
+    pipe,
+    map,
+    filter,
+    reduce,
+} from "../src/utils/async/pipeline";
 import { ApiClient } from "../src/utils/core/ApiClient";
 
 // ============================================================================
@@ -21,17 +27,15 @@ test("US1 map transforms each element and preserves order", async () => {
 
 // T010: filter — sync, retains matches in order; empty array → []
 test("US1 filter retains matching items in original order", async () => {
-    const result = await pipe(
-        filter<number>((n) => n % 2 === 0)
-    ).process([1, 2, 3, 4, 5]);
+    const result = await pipe(filter<number>((n) => n % 2 === 0)).process([
+        1, 2, 3, 4, 5,
+    ]);
 
     assert.deepEqual(result, [2, 4]);
 });
 
 test("US1 filter on empty array returns []", async () => {
-    const result = await pipe(
-        filter<number>((n) => n > 0)
-    ).process([]);
+    const result = await pipe(filter<number>((n) => n > 0)).process([]);
 
     assert.deepEqual(result, []);
 });
@@ -72,8 +76,8 @@ test("US1 Pipeline is immutable — .pipe() does not mutate original", async () 
     const baseResult = await base.process([1, -2, 3]);
     const extResult = await extended.process([1, -2, 3]);
 
-    assert.deepEqual(baseResult, [1, 3]);       // base unchanged
-    assert.deepEqual(extResult, [10, 30]);       // extended works independently
+    assert.deepEqual(baseResult, [1, 3]); // base unchanged
+    assert.deepEqual(extResult, [10, 30]); // extended works independently
 });
 
 // T013: empty Pipeline returns input unchanged
@@ -167,8 +171,8 @@ test("US2 reduce with async reducer accumulates sequentially", async () => {
 // T018: mixed sync and async ops
 test("US2 mixed sync and async ops execute correctly end-to-end", async () => {
     const result = await pipe(
-        filter<number>((n) => n > 0),                          // sync
-        map<number, string>(async (n) => String(n)),           // async
+        filter<number>((n) => n > 0), // sync
+        map<number, string>(async (n) => String(n)), // async
         reduce<string, string>(async (acc, s) => acc + s, "") // async
     ).process([1, -2, 3, -4, 5]);
 
@@ -208,9 +212,7 @@ test("US2 error in reduce fn rejects process() with the original error", async (
 
 // T020: .pipe(op) builder — chains, returns new instance, original unaffected
 test("US2 .pipe(op) builder chains additional op and returns new instance", async () => {
-    const base = pipe(
-        map<number, number>((n) => n * 2)
-    );
+    const base = pipe(map<number, number>((n) => n * 2));
     const chained = base.pipe(map<number, string>((n) => `${n}!`));
 
     assert.notStrictEqual(base, chained); // different instances
@@ -242,9 +244,7 @@ test("US3 GET with pipeline transforms the response body", async () => {
     const client = makeMockClient([1, 2, 3]);
 
     const result = await client.get<number[]>("/items", {
-        pipeline: pipe(
-            map<number, string>((n) => String(n))
-        ),
+        pipeline: pipe(map<number, string>((n) => String(n))),
     });
 
     assert.deepEqual(result, ["1", "2", "3"]);

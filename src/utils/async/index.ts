@@ -37,10 +37,7 @@ export { debounceAsync } from "./debounce.js";
 export { throttleAsync } from "./throttle.js";
 export { PromisePool, PoolTimeoutError } from "./promise-pool.js";
 export type { PromisePoolOptions } from "./promise-pool.js";
-export {
-    RequestQueue,
-    QueueAbortError,
-} from "./request-queue.js";
+export { RequestQueue, QueueAbortError } from "./request-queue.js";
 export type {
     QueuePriority,
     RequestQueueOptions,
