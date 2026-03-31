@@ -1,7 +1,8 @@
 version: 2
 
-# Suppress false-positive alerts from devDependencies that are NOT shipped
-# in the published package (bytekit publishes only dist/ + bin/).
+# bytekit publishes ONLY dist/ + bin/ with zero runtime dependencies.
+# ALL vulnerabilities listed below are in devDependencies (build/test/lint tooling)
+# and will NEVER reach consumers of the bytekit npm package.
 #
 # urlStrings: TypeScript's bundled lib.d.ts files reference MDN/W3C documentation
 #   URLs as spec comments — not runtime outbound connections.
@@ -10,6 +11,15 @@ version: 2
 # licenseNonPermissive: Reported against typescript@x because its lib.d.ts files
 #   include W3C specification text (LicenseRef-W3C-Community-Final-Specification-Agreement).
 #   bytekit has zero runtime dependencies and does not ship TypeScript code.
+#
+# obfuscatedCode: vite, markdown-it, and entities ship minified/bundled builds
+#   (legitimate build optimisation). Socket.dev's heuristic incorrectly flags
+#   minified npm tools as "obfuscated". These are well-known, widely audited packages.
+#
+# newAuthor: path-to-regexp publisher change is irrelevant — bytekit does not
+#   depend on path-to-regexp directly or transitively at runtime.
 issueRules:
   urlStrings: false
   licenseNonPermissive: false
+  obfuscatedCode: false
+  newAuthor: false

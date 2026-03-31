@@ -284,12 +284,35 @@ test("ApiError.toString() includes body and ApiError.toJSON() returns details", 
     assert.match(str, /ApiError/);
     assert.match(str, /404/);
     assert.match(str, /Body/);
+    assert.match(str, /ApiError/);
 
     const json = err.toJSON();
     assert.equal(json.status, 404);
     assert.equal(json.statusText, "Not Found");
     assert.equal(json.message, "Resource not found.");
     assert.equal(json.isTimeout, false);
+    assert.ok(typeof json.stack === "string", "toJSON should include stack trace");
+    assert.match(json.stack!, /ApiError/);
+});
+
+test("ApiError.details includes stack trace for debugging", () => {
+    const err = new ApiError(500, "Internal Server Error", "Something broke");
+    const { status, statusText, message, isTimeout, stack } = err.details;
+    assert.equal(status, 500);
+    assert.equal(statusText, "Internal Server Error");
+    assert.equal(message, "Something broke");
+    assert.equal(isTimeout, false);
+    assert.ok(typeof stack === "string", "details.stack should be a string");
+    assert.match(stack!, /ApiError/);
+});
+
+test("ApiError.toString() includes stack trace", () => {
+    const err = new ApiError(503, "Service Unavailable", "Downstream timeout");
+    const str = err.toString();
+    assert.match(str, /ApiError: Downstream timeout/);
+    assert.match(str, /503/);
+    // stack trace lines start with 'at '
+    assert.match(str, /at /);
 });
 
 test("ApiError.toString() with non-serializable body falls back to String(body)", () => {

@@ -323,43 +323,32 @@ export class CryptoUtils {
 
             return new TextDecoder().decode(decrypted);
         } catch (error) {
-            throw new Error(`Decryption failed: ${error}`);
+            throw new Error(`Decryption failed: ${error}`, { cause: error });
         }
     }
 
     /**
-     * Encrypt string (simple XOR - NOT for production)
-     * @deprecated XOR encryption is NOT cryptographically secure. Use encrypt() instead.
+     * @deprecated Removed — XOR encryption is not cryptographically secure and has been
+     * disabled to prevent accidental use. Use {@link encrypt} / {@link decrypt} instead.
+     * @throws {Error} Always throws. Use `CryptoUtils.encrypt(str, key)` instead.
      */
-    static xorEncrypt(str: string, key: string): string {
-        console.warn(
-            "WARNING: XOR encryption is not cryptographically secure. Use encrypt() for a secure alternative."
+    static xorEncrypt(_str: string, _key: string): never {
+        throw new Error(
+            "xorEncrypt has been removed because XOR encryption is not cryptographically secure. " +
+            "Use CryptoUtils.encrypt(str, key) instead."
         );
-        let result = "";
-        for (let i = 0; i < str.length; i++) {
-            result += String.fromCharCode(
-                str.charCodeAt(i) ^ key.charCodeAt(i % key.length)
-            );
-        }
-        return this.base64Encode(result);
     }
 
     /**
-     * Decrypt string (simple XOR - NOT for production)
-     * @deprecated XOR encryption is NOT cryptographically secure. Use decrypt() instead.
+     * @deprecated Removed — XOR encryption is not cryptographically secure and has been
+     * disabled to prevent accidental use. Use {@link encrypt} / {@link decrypt} instead.
+     * @throws {Error} Always throws. Use `CryptoUtils.decrypt(encrypted, key)` instead.
      */
-    static xorDecrypt(encrypted: string, key: string): string {
-        console.warn(
-            "WARNING: XOR encryption is not cryptographically secure. Use decrypt() for a secure alternative."
+    static xorDecrypt(_encrypted: string, _key: string): never {
+        throw new Error(
+            "xorDecrypt has been removed because XOR encryption is not cryptographically secure. " +
+            "Use CryptoUtils.decrypt(encrypted, key) instead."
         );
-        const str = this.base64Decode(encrypted);
-        let result = "";
-        for (let i = 0; i < str.length; i++) {
-            result += String.fromCharCode(
-                str.charCodeAt(i) ^ key.charCodeAt(i % key.length)
-            );
-        }
-        return result;
     }
 
     /**

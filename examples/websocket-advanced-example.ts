@@ -4,7 +4,7 @@ import { WebSocketHelper } from "bytekit/helpers";
 // Example 1: Exponential backoff with onReconnect / onMaxRetriesReached
 // ─────────────────────────────────────────────────────────────────────────────
 
-async function example1_smartReconnection() {
+export async function example1_smartReconnection() {
     const ws = new WebSocketHelper("wss://api.example.com/stream", {
         reconnect: true,
         maxReconnectAttempts: 8,
@@ -38,16 +38,16 @@ async function example1_smartReconnection() {
     ws.send("subscribe", { channel: "prices" });
 
     // Cleanup
-    // ws.close();
-    // unsubReconnect();
-    // unsubMaxRetries();
+    ws.close();
+    unsubReconnect();
+    unsubMaxRetries();
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Example 2: Custom backoff function (Fibonacci-style)
 // ─────────────────────────────────────────────────────────────────────────────
 
-async function example2_customBackoff() {
+export async function example2_customBackoff() {
     const fibonacci = [1000, 1000, 2000, 3000, 5000, 8000, 13000];
 
     const ws = new WebSocketHelper("wss://api.example.com/stream", {
@@ -71,7 +71,7 @@ async function example2_customBackoff() {
 // from "bytekit/core" — both produce a SchemaAdapter that can be used here.
 // ─────────────────────────────────────────────────────────────────────────────
 
-async function example3_schemaValidation() {
+export async function example3_schemaValidation() {
     // Minimal mock SchemaAdapter (no external dependencies)
     function strictSchema<T>(validator: (data: unknown) => data is T) {
         return {
@@ -123,7 +123,7 @@ async function example3_schemaValidation() {
 // Example 4: Pong detection — detect silent connection drops
 // ─────────────────────────────────────────────────────────────────────────────
 
-async function example4_heartbeatPongDetection() {
+export async function example4_heartbeatPongDetection() {
     const ws = new WebSocketHelper("wss://api.example.com/stream", {
         heartbeatIntervalMs: 15_000, // ping every 15 s
         heartbeatTimeoutMs: 5_000,   // reconnect if no message within 5 s of ping
@@ -148,7 +148,7 @@ async function example4_heartbeatPongDetection() {
 // Example 5: All features combined
 // ─────────────────────────────────────────────────────────────────────────────
 
-async function example5_allFeatures() {
+export async function example5_allFeatures() {
     // Simple structural validator (replace with zodAdapter/valibotAdapter in production)
     const priceSchema = {
         parse(data: unknown) {

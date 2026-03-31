@@ -51,6 +51,12 @@ console.info(
 );
 
 try {
+    // Validate bumpType against allowlist to prevent command injection
+    const VALID_BUMP_TYPES = ["major", "minor", "patch"];
+    if (!VALID_BUMP_TYPES.includes(bumpType)) {
+        console.error(`Invalid bump type: "${bumpType}". Must be one of: ${VALID_BUMP_TYPES.join(", ")}`);
+        process.exit(1);
+    }
     // Perform the bump
     execSync(`npm version ${bumpType} --no-git-tag-version`);
 } catch (error) {
@@ -63,7 +69,7 @@ const newPkg = JSON.parse(fs.readFileSync(pkgPath, "utf8"));
 const newVersion = newPkg.version;
 
 // Update CHANGELOG.md
-if (fs.existsSync(changelogPath)) {
+try {
     let changelog = fs.readFileSync(changelogPath, "utf8");
     const date = new Date().toISOString().split("T")[0];
 
@@ -85,6 +91,9 @@ if (fs.existsSync(changelogPath)) {
     } else {
         console.warn("Could not find [Unreleased] header in CHANGELOG.md");
     }
+} catch (err) {
+    if (err.code !== "ENOENT") throw err;
+    console.warn("CHANGELOG.md not found, skipping.");
 }
 
 console.info(`Successfully bumped version to ${newVersion}`);

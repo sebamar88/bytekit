@@ -65,3 +65,30 @@ test("StorageManager returns null for invalid JSON", () => {
     const storage = new StorageManager(memory);
     assert.equal(storage.get("bad"), null);
 });
+
+test("StorageManager returns null for missing key", () => {
+    const storage = new StorageManager(new MemoryStorage());
+    assert.equal(storage.get("nonexistent"), null);
+});
+
+test("StorageManager returns null and does not throw for truncated JSON", () => {
+    const memory = new MemoryStorage();
+    // Valid JSON start but truncated — triggers JSON.parse catch branch
+    memory.setItem("truncated", '{"value":{"id":1},"expire');
+
+    const storage = new StorageManager(memory);
+    assert.equal(storage.get("truncated"), null);
+});
+
+test("StorageManager returns null for JSON missing expected wrapper shape", () => {
+    const memory = new MemoryStorage();
+    // Valid JSON but not the { value, expires } envelope StorageManager writes —
+    // data.expires is undefined (falsy), so expiry check is skipped and data.value
+    // (also undefined) is returned as T without throwing.
+    memory.setItem("raw", JSON.stringify({ arbitrary: true }));
+
+    const storage = new StorageManager(memory);
+    const result = storage.get("raw");
+    // Should not throw and returns undefined (not null)
+    assert.equal(result, undefined);
+});

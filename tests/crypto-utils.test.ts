@@ -91,15 +91,18 @@ test("CryptoUtils.encrypt and decrypt", async () => {
     assert.equal(decrypted, original);
 });
 
-test("CryptoUtils.xorEncrypt and xorDecrypt", () => {
-    const original = "secret message";
-    const key = "pass";
+test("CryptoUtils.xorEncrypt throws — method removed for security", () => {
+    assert.throws(
+        () => CryptoUtils.xorEncrypt("secret", "pass"),
+        /xorEncrypt has been removed/
+    );
+});
 
-    const encrypted = CryptoUtils.xorEncrypt(original, key);
-    assert.notEqual(encrypted, original);
-
-    const decrypted = CryptoUtils.xorDecrypt(encrypted, key);
-    assert.equal(decrypted, original);
+test("CryptoUtils.xorDecrypt throws — method removed for security", () => {
+    assert.throws(
+        () => CryptoUtils.xorDecrypt("anything", "pass"),
+        /xorDecrypt has been removed/
+    );
 });
 
 test("CryptoUtils.encrypt is non-deterministic (uses random IV)", async () => {
@@ -164,7 +167,6 @@ test("CryptoUtils base64 uses browser btoa/atob when available", () => {
 
 test("CryptoUtils throws error when crypto is missing", () => {
     const originalCrypto = globalThis.crypto;
-    let overridden = false;
 
     try {
         Object.defineProperty(globalThis, "crypto", {
@@ -172,7 +174,6 @@ test("CryptoUtils throws error when crypto is missing", () => {
             configurable: true,
             writable: true,
         });
-        overridden = true;
     } catch {
         return;
     }
@@ -188,18 +189,15 @@ test("CryptoUtils throws error when crypto is missing", () => {
         /Secure random generation unavailable/
     );
 
-    if (overridden) {
-        Object.defineProperty(globalThis, "crypto", {
-            value: originalCrypto,
-            configurable: true,
-            writable: true,
-        });
-    }
+    Object.defineProperty(globalThis, "crypto", {
+        value: originalCrypto,
+        configurable: true,
+        writable: true,
+    });
 });
 
 test("CryptoUtils UUID uses getRandomValues fallback when randomUUID is unavailable", () => {
     const originalCrypto = globalThis.crypto;
-    let overridden = false;
 
     try {
         Object.defineProperty(globalThis, "crypto", {
@@ -210,7 +208,6 @@ test("CryptoUtils UUID uses getRandomValues fallback when randomUUID is unavaila
             configurable: true,
             writable: true,
         });
-        overridden = true;
     } catch {
         return;
     }
@@ -221,18 +218,15 @@ test("CryptoUtils UUID uses getRandomValues fallback when randomUUID is unavaila
         /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
     );
 
-    if (overridden) {
-        Object.defineProperty(globalThis, "crypto", {
-            value: originalCrypto,
-            configurable: true,
-            writable: true,
-        });
-    }
+    Object.defineProperty(globalThis, "crypto", {
+        value: originalCrypto,
+        configurable: true,
+        writable: true,
+    });
 });
 
 test("CryptoUtils hash uses SubtleCrypto when available", async () => {
     const originalCrypto = globalThis.crypto;
-    let overridden = false;
 
     const subtle = {
         digest: async () => new Uint8Array([1, 2, 3]).buffer,
@@ -246,7 +240,6 @@ test("CryptoUtils hash uses SubtleCrypto when available", async () => {
             configurable: true,
             writable: true,
         });
-        overridden = true;
     } catch {
         return;
     }
@@ -257,13 +250,11 @@ test("CryptoUtils hash uses SubtleCrypto when available", async () => {
     const hmac = await CryptoUtils.hmac("msg", "secret");
     assert.equal(hmac, "090909");
 
-    if (overridden) {
-        Object.defineProperty(globalThis, "crypto", {
-            value: originalCrypto,
-            configurable: true,
-            writable: true,
-        });
-    }
+    Object.defineProperty(globalThis, "crypto", {
+        value: originalCrypto,
+        configurable: true,
+        writable: true,
+    });
 });
 
 test("CryptoUtils.generateToken with default length", () => {

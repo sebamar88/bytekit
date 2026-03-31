@@ -116,6 +116,21 @@ const escapeRegExp = (value: string) =>
 const removeDiacritics = (value: string) =>
     value.normalize("NFD").replace(DIACRITICS_REGEX, "");
 
+/** Cached RegExp pairs keyed by escapedSeparator to avoid re-creating on every call. */
+const slugRegExpCache = new Map<string, [RegExp, RegExp]>();
+
+const getSlugRegExps = (escapedSeparator: string): [RegExp, RegExp] => {
+    let regexps = slugRegExpCache.get(escapedSeparator);
+    if (!regexps) {
+        regexps = [
+            new RegExp(`${escapedSeparator}+`, "g"),
+            new RegExp(`^${escapedSeparator}|${escapedSeparator}$`, "g"),
+        ];
+        slugRegExpCache.set(escapedSeparator, regexps);
+    }
+    return regexps;
+};
+
 export class UrlHelper {
     /**
      * Serialises a plain object into a URL query string.
@@ -175,7 +190,7 @@ export class UrlHelper {
             typeof options === "string" ? { separator: options } : options;
         const { separator = "-", lowercase = true } = opts;
 
-        let rawString = "";
+        let rawString: string;
 
         if (typeof params === "string") {
             rawString = params;
@@ -206,13 +221,11 @@ export class UrlHelper {
         const normalized = removeDiacritics(rawString);
         const base = lowercase ? normalized.toLowerCase() : normalized;
         const escapedSeparator = escapeRegExp(separator);
+        const [collapseSepRe, trimSepRe] = getSlugRegExps(escapedSeparator);
 
         return base
             .replace(NON_ALPHANUMERIC_REGEX, separator)
-            .replace(new RegExp(`${escapedSeparator}+`, "g"), separator)
-            .replace(
-                new RegExp(`^${escapedSeparator}|${escapedSeparator}$`, "g"),
-                ""
-            );
+            .replace(collapseSepRe, separator)
+            .replace(trimSepRe, "");
     }
 }

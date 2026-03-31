@@ -332,6 +332,65 @@ test("WebSocketHelper continues to next handler if one fails", async () => {
 // US1: Backoff Strategies & Reconnect Event Handlers (T009–T015)
 // ============================================================================
 
+test("WebSocketHelper handler throwing a number wraps it in Error and notifies onError", async () => {
+    const wsh = new WebSocketHelper("ws://localhost");
+    await wsh.connect();
+
+    let caughtError: Error | null = null;
+    wsh.onError((err) => { caughtError = err; });
+
+    wsh.on("numeric-throw", () => { throw 42; });
+
+    // @ts-expect-error - Test type override
+    wsh.ws._receive({ type: "numeric-throw", data: {} });
+
+    assert.ok(caughtError instanceof Error);
+    assert.equal(caughtError?.message, "42");
+    wsh.close();
+});
+
+test("WebSocketHelper receiving a message for an unregistered type does not throw", async () => {
+    const wsh = new WebSocketHelper("ws://localhost");
+    await wsh.connect();
+
+    let errorFired = false;
+    wsh.onError(() => { errorFired = true; });
+
+    // No handler registered for "unknown-type" — must not throw or notify error
+    let threw = false;
+    try {
+        // @ts-expect-error - Test type override
+        wsh.ws._receive({ type: "unknown-type", data: { val: 1 } });
+    } catch {
+        threw = true;
+    }
+
+    assert.equal(threw, false);
+    assert.equal(errorFired, false);
+    wsh.close();
+});
+
+test("WebSocketHelper handler throwing null wraps it in Error and notifies onError", async () => {
+    const wsh = new WebSocketHelper("ws://localhost");
+    await wsh.connect();
+
+    let caughtError: Error | null = null;
+    wsh.onError((err) => { caughtError = err; });
+
+    wsh.on("null-throw", () => { throw null; });
+
+    // @ts-expect-error - Test type override
+    wsh.ws._receive({ type: "null-throw", data: {} });
+
+    assert.ok(caughtError instanceof Error);
+    assert.equal(caughtError?.message, "null");
+    wsh.close();
+});
+
+// ============================================================================
+// US1: Backoff Strategies & Reconnect Event Handlers (T009–T015)
+// ============================================================================
+
 test("US1 [T009] linear backoff — onReconnect receives correct (attempt, delay) pairs", async () => {
     const wsh = new WebSocketHelper("ws://localhost", {
         reconnect: true,
@@ -499,7 +558,7 @@ test("US1 [T015] multiple onReconnect subscribers — all notified; each unsubsc
     });
     const log: string[] = [];
     const unsub1 = wsh.onReconnect(() => log.push("h1"));
-    const unsub2 = wsh.onReconnect(() => log.push("h2"));
+    const _unsub2 = wsh.onReconnect(() => log.push("h2"));
     await wsh.connect();
 
     // @ts-expect-error - Test type override

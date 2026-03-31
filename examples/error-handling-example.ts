@@ -3,7 +3,7 @@ import { ApiClient, ApiError } from "bytekit";
 /**
  * Example: Localized error handling and custom error messages
  */
-async function runDemo() {
+export async function runDemo() {
     const api = new ApiClient({
         baseUrl: "https://api.example.com",
         locale: "es", // Set default to Spanish
@@ -26,8 +26,8 @@ async function runDemo() {
         if (error instanceof ApiError) {
             // error.message is automatically localized based on status code and 'locale'
             // Output: "El usuario solicitado no fue encontrado"
-            console.log(error.message); 
-            
+            console.log(error.message);
+
             // You can also access raw details from the server response
             console.error(`Status: ${error.status}, Body:`, error.body);
         }

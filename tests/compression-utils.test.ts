@@ -108,7 +108,6 @@ test("CompressionUtils prettyJSON handles object input", () => {
 
 test("CompressionUtils gzip/deflate fallback without node", async () => {
     const originalVersions = process.versions;
-    let overridden = false;
 
     try {
         Object.defineProperty(process, "versions", {
@@ -116,7 +115,6 @@ test("CompressionUtils gzip/deflate fallback without node", async () => {
             configurable: true,
             writable: true,
         });
-        overridden = true;
     } catch {
         return;
     }
@@ -130,13 +128,11 @@ test("CompressionUtils gzip/deflate fallback without node", async () => {
     const inflated = await CompressionUtils.inflate(deflated);
     assert.equal(inflated, "hello");
 
-    if (overridden) {
-        Object.defineProperty(process, "versions", {
-            value: originalVersions,
-            configurable: true,
-            writable: true,
-        });
-    }
+    Object.defineProperty(process, "versions", {
+        value: originalVersions,
+        configurable: true,
+        writable: true,
+    });
 });
 
 test("CompressionUtils compress handles empty string", () => {

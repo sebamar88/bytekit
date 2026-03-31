@@ -1,4 +1,5 @@
 import type { SchemaAdapter } from "../core/SchemaAdapter.js";
+import type { Logger } from "../core/Logger.js";
 
 // ── New exported types ────────────────────────────────────────────────────────
 
@@ -40,6 +41,7 @@ export interface WebSocketOptions {
     jitter?: boolean;
     heartbeatTimeoutMs?: number;
     schemas?: Record<string, SchemaAdapter>;
+    logger?: Logger;
 }
 
 export type WebSocketEventHandler<T = unknown> = (data: T) => void;
@@ -48,7 +50,7 @@ export type WebSocketErrorHandler = (error: Error) => void;
 export class WebSocketHelper {
     private ws: WebSocket | null = null;
     private url: string;
-    private options: Required<WebSocketOptions>;
+    private options: Required<Omit<WebSocketOptions, "logger">>;
     private messageHandlers: Map<string, Set<WebSocketEventHandler>> =
         new Map();
     private errorHandlers: Set<WebSocketErrorHandler> = new Set();
@@ -60,9 +62,11 @@ export class WebSocketHelper {
     private validationErrorHandlers: Set<WebSocketValidationErrorHandler> =
         new Set();
     private pongTimeoutTimer: ReturnType<typeof setTimeout> | undefined;
+    private readonly logger?: Logger;
 
     constructor(url: string, options: WebSocketOptions = {}) {
         this.url = url;
+        this.logger = options.logger;
         this.options = {
             reconnect: options.reconnect ?? true,
             maxReconnectAttempts: options.maxReconnectAttempts ?? 5,
@@ -324,7 +328,7 @@ export class WebSocketHelper {
                 try {
                     handler();
                 } catch (e) {
-                    console.error("Error in maxRetriesReached handler:", e);
+                    this.logError("Error in maxRetriesReached handler:", e);
                 }
             });
             return;
@@ -337,7 +341,7 @@ export class WebSocketHelper {
             try {
                 handler(this.reconnectAttempts, delay);
             } catch (e) {
-                console.error("Error in reconnect handler:", e);
+                this.logError("Error in reconnect handler:", e);
             }
         });
 
@@ -369,7 +373,7 @@ export class WebSocketHelper {
             try {
                 handler(error);
             } catch (e) {
-                console.error("Error in error handler:", e);
+                this.logError("Error in error handler:", e);
             }
         });
     }
@@ -382,8 +386,17 @@ export class WebSocketHelper {
             try {
                 handler(error, message);
             } catch (e) {
-                console.error("Error in validation error handler:", e);
+                this.logError("Error in validation error handler:", e);
             }
         });
+    }
+
+    private logError(message: string, e: unknown): void {
+        const err = e instanceof Error ? e : new Error(String(e));
+        if (this.logger) {
+            this.logger.error(message, undefined, err);
+        } else {
+            console.error(message, err);
+        }
     }
 }

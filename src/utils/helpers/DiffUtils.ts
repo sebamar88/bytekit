@@ -185,6 +185,7 @@ export class DiffUtils {
 
         for (const key of keys) {
             if (current == null) return undefined;
+            if (key === "__proto__" || key === "constructor" || key === "prototype") return undefined;
             current = (current as Record<string, unknown>)[key];
         }
 
@@ -199,7 +200,11 @@ export class DiffUtils {
         path: string,
         value: unknown
     ): void {
+        const BLOCKED_KEYS = new Set(["__proto__", "constructor", "prototype"]);
         const keys = path.split(".");
+
+        if (keys.some((k) => BLOCKED_KEYS.has(k))) return;
+
         let current = obj;
 
         for (let i = 0; i < keys.length - 1; i++) {

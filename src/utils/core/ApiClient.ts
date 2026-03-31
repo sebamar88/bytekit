@@ -145,6 +145,7 @@ export class ApiError extends Error {
             message: this.message,
             body: this.body,
             isTimeout: this.isTimeout,
+            stack: this.stack,
         };
     }
 
@@ -168,6 +169,10 @@ export class ApiError extends Error {
                 /* v8 ignore next */
                 parts.push(`Body: ${this.body}`);
             }
+        }
+
+        if (this.stack) {
+            parts.push(this.stack);
         }
 
         return parts.join("\n");
@@ -470,10 +475,7 @@ export class ApiClient {
         const timeout = timeoutMs ?? this.timeoutMs;
 
         // Convert Headers to plain object for compatibility with all fetch implementations
-        const headersObject: Record<string, string> = {};
-        headers.forEach((value, key) => {
-            headersObject[key] = value;
-        });
+        const headersObject = Object.fromEntries(headers as unknown as Iterable<[string, string]>);
 
         let init: RequestInit = {
             ...rest,
