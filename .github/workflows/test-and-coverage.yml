@@ -11,23 +11,20 @@ jobs:
         name: Run Tests
         runs-on: ubuntu-latest
 
-        strategy:
-            matrix:
-                node-version: [20.x, 22.x]
-
         steps:
             - name: Checkout code
               uses: actions/checkout@v4
 
-            - name: Setup Node.js ${{ matrix.node-version }}
-              uses: actions/setup-node@v4
-              with:
-                  node-version: ${{ matrix.node-version }}
-
             - name: Setup pnpm
               uses: pnpm/action-setup@v4
               with:
-                  version: 8
+                  version: 10
+
+            - name: Setup Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: 22.x
+                  cache: "pnpm"
 
             - name: Install dependencies
               run: pnpm install
@@ -37,6 +34,7 @@ jobs:
 
             - name: Build project
               run: pnpm run build
+
             - name: Run tests
               run: pnpm test
 
@@ -52,15 +50,16 @@ jobs:
             - name: Checkout code
               uses: actions/checkout@v4
 
-            - name: Setup Node.js
-              uses: actions/setup-node@v4
-              with:
-                  node-version: "20.x"
-
             - name: Setup pnpm
               uses: pnpm/action-setup@v4
               with:
-                  version: 8
+                  version: 10
+
+            - name: Setup Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: "22.x"
+                  cache: "pnpm"
 
             - name: Install dependencies
               run: pnpm install
