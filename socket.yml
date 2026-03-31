@@ -20,8 +20,8 @@ version: 2
 #   depend on path-to-regexp directly or transitively at runtime.
 issueRules:
   urlStrings: false
-  licenseNonPermissive: false
-  obfuscatedCode: false
+  nonpermissiveLicense: false
+  obfuscatedFile: false
   newAuthor: false
-  deprecatedException: false
-  deprecatedLicense: false
+  deprecated: false
+  licenseException: false
