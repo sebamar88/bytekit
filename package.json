@@ -140,7 +140,8 @@
     },
     "files": [
         "dist",
-        "bin"
+        "bin",
+        "socket.yml"
     ],
     "keywords": [
         "typescript",
