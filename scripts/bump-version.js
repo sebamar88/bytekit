@@ -1,5 +1,5 @@
 import fs from "fs";
-import { execSync } from "child_process";
+import { execFileSync } from "child_process";
 
 const args = process.argv.slice(2);
 let bumpType = args[0] || "auto";
@@ -57,8 +57,10 @@ try {
         console.error(`Invalid bump type: "${bumpType}". Must be one of: ${VALID_BUMP_TYPES.join(", ")}`);
         process.exit(1);
     }
-    // Perform the bump
-    execSync(`npm version ${bumpType} --no-git-tag-version`);
+    // Perform the bump using a non-shell API to avoid command injection
+    execFileSync("npm", ["version", bumpType, "--no-git-tag-version"], {
+        stdio: "inherit",
+    });
 } catch (error) {
     console.error(`Failed to bump version: ${error.message}`);
     process.exit(1);
