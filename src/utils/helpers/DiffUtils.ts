@@ -215,7 +215,7 @@ export class DiffUtils {
         for (let i = 0; i < keys.length - 1; i++) {
             const key = keys[i];
             if (!(key in current)) {
-                current[key] = {};
+                current[key] = Object.create(null);
             }
             current = current[key] as Record<string, unknown>;
         }
