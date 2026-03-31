@@ -207,8 +207,12 @@ export class DiffUtils {
     ): void {
         const BLOCKED_KEYS = new Set(["__proto__", "constructor", "prototype"]);
         const keys = path.split(".");
+        const lastKey = keys[keys.length - 1];
 
-        if (keys.some((k) => BLOCKED_KEYS.has(k))) return;
+        // Reject empty paths or any segment that could lead to prototype pollution
+        if (!lastKey || keys.some((k) => BLOCKED_KEYS.has(k))) {
+            return;
+        }
 
         let current = obj;
 
@@ -220,7 +224,7 @@ export class DiffUtils {
             current = current[key] as Record<string, unknown>;
         }
 
-        current[keys.at(-1)!] = value;
+        current[lastKey] = value;
     }
 
     /**
