@@ -185,7 +185,12 @@ export class DiffUtils {
 
         for (const key of keys) {
             if (current == null) return undefined;
-            if (key === "__proto__" || key === "constructor" || key === "prototype") return undefined;
+            if (
+                key === "__proto__" ||
+                key === "constructor" ||
+                key === "prototype"
+            )
+                return undefined;
             current = (current as Record<string, unknown>)[key];
         }
 

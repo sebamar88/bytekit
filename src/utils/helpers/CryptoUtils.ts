@@ -335,7 +335,7 @@ export class CryptoUtils {
     static xorEncrypt(_str: string, _key: string): never {
         throw new Error(
             "xorEncrypt has been removed because XOR encryption is not cryptographically secure. " +
-            "Use CryptoUtils.encrypt(str, key) instead."
+                "Use CryptoUtils.encrypt(str, key) instead."
         );
     }
 
@@ -347,7 +347,7 @@ export class CryptoUtils {
     static xorDecrypt(_encrypted: string, _key: string): never {
         throw new Error(
             "xorDecrypt has been removed because XOR encryption is not cryptographically secure. " +
-            "Use CryptoUtils.decrypt(encrypted, key) instead."
+                "Use CryptoUtils.decrypt(encrypted, key) instead."
         );
     }
 

@@ -291,7 +291,10 @@ test("ApiError.toString() includes body and ApiError.toJSON() returns details", 
     assert.equal(json.statusText, "Not Found");
     assert.equal(json.message, "Resource not found.");
     assert.equal(json.isTimeout, false);
-    assert.ok(typeof json.stack === "string", "toJSON should include stack trace");
+    assert.ok(
+        typeof json.stack === "string",
+        "toJSON should include stack trace"
+    );
     assert.match(json.stack!, /ApiError/);
 });
 

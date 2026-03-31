@@ -337,9 +337,13 @@ test("WebSocketHelper handler throwing a number wraps it in Error and notifies o
     await wsh.connect();
 
     let caughtError: Error | null = null;
-    wsh.onError((err) => { caughtError = err; });
+    wsh.onError((err) => {
+        caughtError = err;
+    });
 
-    wsh.on("numeric-throw", () => { throw 42; });
+    wsh.on("numeric-throw", () => {
+        throw 42;
+    });
 
     // @ts-expect-error - Test type override
     wsh.ws._receive({ type: "numeric-throw", data: {} });
@@ -354,7 +358,9 @@ test("WebSocketHelper receiving a message for an unregistered type does not thro
     await wsh.connect();
 
     let errorFired = false;
-    wsh.onError(() => { errorFired = true; });
+    wsh.onError(() => {
+        errorFired = true;
+    });
 
     // No handler registered for "unknown-type" — must not throw or notify error
     let threw = false;
@@ -375,9 +381,13 @@ test("WebSocketHelper handler throwing null wraps it in Error and notifies onErr
     await wsh.connect();
 
     let caughtError: Error | null = null;
-    wsh.onError((err) => { caughtError = err; });
+    wsh.onError((err) => {
+        caughtError = err;
+    });
 
-    wsh.on("null-throw", () => { throw null; });
+    wsh.on("null-throw", () => {
+        throw null;
+    });
 
     // @ts-expect-error - Test type override
     wsh.ws._receive({ type: "null-throw", data: {} });

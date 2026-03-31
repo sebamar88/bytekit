@@ -475,7 +475,9 @@ export class ApiClient {
         const timeout = timeoutMs ?? this.timeoutMs;
 
         // Convert Headers to plain object for compatibility with all fetch implementations
-        const headersObject = Object.fromEntries(headers as unknown as Iterable<[string, string]>);
+        const headersObject = Object.fromEntries(
+            headers as unknown as Iterable<[string, string]>
+        );
 
         let init: RequestInit = {
             ...rest,
