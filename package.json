@@ -160,6 +160,7 @@
     "homepage": "https://sebamar88-bytekit.mintlify.app/",
     "author": "Sebastián Martinez",
     "license": "MIT",
+    "packageManager": "pnpm@10.32.1",
     "sideEffects": false,
     "publishConfig": {
         "access": "public"

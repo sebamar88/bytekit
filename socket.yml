@@ -23,3 +23,5 @@ issueRules:
   licenseNonPermissive: false
   obfuscatedCode: false
   newAuthor: false
+  deprecatedException: false
+  deprecatedLicense: false
