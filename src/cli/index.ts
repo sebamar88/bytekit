@@ -212,7 +212,7 @@ async function handleSimpleFetch(
 function printHelp(): void {
     // Build example base URL from parts to avoid supply-chain URL scanners flagging
     // static help text as a live outbound connection.
-    const exBase = ["https", "://", "api.example.com"].join("");
+    const exBase = "http://localhost:3000";
     console.log(`
 \u001b[1mbytekit CLI\u001b[0m - API Inspection & Type Generation
 
