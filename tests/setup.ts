@@ -52,10 +52,10 @@ const assertShim = {
                 throw new Error("Promise did not reject");
             } catch (err) {
                 const error = err as any;
-                if (error.message === "Promise did not reject") throw error;
+                if (error.message === "Promise did not reject") throw new Error("Promise did not reject", { cause: err });
                 const result = regOrFunc(error);
                 if (!result)
-                    throw new Error("Validation function returned false");
+                    throw new Error("Validation function returned false", { cause: err });
             }
         } else {
             await expect(p).rejects.toThrow(

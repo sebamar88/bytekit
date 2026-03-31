@@ -376,7 +376,6 @@ test("ErrorBoundary.handle: onError throws non-Error → wrapped and logged", as
         // @ts-expect-error - Test type override
         logger: mockLogger,
         onError: () => {
-            // eslint-disable-next-line @typescript-eslint/only-throw-error
             throw "non-Error onError throw";
         },
     });
@@ -390,7 +389,6 @@ test("ErrorBoundary.execute: non-Error thrown is converted to Error", async () =
     await assert.rejects(
         () =>
             eb.execute(async () => {
-                // eslint-disable-next-line @typescript-eslint/only-throw-error
                 throw "string error";
             }),
         (err) => {

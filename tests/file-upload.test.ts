@@ -464,7 +464,6 @@ test("FileUploadHelper.uploadFile uses 'Upload failed' when fetch throws a non-E
     // Make fetch throw a plain string (not an Error instance)
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     globalThis.fetch = (): any => {
-        // eslint-disable-next-line @typescript-eslint/only-throw-error
         throw "network failure string";
     };
 

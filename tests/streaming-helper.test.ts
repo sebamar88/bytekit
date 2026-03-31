@@ -861,7 +861,6 @@ test("streamSSE.connect() catch: EventSource constructor throws an Error calls o
 test("streamSSE.connect() catch: EventSource constructor throws non-Error wraps it (lines 242-244)", async () => {
     class ThrowingNonErrorEventSource {
         constructor(_url: string) {
-            // eslint-disable-next-line @typescript-eslint/only-throw-error
             throw "plain string error from EventSource";
         }
         addEventListener() {}

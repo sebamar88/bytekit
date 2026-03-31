@@ -169,7 +169,6 @@ test("PollingHelper applies numeric jitter on retries (lines ~293-310)", async (
 test("PollingHelper normalises non-Error throw into Error (line 126)", async () => {
     const poller = new PollingHelper(
         async () => {
-            // eslint-disable-next-line @typescript-eslint/only-throw-error
             throw "raw string error";
         },
         { interval: 1, maxAttempts: 1, retryOnError: false }

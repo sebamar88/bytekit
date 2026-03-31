@@ -605,7 +605,7 @@ test("shouldRetry callback is invoked via retryFn when request fails (lines 749-
         retryPolicy: {
             maxAttempts: 2,
             initialDelayMs: 1,
-            shouldRetry: (err, _attempt) => {
+            shouldRetry: (_err, _attempt) => {
                 shouldRetryCallCount++;
                 // Retry on network errors but only once
                 return shouldRetryCallCount < 1;

@@ -853,7 +853,6 @@ test("schema.parse throws a non-Error string — wrapped as Error (line 266)", a
         schemas: {
             "non-err-type": {
                 parse: () => {
-                    // eslint-disable-next-line @typescript-eslint/only-throw-error
                     throw "schema validation string error";
                 },
             },
