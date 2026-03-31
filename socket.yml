@@ -1,0 +1,15 @@
+version: 2
+
+# Suppress false-positive alerts from devDependencies that are NOT shipped
+# in the published package (bytekit publishes only dist/ + bin/).
+#
+# urlStrings: TypeScript's bundled lib.d.ts files reference MDN/W3C documentation
+#   URLs as spec comments — not runtime outbound connections.
+#   bytekit's own source URLs have been replaced with localhost examples.
+#
+# licenseNonPermissive: Reported against typescript@x because its lib.d.ts files
+#   include W3C specification text (LicenseRef-W3C-Community-Final-Specification-Agreement).
+#   bytekit has zero runtime dependencies and does not ship TypeScript code.
+issueRules:
+  urlStrings: false
+  licenseNonPermissive: false

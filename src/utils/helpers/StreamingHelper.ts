@@ -111,7 +111,7 @@ export class StreamingHelper {
      * Each line in the response must be a valid JSON object.
      *
      * @example
-     * await StreamingHelper.streamJsonLines("https://api.example.com/large-data", {
+     * await StreamingHelper.streamJsonLines("http://localhost:3000/large-data", {
      *   onChunk: (item) => console.log("Processed item:", item),
      *   onComplete: () => console.log("Done!")
      * });
@@ -199,7 +199,7 @@ export class StreamingHelper {
      * Automatically parses incoming data as JSON.
      *
      * @example
-     * const stream = StreamingHelper.streamSSE("https://api.example.com/events");
+     * const stream = StreamingHelper.streamSSE("http://localhost:3000/events");
      * const unsubscribe = stream.subscribe((data) => {
      *   console.log("New real-time data:", data);
      * });

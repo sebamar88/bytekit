@@ -38,7 +38,7 @@ export interface ValidationSchema {
 
 /** Describes a single validation failure produced by {@link ResponseValidator.validate}. */
 export interface ValidationError {
-    /** Dot-notation path to the invalid field (e.g., `"root.user.email"`). */
+    /** Dot-notation path to the invalid field (e.g., `"order.item.quantity"`). */
     path: string;
     /** Human-readable description of why the value failed validation. */
     message: string;
