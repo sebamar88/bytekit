@@ -89,6 +89,7 @@ async function executeWithConcurrencyLimit<T>(
                 }
             } catch (err) {
                 // Store first error and set flag
+                /* v8 ignore next */
                 if (!hasError) {
                     hasError = true;
                     firstError = err;

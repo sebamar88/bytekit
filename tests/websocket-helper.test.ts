@@ -211,6 +211,19 @@ test("WebSocketHelper unsubscribe stops receiving messages", async () => {
     wsh.close();
 });
 
+test("WebSocketHelper unsubscribe no-ops when handler registry is already gone", async () => {
+    const wsh = new WebSocketHelper("ws://localhost");
+    await wsh.connect();
+
+    const unsubscribe = wsh.on("notice", () => {});
+    // @ts-expect-error - test access
+    wsh.messageHandlers.delete("notice");
+
+    unsubscribe();
+
+    wsh.close();
+});
+
 test("WebSocketHelper request times out when no response", async () => {
     const wsh = new WebSocketHelper("ws://localhost", { messageTimeout: 20 });
     await wsh.connect();
@@ -219,6 +232,24 @@ test("WebSocketHelper request times out when no response", async () => {
         () => wsh.request("slow", { id: 1 }),
         /Request timeout/
     );
+    wsh.close();
+});
+
+test("WebSocketHelper onError unsubscribe removes the handler", async () => {
+    const wsh = new WebSocketHelper("ws://localhost");
+    await wsh.connect();
+
+    let calls = 0;
+    const unsubscribe = wsh.onError(() => {
+        calls++;
+    });
+
+    unsubscribe();
+
+    // @ts-expect-error - Test type override
+    wsh.ws._error();
+
+    assert.equal(calls, 0);
     wsh.close();
 });
 
@@ -533,6 +564,27 @@ test("US1 [T013] onMaxRetriesReached fires on exhaustion; onError is NOT called 
     wsh.ws.close();
     assert.equal(maxRetriesFired, true);
     assert.ok(!errorMessages.includes("Max reconnection attempts reached"));
+    wsh.close();
+});
+
+test("WebSocketHelper onMaxRetriesReached unsubscribe removes the handler", async () => {
+    const wsh = new WebSocketHelper("ws://localhost", {
+        reconnect: true,
+        maxReconnectAttempts: 0,
+    });
+    let calls = 0;
+
+    const unsubscribe = wsh.onMaxRetriesReached(() => {
+        calls++;
+    });
+
+    unsubscribe();
+    await wsh.connect();
+
+    // @ts-expect-error - Test type override
+    wsh.ws.close();
+
+    assert.equal(calls, 0);
     wsh.close();
 });
 
@@ -914,6 +966,33 @@ test("heartbeat send() throws — empty catch silences it (line 305)", async () 
     }
 });
 
+test("WebSocketHelper.close() is a no-op when no socket exists", () => {
+    const wsh = new WebSocketHelper("ws://localhost");
+    wsh.close();
+    assert.equal(wsh.getState(), WebSocket.CLOSED);
+});
+
+test("WebSocketHelper heartbeat tick skips send while disconnected", async () => {
+    vi.useFakeTimers();
+    try {
+        const wsh = new WebSocketHelper("ws://localhost", {
+            heartbeatIntervalMs: 50,
+            reconnect: false,
+        });
+
+        // @ts-expect-error - test access
+        wsh.startHeartbeat();
+        await vi.advanceTimersByTimeAsync(60);
+
+        assert.equal(wsh.isConnected(), false);
+
+        // @ts-expect-error - test access
+        wsh.stopHeartbeat();
+    } finally {
+        vi.useRealTimers();
+    }
+});
+
 test("maxRetriesReached handler throws — caught and logged (lines 325-326)", async () => {
     const errSpy = vi.spyOn(console, "error").mockImplementation(() => {});
 
@@ -976,6 +1055,34 @@ test("WebSocketHelper validation error handler throw is caught and logged (lines
     );
 
     errSpy.mockRestore();
+    wsh.close();
+});
+
+test("WebSocketHelper logger handles internal logging instead of console.error", async () => {
+    const logger = { error: vi.fn() };
+    const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+
+    const wsh = new WebSocketHelper("ws://localhost", {
+        logger,
+        reconnect: true,
+        maxReconnectAttempts: 1,
+        reconnectDelayMs: 10,
+    });
+
+    await wsh.connect();
+
+    wsh.onReconnect(() => {
+        throw new Error("logger branch");
+    });
+
+    // @ts-expect-error - accessing internal ws
+    wsh.ws.close();
+    await new Promise((r) => setTimeout(r, 30));
+
+    assert.equal(logger.error.mock.calls.length > 0, true);
+    assert.equal(consoleSpy.mock.calls.length, 0);
+
+    consoleSpy.mockRestore();
     wsh.close();
 });
 

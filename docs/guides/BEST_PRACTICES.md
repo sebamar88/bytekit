@@ -129,28 +129,12 @@ env.validate({
 ### 1. Secure Token Management
 
 ```typescript
-import { CryptoUtils, StorageUtils } from "bytekit";
+import { CryptoUtils } from "bytekit";
 
 class TokenManager {
-    private readonly TOKEN_KEY = "auth_token";
-
-    async saveToken(token: string) {
-        // Hash token before storing
-        const hashed = await CryptoUtils.hash(token);
-        StorageUtils.setSecure(this.TOKEN_KEY, hashed);
-    }
-
-    async getToken(): Promise<string | null> {
-        return StorageUtils.getSecure(this.TOKEN_KEY);
-    }
-
-    clearToken() {
-        StorageUtils.remove(this.TOKEN_KEY);
-    }
-
-    isTokenExpired(token: string): boolean {
+    isTokenExpired(jwt: string): boolean {
         try {
-            const payload = JSON.parse(atob(token.split(".")[1]));
+            const payload = JSON.parse(atob(jwt.split(".")[1]));
             return payload.exp * 1000 < Date.now();
         } catch {
             return true;
@@ -161,37 +145,33 @@ class TokenManager {
 export const tokenManager = new TokenManager();
 ```
 
+Recommendations:
+- Prefer `HttpOnly`, `Secure` cookies or another server-managed session strategy for credentials.
+- Do not store session tokens, passwords, refresh tokens, or API keys in `localStorage`.
+- Use `CryptoUtils.hash()` only when a real crypto backend is available; in v3 it fails fast instead of silently falling back to a weak hash.
+
 ### 2. Sensitive Data Handling
 
 ```typescript
-import { StringUtils, CryptoUtils } from "bytekit";
+import { ApiClient, createLogger } from "bytekit";
 
-// Mask sensitive data in logs
 const logger = createLogger({
     namespace: "app",
-    transform: (data) => {
-        if (data.creditCard) {
-            data.creditCard = StringUtils.mask(data.creditCard, {
-                visibleEnd: 4,
-            });
-        }
-        if (data.email) {
-            data.email = StringUtils.mask(data.email, {
-                visibleStart: 2,
-                visibleEnd: 15,
-            });
-        }
-        return data;
-    },
 });
 
-// Generate secure tokens
-const apiKey = CryptoUtils.generateToken(32);
-const sessionId = CryptoUtils.generateUUID();
-
-// Constant-time comparison for tokens
-const isValid = CryptoUtils.constantTimeCompare(providedToken, storedToken);
+const api = new ApiClient({
+    baseUrl: "https://api.example.com",
+    logger,
+    logHeaders: true,
+    // Keep this disabled outside local debugging.
+    logSensitiveData: false,
+});
 ```
+
+Recommendations:
+- Treat request/response bodies as sensitive by default.
+- Keep `logSensitiveData` disabled in production.
+- When comparing secrets or signed values, use `CryptoUtils.constantTimeCompare()`.
 
 ### 3. Input Validation
 

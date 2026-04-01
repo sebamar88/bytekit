@@ -142,6 +142,11 @@ test("DiffUtils deep equals objects", () => {
     assert.equal(DiffUtils.deepEqual({ a: { b: 1 } }, { a: { b: 1 } }), true);
 });
 
+test("DiffUtils.deepDiff keeps primitive-equal roots unchanged", () => {
+    const diff = DiffUtils.deepDiff(1, 1);
+    assert.deepEqual(diff, { changed: [], added: [], removed: [] });
+});
+
 // ============================================================================
 // PollingHelper Tests
 // ============================================================================
@@ -197,6 +202,37 @@ test("PollingHelper applies backoff", async () => {
 test("PollingHelper factory function works", async () => {
     const poller = createPoller(async () => true, { interval: 10 });
     assert.ok(poller instanceof PollingHelper);
+});
+
+test("PollingHelper uses the default stopCondition when none is provided", async () => {
+    const poller = new PollingHelper(async () => "done", {
+        interval: 1,
+        maxAttempts: 5,
+    });
+
+    const result = await poller.start();
+
+    assert.equal(result.success, true);
+    assert.equal(result.result, "done");
+    assert.equal(result.attempts, 1);
+});
+
+test("PollingHelper keeps polling when attempt result is undefined without an error", async () => {
+    let attempts = 0;
+    const poller = new PollingHelper(async () => {
+        attempts++;
+        return attempts >= 2 ? "ready" : (undefined as unknown as string);
+    }, {
+        interval: 1,
+        maxAttempts: 3,
+        stopCondition: (result) => result === "ready",
+    });
+
+    const result = await poller.start();
+
+    assert.equal(result.success, true);
+    assert.equal(result.result, "ready");
+    assert.equal(result.attempts, 2);
 });
 
 test("PollingHelper abort controller works", async () => {

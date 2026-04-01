@@ -8,8 +8,8 @@
  * @example
  * ```typescript
  * const store = new StorageManager();
- * store.set('user', { id: 1, name: 'Alice' }, 3_600_000); // expires in 1 h
- * const user = store.get<{ id: number; name: string }>('user');
+ * store.set('preferences', { theme: 'light' }, 3_600_000); // expires in 1 h
+ * const preferences = store.get<{ theme: string }>('preferences');
  * ```
  */
 export class StorageManager {
@@ -18,6 +18,9 @@ export class StorageManager {
      *
      * @param storage - The `Storage` backend to use. Defaults to
      *   `localStorage`.
+     *
+     * @warning Do not use browser storage for session tokens, passwords,
+     *   API keys, or other secrets. Any XSS issue in the host app can expose them.
      */
     constructor(private storage: Storage = localStorage) {}
 
@@ -32,7 +35,7 @@ export class StorageManager {
      *
      * @example
      * ```typescript
-     * store.set('token', 'abc123', 60_000); // expires in 60 s
+     * store.set('preferences', { compactMode: true }, 60_000);
      * ```
      */
     set<T>(key: string, value: T, ttlMs?: number) {

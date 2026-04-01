@@ -11,6 +11,48 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - No changes yet.
 
+## [3.0.0] - 2026-04-01
+
+### Security
+
+- **ApiClient** now sanitizes request payloads, response payloads, and serialized error details before they reach logs or stringified error output.
+  - Why: the previous behavior could leak tokens, passwords, cookies, API keys, or other secrets into logs and telemetry sinks.
+  - Impact: `ApiError#details`, `ApiError#toJSON()`, and `ApiError#toString()` no longer expose raw payloads by default.
+- **CryptoUtils** no longer falls back to `simpleHash()` when secure hashing is unavailable, and `hmac()` no longer returns an empty string on crypto backend failure.
+  - Why: silent degradation to weak or ambiguous behavior is unsafe for callers that assume cryptographic guarantees.
+  - Impact: these methods now throw when a real crypto backend is not available.
+- **CLI remote fetches** (`--type`, `--swagger`, simple fetch mode) now reject insecure remote `http://` endpoints.
+  - Why: code generation and inspection commands should not fetch schemas or data from plaintext remote origins by default.
+  - Impact: only `https://` is allowed for remote hosts; `http://localhost` and loopback addresses remain allowed for local development.
+- **Type generators** now sanitize schema names, refs, interface names, and property keys produced from remote responses/specifications.
+  - Why: remote input must be treated as untrusted; previously, malformed or hostile field names could generate invalid or unsafe TypeScript.
+  - Impact: generated type names and property declarations may differ from previous versions.
+
+### Breaking Changes
+
+- `ApiError#details`, `ApiError#toJSON()`, and `ApiError#toString()` are now safe-by-default and may redact or truncate payload data that was previously visible.
+- `ApiClient` debug logging no longer emits raw request or response payloads by default.
+- `CryptoUtils.hash()` now throws instead of falling back to non-cryptographic hashing.
+- `CryptoUtils.hmac()` now throws instead of returning an empty string when secure crypto is unavailable.
+- CLI commands that fetch remote resources now reject non-local `http://` URLs.
+- Generated TypeScript names may change for unsafe, reserved, or malformed remote schema/property names.
+
+### Migration Notes
+
+- If you relied on raw payloads in logs, opt in explicitly through `logSensitiveData: true` and restrict that to local debugging only.
+- If you serialize `ApiError` objects, update consumers to expect sanitized `body` content instead of raw payloads.
+- If you depended on `CryptoUtils.hash()` succeeding in restricted runtimes, ensure `crypto.subtle` or Node's crypto backend is available before calling it.
+- If your automation uses remote `http://` specs or endpoints, move them behind `https://` or run them on loopback during local development.
+- If you snapshot generated types, refresh snapshots after the new identifier sanitization rules.
+
+### Why This Changed
+
+- This major release hardens bytekit against the two most common library-level security regressions in HTTP/tooling packages:
+  - sensitive data leaking into logs and serialized errors,
+  - trusting remote schema/input values too much during code generation.
+- The cryptography changes make failure explicit. Returning weak hashes or ambiguous empty HMACs is worse than failing fast because consumers may falsely believe data is protected.
+- The CLI changes treat remote network input as untrusted by default and bring transport security enforcement in line with the fact that these commands can generate code that ships to production.
+
 ## [2.5.3] - 2026-03-31
 
 ### Changed

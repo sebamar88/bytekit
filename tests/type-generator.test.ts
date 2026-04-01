@@ -112,3 +112,66 @@ test("inferArrayElementType returns 'unknown' for empty array (lines 176-177)", 
         await fs.rm(tempDir, { recursive: true, force: true });
     }
 });
+
+test("generateTypesFromEndpoint sanitizes unsafe property names", async () => {
+    const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "sutils-gen-"));
+    const originalCwd = process.cwd();
+    const originalFetch = globalThis.fetch;
+
+    try {
+        process.chdir(tempDir);
+        globalThis.fetch = async () => ({
+            ok: true,
+            status: 200,
+            json: async () => ({
+                "user-name": "Juan",
+                default: true,
+                "1password": "secret",
+            }),
+        });
+
+        await generateTypesFromEndpoint({
+            endpoint: "https://api.example.com/user",
+            output: "types.ts",
+            name: "Unsafe User",
+        });
+
+        const output = await readFile(path.join(tempDir, "types.ts"));
+        assert.ok(output.includes("export interface UnsafeUser"));
+        assert.ok(output.includes('"user-name": string;'));
+        assert.ok(output.includes('"default": boolean;'));
+        assert.ok(output.includes('"1password": string;'));
+    } finally {
+        globalThis.fetch = originalFetch;
+        process.chdir(originalCwd);
+        await fs.rm(tempDir, { recursive: true, force: true });
+    }
+});
+
+test("generateTypesFromEndpoint falls back to unknown for unsupported top-level values", async () => {
+    const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "sutils-gen-"));
+    const originalCwd = process.cwd();
+    const originalFetch = globalThis.fetch;
+
+    try {
+        process.chdir(tempDir);
+        globalThis.fetch = async () => ({
+            ok: true,
+            status: 200,
+            json: async () => BigInt(42),
+        });
+
+        await generateTypesFromEndpoint({
+            endpoint: "https://api.example.com/odd-value",
+            output: "types-top-level.ts",
+            name: "OddValue",
+        });
+
+        const output = await readFile(path.join(tempDir, "types-top-level.ts"));
+        assert.ok(output.includes("type OddValue = unknown;"));
+    } finally {
+        globalThis.fetch = originalFetch;
+        process.chdir(originalCwd);
+        await fs.rm(tempDir, { recursive: true, force: true });
+    }
+});

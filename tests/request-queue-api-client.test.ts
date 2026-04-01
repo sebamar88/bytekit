@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, afterEach } from "vitest";
 import { ApiClient } from "../src/utils/core/ApiClient";
+import { RequestQueue } from "../src/utils/async/request-queue";
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -132,5 +133,32 @@ describe("ApiClient — RequestQueue & RequestBatcher integration (US4)", () => 
 
         expect(mock.getMaxConcurrent()).toBeLessThanOrEqual(2);
         expect(mock.getTotalCalls()).toBe(6);
+    });
+
+    it("RequestQueue exposes queued ids across priority lanes", () => {
+        const queue = new RequestQueue({ concurrency: 1 });
+
+        void queue.add(async () => "first", { priority: "high" });
+        void queue.add(async () => "second", { priority: "normal" });
+        void queue.add(async () => "third", { priority: "low" });
+
+        expect(queue._queuedIds()).toEqual(["2", "3"]);
+    });
+
+    it("RequestQueue exposes queued high-priority ids", () => {
+        const queue = new RequestQueue({ concurrency: 1 });
+
+        let release!: () => void;
+        void queue.add(
+            async () =>
+                new Promise<string>((resolve) => {
+                    release = () => resolve("running");
+                })
+        );
+        void queue.add(async () => "queued-high", { priority: "high" });
+
+        expect(queue._queuedIds()).toEqual(["2"]);
+
+        release();
     });
 });

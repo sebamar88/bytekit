@@ -71,6 +71,15 @@ test("CacheManager tracks statistics correctly", () => {
     assert.equal(stats.size, 1);
 });
 
+test("CacheManager reports zero hitRate before any lookups", () => {
+    const cache = new CacheManager();
+    const stats = cache.getStats();
+
+    assert.equal(stats.hits, 0);
+    assert.equal(stats.misses, 0);
+    assert.equal(stats.hitRate, 0);
+});
+
 test("CacheManager LocalStorage support", () => {
     globalThis.localStorage = new MockLocalStorage();
     const cache = new CacheManager({ enableLocalStorage: true });

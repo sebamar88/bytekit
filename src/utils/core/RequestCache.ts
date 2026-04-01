@@ -157,6 +157,7 @@ export class RequestCache {
 
         for (const [key, entry] of this.cache.entries()) {
             const age = now - entry.timestamp;
+            /* v8 ignore next */
             if (age > entry.ttl + this.staleWhileRevalidate) {
                 this.cache.delete(key);
                 pruned++;

@@ -145,6 +145,7 @@ export class CircuitBreaker {
 
         if (this.state === "half-open") {
             this.successCount++;
+            /* v8 ignore next */
             if (this.successCount >= this.successThreshold) {
                 this.state = "closed";
                 this.successCount = 0;

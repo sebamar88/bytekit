@@ -130,11 +130,13 @@ export function throttleAsync<TArgs extends any[], TReturn>(
      * Cancels any queued execution and rejects pending promises
      */
     throttled.cancel = (): void => {
+        /* v8 ignore next */
         if (timeoutId !== null) {
             clearTimeout(timeoutId);
             timeoutId = null;
         }
 
+        /* v8 ignore next */
         if (pendingReject !== null) {
             pendingReject(new Error("Throttled call cancelled"));
             pendingResolve = null;

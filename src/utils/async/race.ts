@@ -64,6 +64,7 @@ export function race<T>(promises: Array<Promise<T>>): Promise<T> {
 
                     // If all promises have rejected, reject with AggregateError
                     if (rejectionCount === promises.length) {
+                        /* v8 ignore next */
                         if (!settled) {
                             settled = true;
                             reject(

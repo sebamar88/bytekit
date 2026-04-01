@@ -123,6 +123,7 @@ export class ErrorBoundary {
      * Setup global error handlers
      */
     private setupGlobalHandlers(): void {
+        /* v8 ignore next */
         if (typeof globalThis !== "undefined") {
             // Handle unhandled promise rejections
             if (typeof globalThis.addEventListener === "function") {

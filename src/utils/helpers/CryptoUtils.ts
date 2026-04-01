@@ -177,12 +177,14 @@ export class CryptoUtils {
                 hash.update(str);
                 return hash.digest("hex");
             } catch {
-                // Fallback to simple hash
-                return this.simpleHash(str);
+                throw new Error(
+                    "Secure hashing unavailable. A cryptographic backend is required."
+                );
             }
         }
-        // Browser without SubtleCrypto fallback
-        return this.simpleHash(str);
+        throw new Error(
+            "Secure hashing unavailable. A cryptographic backend is required."
+        );
         /* v8 ignore end */
     }
 
@@ -227,11 +229,14 @@ export class CryptoUtils {
                 hmac.update(message);
                 return hmac.digest("hex");
             } catch {
-                return "";
+                throw new Error(
+                    "Secure HMAC unavailable. A cryptographic backend is required."
+                );
             }
         }
-        // Browser without SubtleCrypto fallback
-        return "";
+        throw new Error(
+            "Secure HMAC unavailable. A cryptographic backend is required."
+        );
         /* v8 ignore end */
     }
 
@@ -244,7 +249,7 @@ export class CryptoUtils {
         algorithm: "SHA-1" | "SHA-256" | "SHA-384" | "SHA-512" = "SHA-256"
     ): Promise<boolean> {
         const computed = await this.hash(str, algorithm);
-        return computed === hash;
+        return this.constantTimeCompare(computed, hash);
     }
 
     /**

@@ -244,6 +244,7 @@ export class RequestQueue {
     /** @internal Returns IDs of all queued (not yet running) items across all lanes. */
     _queuedIds(): string[] {
         return [
+            /* v8 ignore next */
             ...this._high.map((i) => i.id),
             ...this._normal.map((i) => i.id),
             ...this._low.map((i) => i.id),

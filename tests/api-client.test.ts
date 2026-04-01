@@ -276,21 +276,26 @@ test("ApiClient.getList merges pagination params with existing searchParams", as
 
 // ─── Coverage gap tests ───────────────────────────────────────────────────────
 
-test("ApiError.toString() includes body and ApiError.toJSON() returns details", () => {
+test("ApiError.toString() includes sanitized body and ApiError.toJSON() returns safe details", () => {
     const err = new ApiError(404, "Not Found", "Resource not found.", {
         id: 1,
+        token: "secret-token",
     });
     const str = err.toString();
     assert.match(str, /ApiError/);
     assert.match(str, /404/);
     assert.match(str, /Body/);
-    assert.match(str, /ApiError/);
+    assert.match(str, /REDACTED/);
 
     const json = err.toJSON();
     assert.equal(json.status, 404);
     assert.equal(json.statusText, "Not Found");
     assert.equal(json.message, "Resource not found.");
     assert.equal(json.isTimeout, false);
+    assert.equal(
+        (json.body as Record<string, unknown>).token,
+        "[REDACTED]"
+    );
     assert.ok(
         typeof json.stack === "string",
         "toJSON should include stack trace"
@@ -339,6 +344,31 @@ test("ApiError.toString() with string body uses string directly (line 164 TRUE b
     const str = err.toString();
     assert.match(str, /plain string body/);
     assert.match(str, /Body:/);
+});
+
+test("ApiError works when Error.captureStackTrace is unavailable", () => {
+    const originalCaptureStackTrace = Error.captureStackTrace;
+
+    try {
+        // @ts-expect-error - test override
+        Error.captureStackTrace = undefined;
+        const err = new ApiError(500, "Internal Server Error", "fallback");
+        assert.equal(err.name, "ApiError");
+        assert.equal(err.message, "fallback");
+    } finally {
+        Error.captureStackTrace = originalCaptureStackTrace;
+    }
+});
+
+test("ApiError.toString() omits stack when stack is unavailable", () => {
+    const err = new ApiError(500, "Internal Server Error", "no stack");
+    // @ts-expect-error - test override
+    err.stack = "";
+
+    const str = err.toString();
+
+    assert.equal(/at /.test(str), false);
+    assert.match(str, /Status: 500 Internal Server Error/);
 });
 
 test("createApiClient factory returns a working ApiClient instance", async () => {
@@ -502,6 +532,75 @@ test("ApiClient logHeaders logs and redacts sensitive headers", async () => {
         .headers;
     assert.equal(headers["authorization"], "[REDACTED]");
     assert.equal(headers["x-custom"], "visible");
+});
+
+test("ApiClient sanitizes request and response payloads in logs by default", async () => {
+    const logCalls: Array<Record<string, unknown>> = [];
+    const mockLogger = {
+        debug: (_msg: string, meta: Record<string, unknown>) => {
+            logCalls.push(meta);
+        },
+        error: () => {},
+        warn: () => {},
+        info: () => {},
+    };
+    const fetchImpl = async () =>
+        jsonResponse({ token: "response-secret", profile: { password: "p4ss" } });
+    const client = new ApiClient({
+        baseUrl: "https://api.example.com",
+        fetchImpl,
+        // @ts-expect-error test logger
+        logger: mockLogger,
+    });
+
+    await client.post("/path", {
+        token: "request-secret",
+        nested: { apiKey: "k-123" },
+    });
+
+    const requestLog = logCalls.find((entry) => "body" in entry)!;
+    const responseLog = logCalls.find((entry) => "data" in entry)!;
+    assert.equal(
+        ((requestLog.body as Record<string, unknown>).nested as Record<string, unknown>).apiKey,
+        "[REDACTED]"
+    );
+    assert.equal(
+        (responseLog.data as Record<string, unknown>).token,
+        "[REDACTED]"
+    );
+});
+
+test("ApiClient can opt into sensitive payload logging", async () => {
+    const logCalls: Array<Record<string, unknown>> = [];
+    const mockLogger = {
+        debug: (_msg: string, meta: Record<string, unknown>) => {
+            logCalls.push(meta);
+        },
+        error: () => {},
+        warn: () => {},
+        info: () => {},
+    };
+    const fetchImpl = async () => jsonResponse({ token: "visible-response" });
+    const client = new ApiClient({
+        baseUrl: "https://api.example.com",
+        fetchImpl,
+        // @ts-expect-error test logger
+        logger: mockLogger,
+        logSensitiveData: true,
+    });
+
+    await client.post("/path", { token: "visible-request" });
+
+    const requestLog = logCalls.find((entry) => "body" in entry)!;
+    const responseLog = logCalls.find((entry) => "data" in entry)!;
+    assert.equal(
+        (requestLog.body as Record<string, unknown>).token,
+        "visible-request"
+    );
+    assert.equal(
+        (responseLog.data as Record<string, unknown>).token,
+        "visible-response"
+    );
 });
 
 test("ApiClient pipeline option post-processes response data", async () => {

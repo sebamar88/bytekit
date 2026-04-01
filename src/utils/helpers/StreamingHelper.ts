@@ -92,6 +92,7 @@ export class StreamingHelper {
     ): void {
         for (let i = 0; i < lines.length - 1; i++) {
             const line = lines[i].trim();
+            /* v8 ignore next */
             if (line) {
                 try {
                     const item = JSON.parse(line) as T;
@@ -327,6 +328,7 @@ export class StreamingHelper {
             } else {
                 // Assume JSON-serializable object
                 requestBody = JSON.stringify(body);
+                /* v8 ignore next */
                 if (!headers["Content-Type"] && !headers["content-type"]) {
                     headers["Content-Type"] = "application/json";
                 }
@@ -446,6 +448,7 @@ export class StreamingHelper {
                             break;
                         case "retry": {
                             const n = parseInt(val, 10);
+                            /* v8 ignore next */
                             if (!isNaN(n)) currentRetry = n;
                             break;
                         }

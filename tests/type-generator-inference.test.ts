@@ -44,7 +44,7 @@ describe("type-generator inference branches", () => {
     it("inferType(null) → type X = null", async () => {
         mockFetch(null);
         await generateTypesFromEndpoint({
-            endpoint: "http://x.com",
+            endpoint: "https://x.com",
             output: "out.ts",
             name: "X",
         });
@@ -55,7 +55,7 @@ describe("type-generator inference branches", () => {
     it("inferType(undefined) → type X = undefined", async () => {
         mockFetch(undefined);
         await generateTypesFromEndpoint({
-            endpoint: "http://x.com",
+            endpoint: "https://x.com",
             output: "out.ts",
             name: "X",
         });
@@ -66,7 +66,7 @@ describe("type-generator inference branches", () => {
     it("inferType(boolean) → type X = boolean", async () => {
         mockFetch(true);
         await generateTypesFromEndpoint({
-            endpoint: "http://x.com",
+            endpoint: "https://x.com",
             output: "out.ts",
             name: "X",
         });
@@ -77,7 +77,7 @@ describe("type-generator inference branches", () => {
     it("inferType(number) → type X = number", async () => {
         mockFetch(42);
         await generateTypesFromEndpoint({
-            endpoint: "http://x.com",
+            endpoint: "https://x.com",
             output: "out.ts",
             name: "X",
         });
@@ -88,7 +88,7 @@ describe("type-generator inference branches", () => {
     it("inferType(string) → type X = string", async () => {
         mockFetch("hello");
         await generateTypesFromEndpoint({
-            endpoint: "http://x.com",
+            endpoint: "https://x.com",
             output: "out.ts",
             name: "X",
         });
@@ -99,7 +99,7 @@ describe("type-generator inference branches", () => {
     it("inferType([]) → type X = unknown[]", async () => {
         mockFetch([]);
         await generateTypesFromEndpoint({
-            endpoint: "http://x.com",
+            endpoint: "https://x.com",
             output: "out.ts",
             name: "X",
         });
@@ -110,7 +110,7 @@ describe("type-generator inference branches", () => {
     it("inferType([1, 2]) → type X = number[]", async () => {
         mockFetch([1, 2]);
         await generateTypesFromEndpoint({
-            endpoint: "http://x.com",
+            endpoint: "https://x.com",
             output: "out.ts",
             name: "X",
         });
@@ -121,7 +121,7 @@ describe("type-generator inference branches", () => {
     it("inferType([1, 'str']) → union type (number | string)[]", async () => {
         mockFetch([1, "str"]);
         await generateTypesFromEndpoint({
-            endpoint: "http://x.com",
+            endpoint: "https://x.com",
             output: "out.ts",
             name: "X",
         });
@@ -134,7 +134,7 @@ describe("type-generator inference branches", () => {
     it("inferInlineType(undefined) in object field → undefined type", async () => {
         mockFetch({ undef: undefined });
         await generateTypesFromEndpoint({
-            endpoint: "http://x.com",
+            endpoint: "https://x.com",
             output: "out.ts",
             name: "R",
         });
@@ -145,7 +145,7 @@ describe("type-generator inference branches", () => {
     it("inferInlineType(boolean) in object field → boolean type", async () => {
         mockFetch({ active: true });
         await generateTypesFromEndpoint({
-            endpoint: "http://x.com",
+            endpoint: "https://x.com",
             output: "out.ts",
             name: "R",
         });
@@ -156,7 +156,7 @@ describe("type-generator inference branches", () => {
     it("inferInlineType(number) in object field → number type", async () => {
         mockFetch({ count: 7 });
         await generateTypesFromEndpoint({
-            endpoint: "http://x.com",
+            endpoint: "https://x.com",
             output: "out.ts",
             name: "R",
         });
@@ -167,7 +167,7 @@ describe("type-generator inference branches", () => {
     it("inferInlineType([]) in object field → unknown[]", async () => {
         mockFetch({ items: [] });
         await generateTypesFromEndpoint({
-            endpoint: "http://x.com",
+            endpoint: "https://x.com",
             output: "out.ts",
             name: "R",
         });
@@ -178,7 +178,7 @@ describe("type-generator inference branches", () => {
     it("inferInlineType(mixed-array) → union element type", async () => {
         mockFetch({ vals: [1, "two", true] });
         await generateTypesFromEndpoint({
-            endpoint: "http://x.com",
+            endpoint: "https://x.com",
             output: "out.ts",
             name: "R",
         });
@@ -192,7 +192,7 @@ describe("type-generator inference branches", () => {
     it("buildInlineObjectType({}) in object field → {} inline type", async () => {
         mockFetch({ meta: {} });
         await generateTypesFromEndpoint({
-            endpoint: "http://x.com",
+            endpoint: "https://x.com",
             output: "out.ts",
             name: "R",
         });
@@ -204,7 +204,7 @@ describe("type-generator inference branches", () => {
     it("buildInlineObjectType with nested properties → inline object type", async () => {
         mockFetch({ address: { city: "Madrid", zip: "28000" } });
         await generateTypesFromEndpoint({
-            endpoint: "http://x.com",
+            endpoint: "https://x.com",
             output: "out.ts",
             name: "R",
         });
@@ -222,13 +222,13 @@ describe("type-generator inference branches", () => {
         });
         globalThis.fetch = spy;
         await generateTypesFromEndpoint({
-            endpoint: "http://x.com/api",
+            endpoint: "https://x.com/api",
             output: "out.ts",
             method: "POST",
             body: '{"x":1}',
         });
         expect(spy).toHaveBeenCalledWith(
-            "http://x.com/api",
+            new URL("https://x.com/api"),
             expect.objectContaining({ body: '{"x":1}', method: "POST" })
         );
     });
@@ -242,12 +242,12 @@ describe("type-generator inference branches", () => {
         });
         globalThis.fetch = spy;
         await generateTypesFromEndpoint({
-            endpoint: "http://x.com/api",
+            endpoint: "https://x.com/api",
             output: "out.ts",
             headers: { Authorization: "Bearer tok" },
         });
         expect(spy).toHaveBeenCalledWith(
-            "http://x.com/api",
+            new URL("https://x.com/api"),
             expect.objectContaining({
                 headers: expect.objectContaining({
                     Authorization: "Bearer tok",

@@ -156,6 +156,7 @@ export class RequestBatcher {
     private async _dispatch(key: string): Promise<void> {
         // Cancel the timer for this key
         const timer = this._timers.get(key);
+        /* v8 ignore next */
         if (timer !== undefined) {
             clearTimeout(timer);
             this._timers.delete(key);

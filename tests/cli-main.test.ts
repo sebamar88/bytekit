@@ -26,13 +26,19 @@ describe("CLI main entry", () => {
         exitSpy.mockRestore();
     });
 
-    it("should handle version command", async () => {
-        const spy = vi.spyOn(console, "log").mockImplementation(() => {});
+    it("should error on unsupported --version flag", async () => {
+        const spy = vi.spyOn(console, "error").mockImplementation(() => {});
         const exitSpy = vi.spyOn(process, "exit").mockImplementation(() => {
-            return undefined as never;
+            throw new Error("exit");
         });
-        await runCli(["--version"]);
-        expect(spy).toHaveBeenCalled();
+
+        try {
+            await runCli(["--version"]);
+        } catch {
+            // ignore exit error
+        }
+
+        expect(spy).toHaveBeenCalledWith(expect.stringContaining("Missing URL"));
         spy.mockRestore();
         exitSpy.mockRestore();
     });
@@ -44,25 +50,24 @@ describe("CLI main entry", () => {
         spy.mockRestore();
     });
 
-    it("should handle create command", async () => {
-        const spy = vi.spyOn(console, "log").mockImplementation(() => {});
+    it("should error on unsupported create command", async () => {
+        const spy = vi.spyOn(console, "error").mockImplementation(() => {});
         const exitSpy = vi.spyOn(process, "exit").mockImplementation(() => {
-            return undefined as never;
+            throw new Error("exit");
         });
-        // Simular que falla la URL para que no intente fetch real
-        await runCli(["create", "test-item"]);
-        expect(exitSpy).toHaveBeenCalled();
+
+        await expect(runCli(["create", "test-item"])).rejects.toThrow();
         spy.mockRestore();
         exitSpy.mockRestore();
     });
 
-    it("should handle resource command", async () => {
-        const spy = vi.spyOn(console, "log").mockImplementation(() => {});
+    it("should error on unsupported resource command", async () => {
+        const spy = vi.spyOn(console, "error").mockImplementation(() => {});
         const exitSpy = vi.spyOn(process, "exit").mockImplementation(() => {
-            return undefined as never;
+            throw new Error("exit");
         });
-        await runCli(["resource", "user"]);
-        expect(exitSpy).toHaveBeenCalled();
+
+        await expect(runCli(["resource", "user"])).rejects.toThrow();
         spy.mockRestore();
         exitSpy.mockRestore();
     });

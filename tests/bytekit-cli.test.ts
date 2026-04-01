@@ -2,7 +2,6 @@ import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
-import { execSync } from "node:child_process";
 import { expect, test, describe, beforeEach, afterEach } from "vitest";
 
 /**
@@ -12,42 +11,35 @@ import { expect, test, describe, beforeEach, afterEach } from "vitest";
 describe("bytekit CLI Integration", () => {
     let tempDir: string;
     let originalCwd: string;
+    let originalFetch: typeof globalThis.fetch;
 
     beforeEach(async () => {
         tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "bytekit-cli-test-"));
         originalCwd = process.cwd();
+        originalFetch = globalThis.fetch;
     });
 
     afterEach(async () => {
+        globalThis.fetch = originalFetch;
         process.chdir(originalCwd);
         await fs.rm(tempDir, { recursive: true, force: true });
     });
 
     test("should generate types from an API endpoint", async () => {
-        // We use a small inline script to run the CLI with a mocked fetch
-        const scriptPath = path.join(tempDir, "run-test.js");
         // Convert to file:// URL for Windows compatibility in ESM imports
         const cliUrl = pathToFileURL(
             path.join(originalCwd, "dist/cli/index.js")
         ).href;
-
-        const script = `
-            import { runCli } from "${cliUrl}";
-            globalThis.fetch = async () => ({
-                ok: true,
-                status: 200,
-                headers: new Headers({ "content-type": "application/json" }),
-                json: async () => ({ id: 1, name: "ByteKit" }),
-            });
-            runCli(["--type", "https://api.example.com/info"]).catch(err => {
-                console.error(err);
-                process.exit(1);
-            });
-        `;
-        await fs.writeFile(scriptPath, script);
+        const { runCli } = await import(cliUrl);
+        globalThis.fetch = async () => ({
+            ok: true,
+            status: 200,
+            headers: new Headers({ "content-type": "application/json" }),
+            json: async () => ({ id: 1, name: "ByteKit" }),
+        });
 
         process.chdir(tempDir);
-        execSync(`node ${scriptPath}`);
+        await runCli(["--type", "https://api.example.com/info"]);
 
         const typeFile = await fs.readFile(
             path.join(tempDir, "src", "types", "info.ts"),
@@ -58,35 +50,26 @@ describe("bytekit CLI Integration", () => {
     });
 
     test("should generate types from a Swagger specification", async () => {
-        const scriptPath = path.join(tempDir, "run-swagger.js");
         const cliUrl = pathToFileURL(
             path.join(originalCwd, "dist/cli/index.js")
         ).href;
-
-        const script = `
-            import { runCli } from "${cliUrl}";
-            globalThis.fetch = async () => ({
-                ok: true,
-                status: 200,
-                headers: new Headers({ "content-type": "application/json" }),
-                json: async () => ({
-                    openapi: "3.0.0",
-                    components: { 
-                        schemas: { 
-                            User: { type: "object", properties: { login: { type: "string" } } } 
-                        } 
-                    }
-                }),
-            });
-            runCli(["--swagger", "https://api.example.com/docs"]).catch(err => {
-                console.error(err);
-                process.exit(1);
-            });
-        `;
-        await fs.writeFile(scriptPath, script);
+        const { runCli } = await import(cliUrl);
+        globalThis.fetch = async () => ({
+            ok: true,
+            status: 200,
+            headers: new Headers({ "content-type": "application/json" }),
+            json: async () => ({
+                openapi: "3.0.0",
+                components: {
+                    schemas: {
+                        User: { type: "object", properties: { login: { type: "string" } } },
+                    },
+                },
+            }),
+        });
 
         process.chdir(tempDir);
-        execSync(`node ${scriptPath}`);
+        await runCli(["--swagger", "https://api.example.com/docs"]);
 
         const swaggerFile = await fs.readFile(
             path.join(tempDir, "src", "types", "api-docs.ts"),
@@ -97,22 +80,13 @@ describe("bytekit CLI Integration", () => {
     });
 
     test("should generate DDD folder structure", async () => {
-        const scriptPath = path.join(tempDir, "run-ddd.js");
         const cliUrl = pathToFileURL(
             path.join(originalCwd, "dist/cli/index.js")
         ).href;
-
-        const script = `
-            import { runCli } from "${cliUrl}";
-            runCli(["--ddd", "--domain=TestContext", "--port=OrderRepository"]).catch(err => {
-                console.error(err);
-                process.exit(1);
-            });
-        `;
-        await fs.writeFile(scriptPath, script);
+        const { runCli } = await import(cliUrl);
 
         process.chdir(tempDir);
-        execSync(`node ${scriptPath}`);
+        await runCli(["--ddd", "--domain=TestContext", "--port=OrderRepository"]);
 
         const outbound = await fs.readFile(
             path.join(
@@ -132,27 +106,18 @@ describe("bytekit CLI Integration", () => {
     });
 
     test("should generate entity, repository interface and use cases when --actions is provided", async () => {
-        const scriptPath = path.join(tempDir, "run-ddd-actions.js");
         const cliUrl = pathToFileURL(
             path.join(originalCwd, "dist/cli/index.js")
         ).href;
-
-        const script = `
-            import { runCli } from "${cliUrl}";
-            runCli([
-                "--ddd",
-                "--domain=Product",
-                "--port=ProductRepository",
-                "--actions=create,findById,update",
-            ]).catch(err => {
-                console.error(err);
-                process.exit(1);
-            });
-        `;
-        await fs.writeFile(scriptPath, script);
+        const { runCli } = await import(cliUrl);
 
         process.chdir(tempDir);
-        execSync(`node ${scriptPath}`);
+        await runCli([
+            "--ddd",
+            "--domain=Product",
+            "--port=ProductRepository",
+            "--actions=create,findById,update",
+        ]);
 
         // Entity
         const entityFile = await fs.readFile(
@@ -231,27 +196,18 @@ describe("bytekit CLI Integration", () => {
     });
 
     test("should import ApiClient from bytekit when --bytekit flag is set", async () => {
-        const scriptPath = path.join(tempDir, "run-ddd-bytekit.js");
         const cliUrl = pathToFileURL(
             path.join(originalCwd, "dist/cli/index.js")
         ).href;
-
-        const script = `
-            import { runCli } from "${cliUrl}";
-            runCli([
-                "--ddd",
-                "--domain=Order",
-                "--port=OrderRepository",
-                "--actions=create,findAll,delete",
-            ]).catch(err => {
-                console.error(err);
-                process.exit(1);
-            });
-        `;
-        await fs.writeFile(scriptPath, script);
+        const { runCli } = await import(cliUrl);
 
         process.chdir(tempDir);
-        execSync(`node ${scriptPath}`);
+        await runCli([
+            "--ddd",
+            "--domain=Order",
+            "--port=OrderRepository",
+            "--actions=create,findAll,delete",
+        ]);
 
         const httpRepo = await fs.readFile(
             path.join(

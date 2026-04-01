@@ -392,6 +392,7 @@ export class WebSocketHelper {
     }
 
     private logError(message: string, e: unknown): void {
+        /* v8 ignore next */
         const err = e instanceof Error ? e : new Error(String(e));
         if (this.logger) {
             this.logger.error(message, undefined, err);

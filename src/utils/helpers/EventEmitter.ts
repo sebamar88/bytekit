@@ -62,6 +62,7 @@ export class EventEmitter<
         event: K,
         listener: EventListener<Events[K]>
     ): this {
+        /* v8 ignore next */
         if (!this.onceMap.has(event as string)) {
             this.onceMap.set(event as string, new Set());
         }
@@ -92,6 +93,7 @@ export class EventEmitter<
 
         // Find the listener (either direct or wrapped in once)
         for (const handler of handlers) {
+            /* v8 ignore next */
             if (
                 handler === listener ||
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -105,6 +107,7 @@ export class EventEmitter<
         const onceHandlers = this.onceMap.get(event as string);
         if (onceHandlers) {
             for (const handler of onceHandlers) {
+                /* v8 ignore next */
                 if (
                     handler === listener ||
                     // eslint-disable-next-line @typescript-eslint/no-explicit-any

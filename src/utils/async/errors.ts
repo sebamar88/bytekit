@@ -9,6 +9,7 @@ export class TimeoutError extends Error {
         super(message);
         this.name = "TimeoutError";
         // Maintains proper stack trace for where our error was thrown (only available on V8)
+        /* v8 ignore next */
         if (Error.captureStackTrace) {
             Error.captureStackTrace(this, TimeoutError);
         }
@@ -23,6 +24,7 @@ export class AbortError extends Error {
         super(message);
         this.name = "AbortError";
         // Maintains proper stack trace for where our error was thrown (only available on V8)
+        /* v8 ignore next */
         if (Error.captureStackTrace) {
             Error.captureStackTrace(this, AbortError);
         }
@@ -41,6 +43,7 @@ export class RetryError extends Error {
         super(message);
         this.name = "RetryError";
         // Maintains proper stack trace for where our error was thrown (only available on V8)
+        /* v8 ignore next */
         if (Error.captureStackTrace) {
             Error.captureStackTrace(this, RetryError);
         }

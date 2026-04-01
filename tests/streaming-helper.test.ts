@@ -77,6 +77,41 @@ test("StreamingHelper.streamJsonLines handles fetch errors", async () => {
     globalThis.fetch = originalFetch;
 });
 
+test("StreamingHelper.streamJsonLines aborts when timeout elapses", async () => {
+    vi.useFakeTimers();
+
+    try {
+        globalThis.fetch = vi.fn((_url: string, init: RequestInit) => {
+            return new Promise((_resolve, reject) => {
+                init.signal?.addEventListener("abort", () => {
+                    reject(new Error("ndjson timeout"));
+                });
+            });
+        });
+
+        let captured: Error | null = null;
+        const pending = StreamingHelper.streamJsonLines(
+            "https://api.example.com/stream",
+            {
+                timeout: 5,
+                onError: (error) => {
+                    captured = error;
+                },
+            }
+        );
+
+        await vi.advanceTimersByTimeAsync(10);
+        const result = await pending;
+
+        assert.equal(result.complete, false);
+        assert.equal(result.error?.message, "ndjson timeout");
+        assert.equal(captured?.message, "ndjson timeout");
+    } finally {
+        vi.useRealTimers();
+        globalThis.fetch = originalFetch;
+    }
+});
+
 test("StreamingHelper.downloadStream tracks progress", async () => {
     const data = "a".repeat(1024); // 1KB
     const chunks = [data.slice(0, 512), data.slice(512)];
@@ -292,6 +327,42 @@ test("StreamingHelper.downloadStream handles empty body", async () => {
 
     assert.equal(errorCalled, true);
     globalThis.fetch = originalFetch;
+});
+
+test("StreamingHelper.downloadStream aborts when timeout elapses", async () => {
+    vi.useFakeTimers();
+
+    try {
+        globalThis.fetch = vi.fn((_url: string, init: RequestInit) => {
+            return new Promise((_resolve, reject) => {
+                init.signal?.addEventListener("abort", () => {
+                    reject(new Error("download timeout"));
+                });
+            });
+        });
+
+        let captured: Error | null = null;
+        const pending = assert.rejects(
+            () =>
+                StreamingHelper.downloadStream(
+                    "https://api.example.com/download",
+                    {
+                        timeout: 5,
+                        onError: (error) => {
+                            captured = error;
+                        },
+                    }
+                ),
+            /download timeout/
+        );
+
+        await vi.advanceTimersByTimeAsync(10);
+        await pending;
+        assert.equal(captured?.message, "download timeout");
+    } finally {
+        vi.useRealTimers();
+        globalThis.fetch = originalFetch;
+    }
 });
 
 test("StreamingHelper.streamSSE warns on parse error", async () => {
@@ -920,6 +991,27 @@ test("downloadStream: fetch error without onError handler — throws directly (l
     );
     delete (globalThis as any).fetch;
 });
+
+test("downloadStream: non-Error failures are wrapped before onError and rethrow", async () => {
+    globalThis.fetch = vi.fn().mockRejectedValue("raw failure");
+
+    let captured: Error | null = null;
+    await assert.rejects(
+        () =>
+            StreamingHelper.downloadStream("https://example.com/raw-fail.bin", {
+                onError: (error) => {
+                    captured = error;
+                },
+            }),
+        /raw failure/
+    );
+
+    assert.ok(captured instanceof Error);
+    assert.equal(captured?.message, "raw failure");
+
+    delete (globalThis as any).fetch;
+});
+
 test("fetchSSE: stream ends with no pending event — flushed is null, no yield (line 378 FALSE)", async () => {
     // SSE stream: a complete event is dispatched on the blank line,
     // then stream ends with empty currentData. flushSSEEvent returns null → if (flushed) is FALSE

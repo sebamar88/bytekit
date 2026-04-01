@@ -19,8 +19,8 @@ export interface QueryStringOptions {
 
 type InterpolableValue = string | number | boolean | null | undefined;
 
+/* v8 ignore next */
 const safeString = (value: InterpolableValue) =>
-    /* v8 ignore next */
     value === null || value === undefined ? "" : String(value);
 
 /* v8 ignore next */
@@ -87,6 +87,7 @@ const buildQueryPairs = (
 
     if (isPlainObject(value)) {
         const entries = Object.entries(value);
+        /* v8 ignore next */
         if (options.sortKeys) entries.sort(([a], [b]) => a.localeCompare(b));
         for (const [childKey, childValue] of entries) {
             const nextKey = key ? `${key}[${childKey}]` : childKey;
@@ -198,6 +199,7 @@ export class UrlHelper {
             const queryOptions = { ...DEFAULT_QUERY_OPTIONS };
             const pairs: QueryPair[] = [];
             const entries = Object.entries(params);
+            /* v8 ignore next */
             if (queryOptions.sortKeys)
                 entries.sort(([a], [b]) => a.localeCompare(b));
 

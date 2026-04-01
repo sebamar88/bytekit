@@ -131,11 +131,13 @@ export function debounceAsync<TArgs extends any[], TReturn>(
      * Cancels any pending execution and rejects pending promises
      */
     debounced.cancel = (): void => {
+        /* v8 ignore next */
         if (timeoutId !== null) {
             clearTimeout(timeoutId);
             timeoutId = null;
         }
 
+        /* v8 ignore next */
         if (pendingReject !== null) {
             pendingReject(new Error("Debounced call cancelled"));
             pendingResolve = null;

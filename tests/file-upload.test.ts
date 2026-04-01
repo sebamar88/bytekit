@@ -44,6 +44,17 @@ test("FileUploadHelper.validateFile validates file extension", () => {
     assert.match(result.error || "", /extension .pdf is not allowed/);
 });
 
+test("FileUploadHelper.validateFile rejects missing file extension", () => {
+    // @ts-expect-error - Test type override
+    const mockFile = { size: 1000, name: "README", type: "text/plain" };
+    const result = FileUploadHelper.validateFile(mockFile, {
+        allowedExtensions: ["txt"],
+    });
+
+    assert.equal(result.valid, false);
+    assert.match(result.error || "", /extension .readme is not allowed/);
+});
+
 test("FileUploadHelper.validateFile passes for valid file", () => {
     // @ts-expect-error - Test type override
     const mockFile = { size: 1000, name: "image.jpg", type: "image/jpeg" };
@@ -479,4 +490,38 @@ test("FileUploadHelper.uploadFile uses 'Upload failed' when fetch throws a non-E
     assert.equal(result.error, "Upload failed");
 
     globalThis.fetch = originalFetch;
+});
+
+test("FileUploadHelper.uploadFile aborts a chunk request when timeout elapses", async () => {
+    vi.useFakeTimers();
+
+    try {
+        globalThis.fetch = vi.fn((_input, init?: RequestInit) => {
+            return new Promise((_resolve, reject) => {
+                init?.signal?.addEventListener("abort", () => {
+                    reject(new Error("chunk aborted"));
+                });
+            });
+        });
+
+        const blob = new Blob(["timeout"], { type: "text/plain" });
+        const pending = FileUploadHelper.uploadFile(
+            blob,
+            "https://api.example.com/upload",
+            {
+                chunkSize: 1024,
+                maxRetries: 1,
+                timeout: 5,
+            }
+        );
+
+        await vi.advanceTimersByTimeAsync(10);
+        const result = await pending;
+
+        assert.equal(result.success, false);
+        assert.equal(result.error, "chunk aborted");
+    } finally {
+        vi.useRealTimers();
+        globalThis.fetch = originalFetch;
+    }
 });

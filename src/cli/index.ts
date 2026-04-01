@@ -1,6 +1,11 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import {
+    assertSecureRemoteUrl,
+    sanitizeFileSegment,
+    sanitizeTypeName,
+} from "./security.js";
 import { generateDddBoilerplate } from "./ddd-boilerplate.js";
 import { generateTypesFromEndpoint } from "./type-generator.js";
 import { generateFromSwagger } from "./swagger-generator.js";
@@ -164,16 +169,19 @@ export async function runCli(argv: string[]): Promise<void> {
 async function handleTypeGeneration(
     options: CliOptions & { url: string }
 ): Promise<void> {
-    const url = new URL(options.url);
+    const url = assertSecureRemoteUrl(options.url, "CLI type generation");
     const endpointName = url.pathname.split("/").filter(Boolean).pop() || "api";
 
     // Create src/types directory if it doesn't exist
     const typesDir = path.join(process.cwd(), "src", "types");
     await fs.mkdir(typesDir, { recursive: true });
 
-    const outputPath = path.join("src", "types", `${endpointName}.ts`);
-    const interfaceName =
-        endpointName.charAt(0).toUpperCase() + endpointName.slice(1);
+    const outputPath = path.join(
+        "src",
+        "types",
+        `${sanitizeFileSegment(endpointName, "api")}.ts`
+    );
+    const interfaceName = sanitizeTypeName(endpointName, "ApiResponse");
 
     await generateTypesFromEndpoint({
         endpoint: options.url,
@@ -188,9 +196,10 @@ async function handleTypeGeneration(
 async function handleSimpleFetch(
     options: CliOptions & { url: string }
 ): Promise<void> {
-    console.log(`\n📡 Fetching ${options.method} ${options.url}...`);
+    const url = assertSecureRemoteUrl(options.url, "CLI fetch");
+    console.log(`\n📡 Fetching ${options.method} ${url.toString()}...`);
     try {
-        const response = await fetch(options.url, {
+        const response = await fetch(url, {
             method: options.method,
             headers: {
                 "Content-Type": "application/json",

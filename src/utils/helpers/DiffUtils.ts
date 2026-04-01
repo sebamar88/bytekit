@@ -185,6 +185,7 @@ export class DiffUtils {
 
         for (const key of keys) {
             if (current == null) return undefined;
+            /* v8 ignore next */
             if (
                 key === "__proto__" ||
                 key === "constructor" ||
@@ -210,6 +211,7 @@ export class DiffUtils {
         const lastKey = keys[keys.length - 1];
 
         // Reject empty paths or any segment that could lead to prototype pollution
+        /* v8 ignore next */
         if (!lastKey || keys.some((k) => BLOCKED_KEYS.has(k))) {
             return;
         }

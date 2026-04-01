@@ -1,6 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import fs from "node:fs/promises";
 import path from "node:path";
+import {
+    assertSecureRemoteUrl,
+    formatPropertyKey,
+    sanitizeTypeName,
+} from "./security.js";
 
 interface SwaggerOptions {
     url: string | URL;
@@ -14,7 +19,11 @@ export async function generateFromSwagger(
     options: SwaggerOptions
 ): Promise<void> {
     const { url, output = "src/types/api-docs.ts" } = options;
-    const urlStr = String(url);
+    const secureUrl = assertSecureRemoteUrl(
+        url,
+        "Swagger/OpenAPI type generation"
+    );
+    const urlStr = secureUrl.toString();
 
     console.log(
         `\n📖 Attempting to resolve Swagger/OpenAPI spec from ${urlStr}...`
@@ -22,7 +31,7 @@ export async function generateFromSwagger(
 
     try {
         let spec: any;
-        const response = await fetch(urlStr);
+        const response = await fetch(secureUrl);
 
         if (!response.ok) {
             throw new Error(`HTTP ${response.status}: ${response.statusText}`);
@@ -54,7 +63,12 @@ export async function generateFromSwagger(
                     ? `${baseUrl}${p.slice(1)}`
                     : `${baseUrl}${p}`;
                 try {
-                    const tryRes = await fetch(tryUrl);
+                    const tryRes = await fetch(
+                        assertSecureRemoteUrl(
+                            tryUrl,
+                            "Swagger/OpenAPI type generation"
+                        )
+                    );
                     if (
                         tryRes.ok &&
                         /* v8 ignore next */
@@ -120,7 +134,7 @@ export async function generateFromSwagger(
 
 function generateInterface(name: string, schema: any): string {
     // Sanitize name (remove invalid characters)
-    const sanitizedName = name.replace(/[^a-zA-Z0-9]/g, "");
+    const sanitizedName = sanitizeTypeName(name, "GeneratedSchema");
 
     if (
         schema.type === "object" ||
@@ -141,7 +155,7 @@ function generateInterface(name: string, schema: any): string {
             .map(([propName, propSchema]: [string, any]) => {
                 const isRequired = required.includes(propName);
                 const type = mapOpenApiToTs(propSchema);
-                return `  ${propName}${isRequired ? "" : "?"}: ${type};`;
+                return `  ${formatPropertyKey(propName)}${isRequired ? "" : "?"}: ${type};`;
             })
             .join("\n");
 
@@ -169,7 +183,7 @@ function mapOpenApiToTs(schema: any): string {
     if (schema.$ref) {
         const refName = schema.$ref.split("/").pop();
         /* v8 ignore next */
-        return refName ? refName.replace(/[^a-zA-Z0-9]/g, "") : "any";
+        return refName ? sanitizeTypeName(refName, "ReferencedSchema") : "any";
     }
 
     // Handle basic types

@@ -89,6 +89,94 @@ describe("swagger-generator", () => {
         expect(content).toContain("export interface Product");
     });
 
+    it("skips HTML fallback candidates that return non-JSON content-types", async () => {
+        const htmlRes = {
+            ok: true,
+            headers: new Headers({ "content-type": "text/html" }),
+        };
+
+        const nonJsonRes = {
+            ok: true,
+            headers: new Headers({ "content-type": "text/html" }),
+        };
+
+        const specRes = {
+            ok: true,
+            headers: new Headers({ "content-type": "application/json" }),
+            json: async () => ({
+                components: {
+                    schemas: {
+                        AuditLog: {
+                            type: "object",
+                            properties: { id: { type: "string" } },
+                        },
+                    },
+                },
+            }),
+        };
+
+        globalThis.fetch = vi
+            .fn()
+            .mockResolvedValueOnce(htmlRes)
+            .mockResolvedValueOnce(nonJsonRes)
+            .mockResolvedValueOnce(specRes);
+
+        await generateFromSwagger({
+            url: "https://api.example.com/docs",
+            output: "audit-log.ts",
+        });
+
+        const content = await fs.readFile(
+            path.join(tempDir, "audit-log.ts"),
+            "utf8"
+        );
+        expect(content).toContain("export interface AuditLog");
+    });
+
+    it("covers HTML fallback candidates whose content-type header is missing", async () => {
+        const htmlRes = {
+            ok: true,
+            headers: new Headers({ "content-type": "text/html" }),
+        };
+
+        const missingContentTypeRes = {
+            ok: true,
+            headers: { get: () => null },
+        };
+
+        const specRes = {
+            ok: true,
+            headers: new Headers({ "content-type": "application/json" }),
+            json: async () => ({
+                components: {
+                    schemas: {
+                        MissingHeaderSpec: {
+                            type: "object",
+                            properties: { ok: { type: "boolean" } },
+                        },
+                    },
+                },
+            }),
+        };
+
+        globalThis.fetch = vi
+            .fn()
+            .mockResolvedValueOnce(htmlRes)
+            .mockResolvedValueOnce(missingContentTypeRes)
+            .mockResolvedValueOnce(specRes);
+
+        await generateFromSwagger({
+            url: "https://api.example.com/docs",
+            output: "missing-header.ts",
+        });
+
+        const content = await fs.readFile(
+            path.join(tempDir, "missing-header.ts"),
+            "utf8"
+        );
+        expect(content).toContain("export interface MissingHeaderSpec");
+    });
+
     it("covers trailing-slash baseUrl branch in HTML path (line 53 true branch)", async () => {
         // When baseUrl ends with '/', the tryUrl uses p.slice(1) instead of plain concatenation
         const htmlRes = {
@@ -176,7 +264,7 @@ describe("swagger-generator", () => {
         });
 
         const output = "enums.ts";
-        await generateFromSwagger({ url: "http://api.com/json", output });
+        await generateFromSwagger({ url: "https://api.com/json", output });
 
         const content = await fs.readFile(path.join(tempDir, output), "utf8");
         expect(content).toContain("export type Status = 'active' | 'inactive'");
@@ -189,7 +277,7 @@ describe("swagger-generator", () => {
             json: async () => ({ components: {} }),
         });
         const spy = vi.spyOn(console, "warn").mockImplementation(() => {});
-        await generateFromSwagger({ url: "http://api.com/empty" });
+        await generateFromSwagger({ url: "https://api.com/empty" });
         expect(spy).toHaveBeenCalledWith(expect.stringContaining("No schemas"));
     });
 
@@ -216,7 +304,7 @@ describe("swagger-generator", () => {
         });
 
         const output = "complex.ts";
-        await generateFromSwagger({ url: "http://api.com/json", output });
+        await generateFromSwagger({ url: "https://api.com/json", output });
 
         const content = await fs.readFile(path.join(tempDir, output), "utf8");
         expect(content).toContain("type Union = (string | number)");
@@ -233,7 +321,7 @@ describe("swagger-generator", () => {
         });
 
         await expect(
-            generateFromSwagger({ url: "http://api.com/fail" })
+            generateFromSwagger({ url: "https://api.com/fail" })
         ).rejects.toThrow();
         expect(spy).toHaveBeenCalled();
         exitSpy.mockRestore();
@@ -281,7 +369,7 @@ describe("swagger-generator", () => {
         });
 
         await generateFromSwagger({
-            url: "http://api.com/json",
+            url: "https://api.com/json",
             output: "order.ts",
         });
         const content = await fs.readFile(
@@ -319,7 +407,7 @@ describe("swagger-generator", () => {
         });
 
         await generateFromSwagger({
-            url: "http://api.com/json",
+            url: "https://api.com/json",
             output: "event.ts",
         });
         const content = await fs.readFile(
@@ -349,7 +437,7 @@ describe("swagger-generator", () => {
         });
 
         await generateFromSwagger({
-            url: "http://api.com/json",
+            url: "https://api.com/json",
             output: "any-union.ts",
         });
         const content = await fs.readFile(
@@ -387,7 +475,7 @@ describe("swagger-generator", () => {
         });
 
         await generateFromSwagger({
-            url: "http://api.com/json",
+            url: "https://api.com/json",
             output: "edge-cases.ts",
         });
         const content = await fs.readFile(
@@ -417,7 +505,7 @@ describe("swagger-generator", () => {
         });
 
         await generateFromSwagger({
-            url: "http://api.com/json",
+            url: "https://api.com/json",
             output: "null-ct.ts",
         });
         const content = await fs.readFile(
@@ -425,5 +513,54 @@ describe("swagger-generator", () => {
             "utf8"
         );
         expect(content).toContain("Item");
+    });
+
+    it("sanitizes unsafe schema names and property keys", async () => {
+        const spec = {
+            components: {
+                schemas: {
+                    "user-profile": {
+                        type: "object",
+                        properties: {
+                            "display-name": { type: "string" },
+                            default: { type: "boolean" },
+                        },
+                    },
+                },
+            },
+        };
+
+        globalThis.fetch = vi.fn().mockResolvedValue({
+            ok: true,
+            headers: new Headers({ "content-type": "application/json" }),
+            json: async () => spec,
+        });
+
+        await generateFromSwagger({
+            url: "https://api.com/json",
+            output: "sanitized.ts",
+        });
+        const content = await fs.readFile(
+            path.join(tempDir, "sanitized.ts"),
+            "utf8"
+        );
+
+        expect(content).toContain("export interface UserProfile");
+        expect(content).toContain('"display-name"?: string;');
+        expect(content).toContain('"default"?: boolean;');
+    });
+
+    it("rejects insecure remote http swagger urls", async () => {
+        const spy = vi.spyOn(console, "error").mockImplementation(() => {});
+        const exitSpy = vi.spyOn(process, "exit").mockImplementation(() => {
+            throw new Error("exit");
+        });
+
+        await expect(
+            generateFromSwagger({ url: "http://api.com/json" })
+        ).rejects.toThrow(/requires https/i);
+
+        spy.mockRestore();
+        exitSpy.mockRestore();
     });
 });

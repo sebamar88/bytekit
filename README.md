@@ -97,6 +97,14 @@ import { UrlSlugHelper } from "bytekit/url-slug-helper";
 
 Bytekit includes a command-line tool for rapid scaffolding directly from your terminal.
 
+### Security Notes for v3
+
+- Remote CLI fetches now require `https://` unless you are targeting `localhost` or another loopback address.
+- Generated type names and property keys are sanitized before being written to disk.
+- `ApiClient` and `ApiError` are now safe-by-default for logging and serialization; sensitive payload fields are redacted unless you explicitly opt into risky logging.
+- `StorageManager` is not appropriate for secrets such as session tokens or API keys.
+- Migration details: see [docs/guides/MIGRATION_v3_SECURITY.md](docs/guides/MIGRATION_v3_SECURITY.md).
+
 ### Type Generation from an API Endpoint
 
 ```bash
@@ -110,6 +118,8 @@ bytekit --type https://api.example.com/users
 # Generates src/types/api-docs.ts with all DTOs from the spec
 bytekit --swagger https://api.example.com/swagger.json
 ```
+
+Plain `http://` is now reserved for local development only, for example `http://localhost:3000/swagger.json`.
 
 ### DDD Bounded-Context Scaffolding
 

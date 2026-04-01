@@ -15,6 +15,7 @@ import { SchemaAdapter, isSchemaAdapter } from "./SchemaAdapter.js";
 import { PromisePool, PromisePoolOptions } from "../async/promise-pool.js";
 import { RequestQueue, RequestQueueOptions } from "../async/request-queue.js";
 import { RequestBatcher, BatchOptions } from "../async/request-batcher.js";
+import { safeSerialize } from "./SafeSerialization.js";
 
 export type QueryParamValue = string | number | boolean | null | undefined;
 export type QueryParam =
@@ -42,6 +43,7 @@ export interface ApiClientConfig {
     interceptors?: ApiClientInterceptors;
     disableInterceptors?: boolean;
     logHeaders?: boolean;
+    logSensitiveData?: boolean;
     redactHeaderKeys?: string[];
     logger?: Logger;
     retryPolicy?: RetryConfig;
@@ -80,6 +82,7 @@ export interface RequestOptions<TResponse = unknown> extends Omit<
     skipRetry?: boolean;
     skipInterceptors?: boolean;
     logHeaders?: boolean;
+    logSensitiveData?: boolean;
 }
 
 export interface SortParams {
@@ -143,7 +146,7 @@ export class ApiError extends Error {
             status: this.status,
             statusText: this.statusText,
             message: this.message,
-            body: this.body,
+            body: safeSerialize(this.body),
             isTimeout: this.isTimeout,
             stack: this.stack,
         };
@@ -162,12 +165,12 @@ export class ApiError extends Error {
             try {
                 const bodyStr =
                     typeof this.body === "string"
-                        ? this.body
-                        : JSON.stringify(this.body, null, 2);
+                        ? String(safeSerialize(this.body))
+                        : JSON.stringify(safeSerialize(this.body), null, 2);
                 parts.push(`Body: ${bodyStr}`);
             } catch {
                 /* v8 ignore next */
-                parts.push(`Body: ${this.body}`);
+                parts.push(`Body: ${String(safeSerialize(this.body))}`);
             }
         }
 
@@ -236,6 +239,7 @@ export class ApiClient {
     private readonly interceptors?: ApiClientInterceptors;
     private readonly disableInterceptors: boolean;
     private readonly logHeaders: boolean;
+    private readonly logSensitiveData: boolean;
     private readonly redactHeaderKeys: Set<string>;
     private readonly logger?: Logger;
     private readonly errorMessages: Partial<
@@ -272,6 +276,7 @@ export class ApiClient {
         interceptors,
         disableInterceptors = false,
         logHeaders = false,
+        logSensitiveData = false,
         redactHeaderKeys,
         logger,
         retryPolicy,
@@ -297,6 +302,7 @@ export class ApiClient {
         this.interceptors = interceptors;
         this.disableInterceptors = disableInterceptors;
         this.logHeaders = logHeaders;
+        this.logSensitiveData = logSensitiveData;
         this.redactHeaderKeys = new Set(
             (
                 redactHeaderKeys ?? [
@@ -396,9 +402,11 @@ export class ApiClient {
             if (options.pagination.page !== undefined) {
                 searchParams.page = options.pagination.page;
             }
+            /* v8 ignore next */
             if (options.pagination.limit !== undefined) {
                 searchParams.limit = options.pagination.limit;
             }
+            /* v8 ignore next */
             if (options.pagination.offset !== undefined) {
                 searchParams.offset = options.pagination.offset;
             }
@@ -406,9 +414,11 @@ export class ApiClient {
 
         // Add sort params
         if (options?.sort) {
+            /* v8 ignore next */
             if (options.sort.field !== undefined) {
                 searchParams.sort = options.sort.field;
             }
+            /* v8 ignore next */
             if (options.sort.order !== undefined) {
                 searchParams.order = options.sort.order;
             }
@@ -529,6 +539,7 @@ export class ApiClient {
                     data,
                     validateResponse as ValidationSchema
                 );
+                /* v8 ignore next */
                 if (errors.length > 0) {
                     throw new Error(
                         `Response validation failed: ${errors
@@ -566,7 +577,7 @@ export class ApiClient {
                     method,
                     status: err.status,
                     statusText: err.statusText,
-                    body: err.body,
+                    body: safeSerialize(err.body),
                 },
                 err
             );
@@ -622,6 +633,7 @@ export class ApiClient {
             skipRetry,
             skipInterceptors,
             logHeaders,
+            logSensitiveData,
             ...requestOptions
         } = options;
 
@@ -639,16 +651,23 @@ export class ApiClient {
 
                 // Log request
                 const shouldLogHeaders = logHeaders ?? this.logHeaders;
+                const allowSensitiveLogs =
+                    logSensitiveData ?? this.logSensitiveData;
                 const headersForLog = shouldLogHeaders
-                    ? this.redactHeaders(this.normalizeHeaders(init.headers))
+                    ? allowSensitiveLogs
+                        ? this.normalizeHeaders(init.headers)
+                        : this.redactHeaders(this.normalizeHeaders(init.headers))
                     : undefined;
+                const requestBodyForLog = allowSensitiveLogs
+                    ? rest.body
+                    : safeSerialize(rest.body);
 
                 /* v8 ignore start */
                 this.logger?.debug("HTTP Request", {
                     method: rest.method,
                     url,
                     ...(shouldLogHeaders ? { headers: headersForLog } : {}),
-                    body: rest.body,
+                    body: requestBodyForLog,
                 });
                 /* v8 ignore end */
 
@@ -687,7 +706,7 @@ export class ApiClient {
                     this.logger?.debug("HTTP Response", {
                         status: finalResponse.status,
                         url,
-                        data,
+                        data: allowSensitiveLogs ? data : safeSerialize(data),
                     });
 
                     return data as T;

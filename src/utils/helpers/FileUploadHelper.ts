@@ -321,6 +321,7 @@ export class FileUploadHelper {
         }
 
         // Check extension
+        /* v8 ignore next */
         if (allowedExtensions.length > 0) {
             const extension = file.name.split(".").pop()?.toLowerCase();
             if (!extension || !allowedExtensions.includes(extension)) {

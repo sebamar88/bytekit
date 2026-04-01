@@ -160,6 +160,13 @@ test("ResponseValidator validates boolean enum values", () => {
     assert.match(invalidErrors[0].message, /one of/);
 });
 
+test("ResponseValidator reports type mismatch for boolean schema with non-boolean data", () => {
+    const schema = { type: "boolean" } as const;
+    const errors = ResponseValidator.validate("false", schema);
+    assert.equal(errors.length, 1);
+    assert.match(errors[0].message, /Expected type boolean/);
+});
+
 test("ResponseValidator validates number enum values", () => {
     const schema = {
         type: "number",

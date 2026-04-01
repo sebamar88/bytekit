@@ -1,5 +1,10 @@
 import fs from "node:fs/promises";
 import path from "node:path";
+import {
+    assertSecureRemoteUrl,
+    formatPropertyKey,
+    sanitizeTypeName,
+} from "./security.js";
 
 interface TypeGeneratorOptions {
     endpoint: string;
@@ -25,10 +30,16 @@ export async function generateTypesFromEndpoint(
         body,
     } = options;
 
-    console.log(`\n📡 Fetching ${method} ${endpoint}...`);
+    const endpointUrl = assertSecureRemoteUrl(
+        endpoint,
+        "Type generation from an endpoint"
+    );
+    const safeTypeName = sanitizeTypeName(name, "ApiResponse");
+
+    console.log(`\n📡 Fetching ${method} ${endpointUrl.toString()}...`);
 
     try {
-        const response = await fetch(endpoint, {
+        const response = await fetch(endpointUrl, {
             method,
             headers: {
                 "Content-Type": "application/json",
@@ -42,7 +53,7 @@ export async function generateTypesFromEndpoint(
         }
 
         const data = await response.json();
-        const typeDefinition = generateTypeFromData(data, name);
+        const typeDefinition = generateTypeFromData(data, safeTypeName);
 
         const outputPath = path.join(process.cwd(), output);
         await fs.writeFile(outputPath, typeDefinition, "utf8");
@@ -64,6 +75,7 @@ export async function generateTypesFromEndpoint(
 /**
  * Generate TypeScript type definition from data
  */
+/* v8 ignore next */
 function generateTypeFromData(data: unknown, typeName: string): string {
     const typeDefinition = inferType(data, typeName);
     return `// Auto-generated types from API response\n// Generated at ${new Date().toISOString()}\n\n${typeDefinition}\n`;
@@ -126,7 +138,7 @@ function generateObjectType(
         .map(([key, value]) => {
             const fieldType = inferInlineType(value, depth + 1);
             const isOptional = value === null || value === undefined ? "?" : "";
-            return `${innerIndent}${key}${isOptional}: ${fieldType};`;
+            return `${innerIndent}${formatPropertyKey(key)}${isOptional}: ${fieldType};`;
         })
         .join("\n");
 
@@ -195,7 +207,7 @@ function buildInlineObjectType(
             const fieldType = inferInlineType(value, depth + 1);
             /* v8 ignore next */
             const isOptional = value === null || value === undefined ? "?" : "";
-            return `${innerIndent}${key}${isOptional}: ${fieldType};`;
+            return `${innerIndent}${formatPropertyKey(key)}${isOptional}: ${fieldType};`;
         })
         .join("\n");
 

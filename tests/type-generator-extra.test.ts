@@ -34,7 +34,7 @@ describe("type-generator extra", () => {
 
         await expect(
             generateTypesFromEndpoint({
-                endpoint: "http://api.com/fail",
+                endpoint: "https://api.com/fail",
                 output: "fail.ts",
             })
         ).rejects.toThrow();
@@ -58,10 +58,26 @@ describe("type-generator extra", () => {
 
         await expect(
             generateTypesFromEndpoint({
-                endpoint: "http://api.com/bad-json",
+                endpoint: "https://api.com/bad-json",
                 output: "bad.ts",
             })
         ).rejects.toThrow();
+
+        exitSpy.mockRestore();
+    });
+
+    it("should reject insecure remote http endpoints", async () => {
+        vi.spyOn(console, "error").mockImplementation(() => {});
+        const exitSpy = vi.spyOn(process, "exit").mockImplementation(() => {
+            throw new Error("exit");
+        });
+
+        await expect(
+            generateTypesFromEndpoint({
+                endpoint: "http://api.com/insecure",
+                output: "bad.ts",
+            })
+        ).rejects.toThrow(/requires https/i);
 
         exitSpy.mockRestore();
     });

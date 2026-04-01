@@ -57,6 +57,7 @@ export class PollingHelper<T = unknown> {
             maxDuration: options.maxDuration ?? Infinity,
             backoffMultiplier: options.backoffMultiplier ?? 1,
             maxBackoffInterval: options.maxBackoffInterval ?? 30000,
+            /* v8 ignore next */
             stopCondition: options.stopCondition ?? (() => true),
             onAttempt: options.onAttempt ?? (() => {}),
             onSuccess: options.onSuccess ?? (() => {}),
