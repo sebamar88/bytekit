@@ -11,6 +11,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - No changes yet.
 
+## [3.0.1] - 2026-04-01
+
+### Fixed
+
+- Corrected the published package `homepage` metadata from `https://sebamar88-bytekit.mintlify.app/` to `https://bytekit.mintlify.app/`.
+  - Why: npm package metadata was pointing users to the wrong documentation host.
+  - Impact: no runtime or API changes; this patch only fixes package metadata and the link shown by npm.
+
 ## [3.0.0] - 2026-04-01
 
 ### Security
