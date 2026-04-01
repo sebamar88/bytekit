@@ -62,7 +62,10 @@ describe("bytekit CLI Integration", () => {
                 openapi: "3.0.0",
                 components: {
                     schemas: {
-                        User: { type: "object", properties: { login: { type: "string" } } },
+                        User: {
+                            type: "object",
+                            properties: { login: { type: "string" } },
+                        },
                     },
                 },
             }),
@@ -86,7 +89,11 @@ describe("bytekit CLI Integration", () => {
         const { runCli } = await import(cliUrl);
 
         process.chdir(tempDir);
-        await runCli(["--ddd", "--domain=TestContext", "--port=OrderRepository"]);
+        await runCli([
+            "--ddd",
+            "--domain=TestContext",
+            "--port=OrderRepository",
+        ]);
 
         const outbound = await fs.readFile(
             path.join(

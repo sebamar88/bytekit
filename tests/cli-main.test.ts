@@ -38,7 +38,9 @@ describe("CLI main entry", () => {
             // ignore exit error
         }
 
-        expect(spy).toHaveBeenCalledWith(expect.stringContaining("Missing URL"));
+        expect(spy).toHaveBeenCalledWith(
+            expect.stringContaining("Missing URL")
+        );
         spy.mockRestore();
         exitSpy.mockRestore();
     });

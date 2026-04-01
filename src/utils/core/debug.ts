@@ -112,11 +112,11 @@ export const measureAsync = async <T>(
     const result = await fn();
     const durationMs = stopwatch.stop();
 
-        /* v8 ignore next */
-        if (options.logger) {
-            const logInstance =
-                options.namespace && options.logger
-                    ? options.logger.child(options.namespace)
+    /* v8 ignore next */
+    if (options.logger) {
+        const logInstance =
+            options.namespace && options.logger
+                ? options.logger.child(options.namespace)
                 : options.logger;
 
         logInstance.debug(`${label} completed in ${durationMs.toFixed(2)}ms`, {

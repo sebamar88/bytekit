@@ -22,8 +22,10 @@ describe("CLI security helpers", () => {
 
     it("accepts loopback http URLs", () => {
         expect(
-            assertSecureRemoteUrl("http://127.0.0.5:3000/spec.json", "Spec fetch")
-                .toString()
+            assertSecureRemoteUrl(
+                "http://127.0.0.5:3000/spec.json",
+                "Spec fetch"
+            ).toString()
         ).toContain("127.0.0.5:3000");
     });
 
@@ -120,7 +122,7 @@ describe("safe serialization helpers", () => {
         ) as Record<string, unknown>;
 
         expect(
-            ((result.circular as Record<string, unknown>).self as string)
+            (result.circular as Record<string, unknown>).self as string
         ).toBe("[Circular]");
         expect(result.deepArray).toEqual(["[Array]"]);
         expect(result.deepObject).toEqual({ a: "[Object]" });

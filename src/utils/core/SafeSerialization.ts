@@ -41,7 +41,11 @@ export function safeSerialize(
     const sensitiveKeySet = createSensitiveKeySet(sensitiveKeys);
     const seen = new WeakSet<object>();
 
-    const visit = (input: unknown, depth: number, parentKey?: string): unknown => {
+    const visit = (
+        input: unknown,
+        depth: number,
+        parentKey?: string
+    ): unknown => {
         if (parentKey && isSensitiveKey(parentKey, sensitiveKeySet)) {
             return "[REDACTED]";
         }

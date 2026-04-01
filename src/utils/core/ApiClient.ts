@@ -656,7 +656,9 @@ export class ApiClient {
                 const headersForLog = shouldLogHeaders
                     ? allowSensitiveLogs
                         ? this.normalizeHeaders(init.headers)
-                        : this.redactHeaders(this.normalizeHeaders(init.headers))
+                        : this.redactHeaders(
+                              this.normalizeHeaders(init.headers)
+                          )
                     : undefined;
                 const requestBodyForLog = allowSensitiveLogs
                     ? rest.body

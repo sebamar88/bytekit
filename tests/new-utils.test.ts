@@ -219,14 +219,17 @@ test("PollingHelper uses the default stopCondition when none is provided", async
 
 test("PollingHelper keeps polling when attempt result is undefined without an error", async () => {
     let attempts = 0;
-    const poller = new PollingHelper(async () => {
-        attempts++;
-        return attempts >= 2 ? "ready" : (undefined as unknown as string);
-    }, {
-        interval: 1,
-        maxAttempts: 3,
-        stopCondition: (result) => result === "ready",
-    });
+    const poller = new PollingHelper(
+        async () => {
+            attempts++;
+            return attempts >= 2 ? "ready" : (undefined as unknown as string);
+        },
+        {
+            interval: 1,
+            maxAttempts: 3,
+            stopCondition: (result) => result === "ready",
+        }
+    );
 
     const result = await poller.start();
 

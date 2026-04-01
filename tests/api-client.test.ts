@@ -292,10 +292,7 @@ test("ApiError.toString() includes sanitized body and ApiError.toJSON() returns 
     assert.equal(json.statusText, "Not Found");
     assert.equal(json.message, "Resource not found.");
     assert.equal(json.isTimeout, false);
-    assert.equal(
-        (json.body as Record<string, unknown>).token,
-        "[REDACTED]"
-    );
+    assert.equal((json.body as Record<string, unknown>).token, "[REDACTED]");
     assert.ok(
         typeof json.stack === "string",
         "toJSON should include stack trace"
@@ -545,7 +542,10 @@ test("ApiClient sanitizes request and response payloads in logs by default", asy
         info: () => {},
     };
     const fetchImpl = async () =>
-        jsonResponse({ token: "response-secret", profile: { password: "p4ss" } });
+        jsonResponse({
+            token: "response-secret",
+            profile: { password: "p4ss" },
+        });
     const client = new ApiClient({
         baseUrl: "https://api.example.com",
         fetchImpl,
@@ -561,7 +561,12 @@ test("ApiClient sanitizes request and response payloads in logs by default", asy
     const requestLog = logCalls.find((entry) => "body" in entry)!;
     const responseLog = logCalls.find((entry) => "data" in entry)!;
     assert.equal(
-        ((requestLog.body as Record<string, unknown>).nested as Record<string, unknown>).apiKey,
+        (
+            (requestLog.body as Record<string, unknown>).nested as Record<
+                string,
+                unknown
+            >
+        ).apiKey,
         "[REDACTED]"
     );
     assert.equal(
