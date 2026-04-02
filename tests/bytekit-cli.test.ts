@@ -31,11 +31,14 @@ describe("bytekit CLI Integration", () => {
             path.join(originalCwd, "dist/cli/index.js")
         ).href;
         const { runCli } = await import(cliUrl);
-        globalThis.fetch = async () => ({
+        globalThis.fetch = async (url: unknown) => ({
             ok: true,
             status: 200,
+            url: String(url),
             headers: new Headers({ "content-type": "application/json" }),
             json: async () => ({ id: 1, name: "ByteKit" }),
+            text: async () => JSON.stringify({ id: 1, name: "ByteKit" }),
+            body: null,
         });
 
         process.chdir(tempDir);
@@ -54,21 +57,25 @@ describe("bytekit CLI Integration", () => {
             path.join(originalCwd, "dist/cli/index.js")
         ).href;
         const { runCli } = await import(cliUrl);
-        globalThis.fetch = async () => ({
-            ok: true,
-            status: 200,
-            headers: new Headers({ "content-type": "application/json" }),
-            json: async () => ({
-                openapi: "3.0.0",
-                components: {
-                    schemas: {
-                        User: {
-                            type: "object",
-                            properties: { login: { type: "string" } },
-                        },
+        const swaggerData = {
+            openapi: "3.0.0",
+            components: {
+                schemas: {
+                    User: {
+                        type: "object",
+                        properties: { login: { type: "string" } },
                     },
                 },
-            }),
+            },
+        };
+        globalThis.fetch = async (url: unknown) => ({
+            ok: true,
+            status: 200,
+            url: String(url),
+            headers: new Headers({ "content-type": "application/json" }),
+            json: async () => swaggerData,
+            text: async () => JSON.stringify(swaggerData),
+            body: null,
         });
 
         process.chdir(tempDir);
