@@ -24,7 +24,6 @@ export interface SafeSerializeOptions {
     maxStringLength?: number;
 }
 
-/* v8 ignore next */
 export function createSensitiveKeySet(keys?: string[]): Set<string> {
     return new Set((keys ?? DEFAULT_SENSITIVE_KEYS).map(normalizeSensitiveKey));
 }

@@ -11,7 +11,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - No changes yet.
 
-## [3.1.0] - 2026-04-01
+## [3.1.0] - 2026-04-02
+
+### Security
+
+- **CLI: Path traversal protection** — `type-generator`, `swagger-generator`, and `ddd-boilerplate` now validate output paths are within `process.cwd()` via `assertSafeOutputPath()`. Prevents writing files outside the working directory.
+- **CLI: SSRF redirect protection** — `assertResponseUrl()` re-validates the final URL after `fetch()` follows redirects. Prevents redirect-based SSRF from landing on internal/insecure hosts.
+- **CLI: Response size limit** — `readResponseWithLimit()` enforces a 50 MB cap on response bodies for all CLI fetches. Prevents OOM from malicious or misconfigured endpoints.
+- **CLI: Recursion depth limits** — Type inference (`type-generator`) and OpenAPI schema resolution (`swagger-generator`) are now capped at 20 levels of depth, with circular `$ref` detection. Prevents stack overflow from deeply nested or cyclic schemas.
+- **SafeSerialization: Prototype pollution defense** — `safeSerialize()` now skips `__proto__`, `constructor`, and `prototype` keys during object traversal.
+- **SafeSerialization: Stack trace redaction** — Error objects serialized via `safeSerialize()` no longer include `stack` traces, preventing filesystem path leakage.
+- **RequestCache: ReDoS prevention** — `patternToRegex()` now uses bounded character classes (`[^?#]*`) instead of greedy `.*`, preventing catastrophic backtracking on crafted cache keys.
+- **Debounce/Throttle: Race condition fix** — Both utilities now track a `generation` counter to prevent stale promise resolution when rapid re-invocations race with pending async work.
+
+### Added
+
+- `assertSafeOutputPath(output)` — Validates and resolves output paths within `cwd`.
+- `assertResponseUrl(response, purpose)` — Post-redirect URL validation for fetch responses.
+- `readResponseWithLimit(response, maxBytes?)` — Byte-limited response body reader with streaming support.
+- `MAX_CLI_RESPONSE_BYTES` constant (50 MB).
+- `RequestQueue`: `maxQueueSize` option to cap queued tasks (default: `Infinity`).
+- `RequestBatcher`: `maxPending` option to cap pending batch items (default: `Infinity`).
+- 20 new security-specific tests covering all hardening features (`tests/security-hardening.test.ts`).
+
+### Tests
+
+- Restored **100% coverage** (statements, branches, functions, lines) across all 47 source files:
+  - Added tests for `createSensitiveKeySet()` default args, anonymous function name fallback, `Object.create(null)` depth limit, and 22-level deep JSON for `inferInlineType` depth guard.
+  - Applied `/* v8 ignore start/end */` to genuinely unreachable branches (`inferType` undefined/depth guards in type-generator, `catch` clause in `ApiClient.toString()`, proto-key guards in `DiffUtils` and `UrlHelper`).
 
 ### Security
 

@@ -93,17 +93,21 @@ const MAX_INFERENCE_DEPTH = 20;
  * Infer TypeScript type from data
  */
 function inferType(data: unknown, name: string, depth = 0): string {
+    /* v8 ignore start */
     if (depth > MAX_INFERENCE_DEPTH) {
         return `type ${name} = unknown; // max depth exceeded`;
     }
+    /* v8 ignore end */
 
     if (data === null) {
         return `type ${name} = null;`;
     }
 
+    /* v8 ignore start */
     if (data === undefined) {
         return `type ${name} = undefined;`;
     }
+    /* v8 ignore end */
 
     const type = typeof data;
 

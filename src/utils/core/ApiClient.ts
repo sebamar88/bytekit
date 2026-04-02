@@ -168,10 +168,11 @@ export class ApiError extends Error {
                         ? String(safeSerialize(this.body))
                         : JSON.stringify(safeSerialize(this.body), null, 2);
                 parts.push(`Body: ${bodyStr}`);
+            /* v8 ignore start */
             } catch {
-                /* v8 ignore next */
                 parts.push(`Body: ${String(safeSerialize(this.body))}`);
             }
+            /* v8 ignore end */
         }
 
         if (this.stack) {

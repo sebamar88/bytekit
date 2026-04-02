@@ -270,4 +270,21 @@ describe("type-generator inference branches", () => {
             })
         );
     });
+
+    it("inferInlineType depth guard → 'unknown /* max depth exceeded */'", async () => {
+        // Build a 22-level deeply nested object to exceed MAX_INFERENCE_DEPTH (20)
+        let deep: Record<string, unknown> = { value: 1 };
+        for (let i = 0; i < 22; i++) {
+            deep = { nested: deep };
+        }
+        mockFetch(deep);
+        await generateTypesFromEndpoint({
+            endpoint: "https://x.com",
+            output: "out.ts",
+            name: "Deep",
+        });
+        const content = await readOutput();
+        // The deeply-nested field should be truncated with 'unknown /* max depth exceeded */'
+        expect(content).toContain("max depth exceeded");
+    });
 });
