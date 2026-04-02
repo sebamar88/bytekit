@@ -1,3 +1,5 @@
+import path from "node:path";
+
 const RESERVED_TS_WORDS = new Set([
     "break",
     "case",
@@ -114,6 +116,18 @@ export function formatPropertyKey(key: string): string {
     return JSON.stringify(key);
 }
 
+export function assertSafeOutputPath(output: string): string {
+    const cwd = process.cwd();
+    const resolved = path.resolve(cwd, output);
+    if (!resolved.startsWith(cwd + path.sep) && resolved !== cwd) {
+        throw new Error(
+            `Output path "${output}" resolves outside the current working directory. ` +
+                `Resolved: ${resolved}`
+        );
+    }
+    return resolved;
+}
+
 export function sanitizeFileSegment(input: string, fallback = "api"): string {
     const cleaned = input
         .trim()
@@ -121,6 +135,67 @@ export function sanitizeFileSegment(input: string, fallback = "api"): string {
         .replace(/[^a-z0-9]+/g, "-")
         .replace(/^-+|-+$/g, "");
     return cleaned || fallback;
+}
+
+/**
+ * Maximum response body size for CLI-initiated fetches (50 MB).
+ * Prevents OOM when a remote endpoint returns an unexpectedly large payload.
+ */
+export const MAX_CLI_RESPONSE_BYTES = 50 * 1024 * 1024;
+
+/**
+ * Re-validates the final URL of a fetch response to prevent SSRF via redirect.
+ * Call this after `fetch()` to ensure the redirect chain did not land on an
+ * insecure or internal host.
+ */
+export function assertResponseUrl(
+    response: Response,
+    purpose: string
+): void {
+    const finalUrl = response.url;
+    if (finalUrl) {
+        assertSecureRemoteUrl(finalUrl, purpose);
+    }
+}
+
+/**
+ * Reads a fetch response body as text, enforcing a byte-size limit.
+ * @throws if the body exceeds `maxBytes`.
+ */
+export async function readResponseWithLimit(
+    response: Response,
+    maxBytes = MAX_CLI_RESPONSE_BYTES
+): Promise<string> {
+    const contentLength = response.headers.get("content-length");
+    if (contentLength && Number(contentLength) > maxBytes) {
+        throw new Error(
+            `Response body too large: ${contentLength} bytes (limit: ${maxBytes} bytes)`
+        );
+    }
+
+    const reader = response.body?.getReader();
+    if (!reader) {
+        return await response.text();
+    }
+
+    const decoder = new TextDecoder();
+    let total = 0;
+    let result = "";
+    // eslint-disable-next-line no-constant-condition
+    while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        total += value.byteLength;
+        if (total > maxBytes) {
+            reader.cancel();
+            throw new Error(
+                `Response body too large: exceeded ${maxBytes} byte limit`
+            );
+        }
+        result += decoder.decode(value, { stream: true });
+    }
+    result += decoder.decode();
+    return result;
 }
 
 function isLoopbackHost(hostname: string): boolean {

@@ -4,6 +4,41 @@ import path from "node:path";
 import os from "node:os";
 import { generateFromSwagger } from "../src/cli/swagger-generator";
 
+/** Creates a mock Response with the minimum properties that readResponseWithLimit and assertResponseUrl need. */
+function jsonResponse(
+    data: unknown,
+    opts: { ok?: boolean; status?: number; contentType?: string; url?: string } = {}
+) {
+    const {
+        ok = true,
+        status = 200,
+        contentType = "application/json",
+        url = "https://api.example.com",
+    } = opts;
+    const body = JSON.stringify(data);
+    const headers = new Headers();
+    if (contentType) headers.set("content-type", contentType);
+    return {
+        ok,
+        status,
+        url,
+        headers,
+        body: null,
+        text: async () => body,
+        json: async () => JSON.parse(body),
+    };
+}
+
+function htmlResponse(url = "https://api.example.com") {
+    return {
+        ok: true,
+        url,
+        headers: new Headers({ "content-type": "text/html" }),
+        body: null,
+        text: async () => "<html>Swagger UI</html>",
+    };
+}
+
 describe("swagger-generator", () => {
     let tempDir: string;
     let originalCwd: string;
@@ -36,11 +71,7 @@ describe("swagger-generator", () => {
             },
         };
 
-        globalThis.fetch = vi.fn().mockResolvedValue({
-            ok: true,
-            headers: new Headers({ "content-type": "application/json" }),
-            json: async () => spec,
-        });
+        globalThis.fetch = vi.fn().mockResolvedValue(jsonResponse(spec));
 
         const output = "api-types.ts";
         await generateFromSwagger({
@@ -54,30 +85,20 @@ describe("swagger-generator", () => {
     });
 
     it("should attempt to find spec JSON if URL returns HTML", async () => {
-        const htmlRes = {
-            ok: true,
-            headers: new Headers({ "content-type": "text/html" }),
-            text: async () => "<html>Swagger UI</html>",
-        };
-
-        const specRes = {
-            ok: true,
-            headers: new Headers({ "content-type": "application/json" }),
-            json: async () => ({
-                definitions: {
-                    Product: {
-                        type: "object",
-                        properties: { price: { type: "number" } },
-                    },
+        const specData = {
+            definitions: {
+                Product: {
+                    type: "object",
+                    properties: { price: { type: "number" } },
                 },
-            }),
+            },
         };
 
         globalThis.fetch = vi
             .fn()
-            .mockResolvedValueOnce(htmlRes)
+            .mockResolvedValueOnce(htmlResponse("https://api.example.com/docs"))
             .mockResolvedValueOnce({ ok: false })
-            .mockResolvedValueOnce(specRes);
+            .mockResolvedValueOnce(jsonResponse(specData));
 
         const output = "product-types.ts";
         await generateFromSwagger({
@@ -90,36 +111,30 @@ describe("swagger-generator", () => {
     });
 
     it("skips HTML fallback candidates that return non-JSON content-types", async () => {
-        const htmlRes = {
-            ok: true,
-            headers: new Headers({ "content-type": "text/html" }),
-        };
-
         const nonJsonRes = {
             ok: true,
+            url: "https://api.example.com",
             headers: new Headers({ "content-type": "text/html" }),
+            body: null,
+            text: async () => "<html></html>",
         };
 
-        const specRes = {
-            ok: true,
-            headers: new Headers({ "content-type": "application/json" }),
-            json: async () => ({
-                components: {
-                    schemas: {
-                        AuditLog: {
-                            type: "object",
-                            properties: { id: { type: "string" } },
-                        },
+        const specData = {
+            components: {
+                schemas: {
+                    AuditLog: {
+                        type: "object",
+                        properties: { id: { type: "string" } },
                     },
                 },
-            }),
+            },
         };
 
         globalThis.fetch = vi
             .fn()
-            .mockResolvedValueOnce(htmlRes)
+            .mockResolvedValueOnce(htmlResponse("https://api.example.com/docs"))
             .mockResolvedValueOnce(nonJsonRes)
-            .mockResolvedValueOnce(specRes);
+            .mockResolvedValueOnce(jsonResponse(specData));
 
         await generateFromSwagger({
             url: "https://api.example.com/docs",
@@ -134,36 +149,30 @@ describe("swagger-generator", () => {
     });
 
     it("covers HTML fallback candidates whose content-type header is missing", async () => {
-        const htmlRes = {
-            ok: true,
-            headers: new Headers({ "content-type": "text/html" }),
-        };
-
         const missingContentTypeRes = {
             ok: true,
+            url: "https://api.example.com",
             headers: { get: () => null },
+            body: null,
+            text: async () => "",
         };
 
-        const specRes = {
-            ok: true,
-            headers: new Headers({ "content-type": "application/json" }),
-            json: async () => ({
-                components: {
-                    schemas: {
-                        MissingHeaderSpec: {
-                            type: "object",
-                            properties: { ok: { type: "boolean" } },
-                        },
+        const specData = {
+            components: {
+                schemas: {
+                    MissingHeaderSpec: {
+                        type: "object",
+                        properties: { ok: { type: "boolean" } },
                     },
                 },
-            }),
+            },
         };
 
         globalThis.fetch = vi
             .fn()
-            .mockResolvedValueOnce(htmlRes)
+            .mockResolvedValueOnce(htmlResponse("https://api.example.com/docs"))
             .mockResolvedValueOnce(missingContentTypeRes)
-            .mockResolvedValueOnce(specRes);
+            .mockResolvedValueOnce(jsonResponse(specData));
 
         await generateFromSwagger({
             url: "https://api.example.com/docs",
@@ -179,34 +188,26 @@ describe("swagger-generator", () => {
 
     it("covers trailing-slash baseUrl branch in HTML path (line 53 true branch)", async () => {
         // When baseUrl ends with '/', the tryUrl uses p.slice(1) instead of plain concatenation
-        const htmlRes = {
-            ok: true,
-            headers: new Headers({ "content-type": "text/html" }),
-        };
-        const specRes = {
-            ok: true,
-            headers: new Headers({ "content-type": "application/json" }),
-            json: async () => ({
-                components: {
-                    schemas: {
-                        Item: {
-                            type: "object",
-                            properties: { id: { type: "integer" } },
-                        },
+        const specData = {
+            components: {
+                schemas: {
+                    Item: {
+                        type: "object",
+                        properties: { id: { type: "integer" } },
                     },
                 },
-            }),
+            },
         };
 
         // URL "https://api.example.com/v1/" — trailing slash not matching /docs or /swagger-ui
         // so baseUrl stays as "https://api.example.com/v1/"
         globalThis.fetch = vi
             .fn()
-            .mockResolvedValueOnce(htmlRes)
+            .mockResolvedValueOnce(htmlResponse("https://api.example.com/v1/"))
             .mockResolvedValueOnce({ ok: false })
             .mockResolvedValueOnce({ ok: false })
             .mockResolvedValueOnce({ ok: false })
-            .mockResolvedValueOnce(specRes);
+            .mockResolvedValueOnce(jsonResponse(specData));
 
         const output = "item-types.ts";
         await generateFromSwagger({
@@ -219,18 +220,11 @@ describe("swagger-generator", () => {
     });
 
     it("throws when HTML spec page has no resolvable JSON endpoint (line 69 !found throw)", async () => {
-        // All 4 common-path attempts fail → !found → throw
-        // Also exercises catch { continue } when a path fetch rejects
-        const htmlRes = {
-            ok: true,
-            headers: new Headers({ "content-type": "text/html" }),
-        };
-
         globalThis.fetch = vi
             .fn()
-            .mockResolvedValueOnce(htmlRes) // main URL → HTML
-            .mockRejectedValueOnce(new Error("net")) // first path throws → catch continue (line 69)
-            .mockResolvedValue({ ok: false }); // remaining paths return 404
+            .mockResolvedValueOnce(htmlResponse("https://api.example.com/docs"))
+            .mockRejectedValueOnce(new Error("net"))
+            .mockResolvedValue({ ok: false });
 
         const spy = vi.spyOn(console, "error").mockImplementation(() => {});
         const exitSpy = vi.spyOn(process, "exit").mockImplementation(() => {
@@ -257,11 +251,7 @@ describe("swagger-generator", () => {
             },
         };
 
-        globalThis.fetch = vi.fn().mockResolvedValue({
-            ok: true,
-            headers: new Headers({ "content-type": "application/json" }),
-            json: async () => spec,
-        });
+        globalThis.fetch = vi.fn().mockResolvedValue(jsonResponse(spec));
 
         const output = "enums.ts";
         await generateFromSwagger({ url: "https://api.com/json", output });
@@ -271,11 +261,7 @@ describe("swagger-generator", () => {
     });
 
     it("should warn if no schemas are found", async () => {
-        globalThis.fetch = vi.fn().mockResolvedValue({
-            ok: true,
-            headers: new Headers({ "content-type": "application/json" }),
-            json: async () => ({ components: {} }),
-        });
+        globalThis.fetch = vi.fn().mockResolvedValue(jsonResponse({ components: {} }));
         const spy = vi.spyOn(console, "warn").mockImplementation(() => {});
         await generateFromSwagger({ url: "https://api.com/empty" });
         expect(spy).toHaveBeenCalledWith(expect.stringContaining("No schemas"));
@@ -297,11 +283,7 @@ describe("swagger-generator", () => {
             },
         };
 
-        globalThis.fetch = vi.fn().mockResolvedValue({
-            ok: true,
-            headers: new Headers({ "content-type": "application/json" }),
-            json: async () => spec,
-        });
+        globalThis.fetch = vi.fn().mockResolvedValue(jsonResponse(spec));
 
         const output = "complex.ts";
         await generateFromSwagger({ url: "https://api.com/json", output });
@@ -314,7 +296,7 @@ describe("swagger-generator", () => {
     it("should handle fetch errors", async () => {
         globalThis.fetch = vi
             .fn()
-            .mockResolvedValue({ ok: false, status: 500 });
+            .mockResolvedValue({ ok: false, status: 500, url: "https://api.com/fail" });
         const spy = vi.spyOn(console, "error").mockImplementation(() => {});
         const exitSpy = vi.spyOn(process, "exit").mockImplementation(() => {
             throw new Error("exit");
@@ -362,11 +344,7 @@ describe("swagger-generator", () => {
             },
         };
 
-        globalThis.fetch = vi.fn().mockResolvedValue({
-            ok: true,
-            headers: new Headers({ "content-type": "application/json" }),
-            json: async () => spec,
-        });
+        globalThis.fetch = vi.fn().mockResolvedValue(jsonResponse(spec));
 
         await generateFromSwagger({
             url: "https://api.com/json",
@@ -400,11 +378,7 @@ describe("swagger-generator", () => {
             },
         };
 
-        globalThis.fetch = vi.fn().mockResolvedValue({
-            ok: true,
-            headers: new Headers({ "content-type": "application/json" }),
-            json: async () => spec,
-        });
+        globalThis.fetch = vi.fn().mockResolvedValue(jsonResponse(spec));
 
         await generateFromSwagger({
             url: "https://api.com/json",
@@ -430,9 +404,13 @@ describe("swagger-generator", () => {
             },
         };
 
+        const body = JSON.stringify(spec);
         globalThis.fetch = vi.fn().mockResolvedValue({
             ok: true,
+            url: "https://api.com/json",
             headers: new Headers(), // no content-type → null → "" fallback (line 31)
+            body: null,
+            text: async () => body,
             json: async () => spec,
         });
 
@@ -468,11 +446,7 @@ describe("swagger-generator", () => {
             },
         };
 
-        globalThis.fetch = vi.fn().mockResolvedValue({
-            ok: true,
-            headers: new Headers({ "content-type": "application/json" }),
-            json: async () => spec,
-        });
+        globalThis.fetch = vi.fn().mockResolvedValue(jsonResponse(spec));
 
         await generateFromSwagger({
             url: "https://api.com/json",
@@ -498,9 +472,13 @@ describe("swagger-generator", () => {
         // Using a plain object mock with get() returning null guarantees the null path
         const spec = { components: { schemas: { Item: { type: "string" } } } };
 
+        const body = JSON.stringify(spec);
         globalThis.fetch = vi.fn().mockResolvedValue({
             ok: true,
+            url: "https://api.com/json",
             headers: { get: (_: string) => null }, // Always returns null → || "" taken
+            body: null,
+            text: async () => body,
             json: async () => spec,
         });
 
@@ -530,11 +508,7 @@ describe("swagger-generator", () => {
             },
         };
 
-        globalThis.fetch = vi.fn().mockResolvedValue({
-            ok: true,
-            headers: new Headers({ "content-type": "application/json" }),
-            json: async () => spec,
-        });
+        globalThis.fetch = vi.fn().mockResolvedValue(jsonResponse(spec));
 
         await generateFromSwagger({
             url: "https://api.com/json",

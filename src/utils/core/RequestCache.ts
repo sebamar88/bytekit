@@ -183,7 +183,7 @@ export class RequestCache {
 
     private patternToRegex(pattern: string): RegExp {
         const escaped = pattern.replaceAll(/[.+^${}()|[\]\\]/g, "\\$&");
-        const regex = escaped.replaceAll(/\*/g, ".*");
+        const regex = escaped.replaceAll(/\*+/g, "[^?#]*");
         return new RegExp(`^${regex}$`);
     }
 }

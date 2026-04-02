@@ -17,6 +17,11 @@ export interface BatchOptions {
      */
     maxSize?: number;
     /**
+     * Maximum total pending requests across all batch keys. Default: `Infinity`.
+     * When reached, `add()` rejects immediately with a `TypeError`.
+     */
+    maxPending?: number;
+    /**
      * If `true`, the window timer resets on each new request (sliding window).
      * Default: `false` — fixed window: timer fires once after the first request.
      */
@@ -84,6 +89,7 @@ function defaultKeyFn(url: string, init: RequestInit): string {
 export class RequestBatcher {
     private readonly _windowMs: number;
     private readonly _maxSize: number;
+    private readonly _maxPending: number;
     private readonly _sliding: boolean;
     private readonly _keyFn: (url: string, init: RequestInit) => string;
     private readonly _buckets = new Map<string, BatchEntry[]>();
@@ -103,6 +109,7 @@ export class RequestBatcher {
         }
         this._windowMs = options.windowMs;
         this._maxSize = options.maxSize ?? Infinity;
+        this._maxPending = options.maxPending ?? Infinity;
         this._sliding = options.sliding ?? false;
         this._keyFn = options.keyFn ?? defaultKeyFn;
     }
@@ -123,6 +130,14 @@ export class RequestBatcher {
         fetcher: (url: string, init: RequestInit) => Promise<T>
     ): Promise<T> {
         const key = this._keyFn(url, init);
+
+        if (this.pendingCount >= this._maxPending) {
+            return Promise.reject(
+                new TypeError(
+                    `Batcher is full (maxPending=${this._maxPending})`
+                )
+            );
+        }
 
         return new Promise<T>((resolve, reject) => {
             const entry: BatchEntry = { fetcher, url, init, resolve, reject };

@@ -1,5 +1,6 @@
 import fs from "node:fs/promises";
 import path from "node:path";
+import { assertSafeOutputPath } from "./security.js";
 
 export interface DddBoilerplateOptions {
     /** Bounded context / módulo de dominio (nombre legible o slug). */
@@ -343,7 +344,7 @@ export async function generateDddBoilerplate(
         );
     }
 
-    const rootDir = path.resolve(process.cwd(), options.outDir?.trim() || slug);
+    const rootDir = assertSafeOutputPath(options.outDir?.trim() || slug);
 
     const contextPascal = pascalFromKebabSlug(slug);
     const outboundSlug = slugifyDomain(portLabel);

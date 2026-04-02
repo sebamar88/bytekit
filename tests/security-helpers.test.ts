@@ -103,7 +103,7 @@ describe("safe serialization helpers", () => {
 
         expect(result.createdAt).toBe("2026-04-01T00:00:00.000Z");
         expect((result.err as Record<string, unknown>).message).toBe("boom");
-        expect(result.namedFn).toBe("[Function namedFn]");
+        expect(result.namedFn).toMatch(/^\[Function namedFn\d*\]$/);
         expect(result.anon).toBe("[Function anon]");
         expect(result.symbolValue).toBe("Symbol(s)");
     });

@@ -2,8 +2,11 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import {
+    assertResponseUrl,
+    assertSafeOutputPath,
     assertSecureRemoteUrl,
     formatPropertyKey,
+    readResponseWithLimit,
     sanitizeTypeName,
 } from "./security.js";
 
@@ -32,6 +35,8 @@ export async function generateFromSwagger(
     try {
         let spec: any;
         const response = await fetch(secureUrl);
+
+        assertResponseUrl(response, "Swagger/OpenAPI type generation");
 
         if (!response.ok) {
             throw new Error(`HTTP ${response.status}: ${response.statusText}`);
@@ -69,6 +74,7 @@ export async function generateFromSwagger(
                             "Swagger/OpenAPI type generation"
                         )
                     );
+                    assertResponseUrl(tryRes, "Swagger/OpenAPI type generation");
                     if (
                         tryRes.ok &&
                         /* v8 ignore next */
@@ -77,7 +83,8 @@ export async function generateFromSwagger(
                         )
                     ) {
                         console.log(`✨ Found spec at: ${tryUrl}`);
-                        spec = await tryRes.json();
+                        const tryText = await readResponseWithLimit(tryRes);
+                        spec = JSON.parse(tryText);
                         found = true;
                         break;
                     }
@@ -92,7 +99,8 @@ export async function generateFromSwagger(
                 );
             }
         } else {
-            spec = await response.json();
+            const text = await readResponseWithLimit(response);
+            spec = JSON.parse(text);
         }
 
         const schemas = spec.components?.schemas || spec.definitions || {};
@@ -114,7 +122,7 @@ export async function generateFromSwagger(
 
         const typeDefinitions = typeDefinitionsArray.join("\n\n") + "\n\n";
 
-        const outputPath = path.join(process.cwd(), output);
+        const outputPath = assertSafeOutputPath(output);
         const outputDir = path.dirname(outputPath);
 
         await fs.mkdir(outputDir, { recursive: true });
@@ -176,11 +184,19 @@ function generateInterface(name: string, schema: any): string {
     return `export type ${sanitizedName} = ${mapOpenApiToTs(schema)};`;
 }
 
-function mapOpenApiToTs(schema: any): string {
+const MAX_SCHEMA_DEPTH = 20;
+
+function mapOpenApiToTs(schema: any, depth = 0, visitedRefs = new Set<string>()): string {
     if (!schema) return "any";
+    if (depth > MAX_SCHEMA_DEPTH) return "any /* max depth exceeded */";
 
     // Handle references
     if (schema.$ref) {
+        if (visitedRefs.has(schema.$ref)) {
+            const refName = schema.$ref.split("/").pop();
+            return refName ? sanitizeTypeName(refName, "ReferencedSchema") : "any";
+        }
+        visitedRefs.add(schema.$ref);
         const refName = schema.$ref.split("/").pop();
         /* v8 ignore next */
         return refName ? sanitizeTypeName(refName, "ReferencedSchema") : "any";
@@ -198,24 +214,24 @@ function mapOpenApiToTs(schema: any): string {
         case "boolean":
             return "boolean";
         case "array": {
-            const itemType = mapOpenApiToTs(schema.items);
+            const itemType = mapOpenApiToTs(schema.items, depth + 1, visitedRefs);
             return `${itemType}[]`;
         }
         case "object":
             if (schema.additionalProperties) {
-                return `Record<string, ${mapOpenApiToTs(schema.additionalProperties)}>`;
+                return `Record<string, ${mapOpenApiToTs(schema.additionalProperties, depth + 1, visitedRefs)}>`;
             }
             return "Record<string, any>";
         default:
             // Handle combinations (oneOf, anyOf, allOf)
             if (schema.oneOf || schema.anyOf) {
                 const types = (schema.oneOf || schema.anyOf).map((s: any) =>
-                    mapOpenApiToTs(s)
+                    mapOpenApiToTs(s, depth + 1, visitedRefs)
                 );
                 return `(${types.join(" | ")})`;
             }
             if (schema.allOf) {
-                const types = schema.allOf.map((s: any) => mapOpenApiToTs(s));
+                const types = schema.allOf.map((s: any) => mapOpenApiToTs(s, depth + 1, visitedRefs));
                 return `(${types.join(" & ")})`;
             }
             return "any";

@@ -10,9 +10,14 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { generateTypesFromEndpoint } from "../src/cli/type-generator";
 
 const mockFetch = (responseData: unknown) => {
+    const body = JSON.stringify(responseData) ?? "null";
     globalThis.fetch = vi.fn().mockResolvedValue({
         ok: true,
         status: 200,
+        url: "https://x.com",
+        headers: new Headers({ "content-type": "application/json" }),
+        body: null,
+        text: async () => body,
         json: async () => responseData,
     });
 };
@@ -52,7 +57,7 @@ describe("type-generator inference branches", () => {
         expect(content).toContain("type X = null;");
     });
 
-    it("inferType(undefined) → type X = undefined", async () => {
+    it("inferType(undefined) → type X = null (undefined becomes null via JSON)", async () => {
         mockFetch(undefined);
         await generateTypesFromEndpoint({
             endpoint: "https://x.com",
@@ -60,7 +65,7 @@ describe("type-generator inference branches", () => {
             name: "X",
         });
         const content = await readOutput();
-        expect(content).toContain("type X = undefined;");
+        expect(content).toContain("type X = null;");
     });
 
     it("inferType(boolean) → type X = boolean", async () => {
@@ -131,15 +136,15 @@ describe("type-generator inference branches", () => {
 
     // ── inferInlineType branches inside object fields ────────────────────────
 
-    it("inferInlineType(undefined) in object field → undefined type", async () => {
-        mockFetch({ undef: undefined });
+    it("inferInlineType(null) in object field → null type", async () => {
+        mockFetch({ undef: null });
         await generateTypesFromEndpoint({
             endpoint: "https://x.com",
             output: "out.ts",
             name: "R",
         });
         const content = await readOutput();
-        expect(content).toContain("undefined");
+        expect(content).toContain("null");
     });
 
     it("inferInlineType(boolean) in object field → boolean type", async () => {
@@ -216,8 +221,13 @@ describe("type-generator inference branches", () => {
     // ── body request option ───────────────────────────────────────────────────
 
     it("passes body to fetch when body option is provided", async () => {
+        const body = JSON.stringify({ result: "ok" });
         const spy = vi.fn().mockResolvedValue({
             ok: true,
+            url: "https://x.com/api",
+            headers: new Headers({ "content-type": "application/json" }),
+            body: null,
+            text: async () => body,
             json: async () => ({ result: "ok" }),
         });
         globalThis.fetch = spy;
@@ -236,8 +246,13 @@ describe("type-generator inference branches", () => {
     // ── headers option ────────────────────────────────────────────────────────
 
     it("merges custom headers into fetch call", async () => {
+        const body = JSON.stringify({ ok: true });
         const spy = vi.fn().mockResolvedValue({
             ok: true,
+            url: "https://x.com/api",
+            headers: new Headers({ "content-type": "application/json" }),
+            body: null,
+            text: async () => body,
             json: async () => ({ ok: true }),
         });
         globalThis.fetch = spy;
