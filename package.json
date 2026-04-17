@@ -121,6 +121,10 @@
         "./object-utils": {
             "types": "./dist/utils/helpers/ObjectUtils.d.ts",
             "import": "./dist/utils/helpers/ObjectUtils.js"
+        },
+        "./string-utils": {
+            "types": "./dist/utils/helpers/StringUtils.d.ts",
+            "import": "./dist/utils/helpers/StringUtils.js"
         }
     },
     "scripts": {
