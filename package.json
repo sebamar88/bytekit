@@ -117,6 +117,10 @@
         "./collection-utils": {
             "types": "./dist/utils/helpers/CollectionUtils.d.ts",
             "import": "./dist/utils/helpers/CollectionUtils.js"
+        },
+        "./object-utils": {
+            "types": "./dist/utils/helpers/ObjectUtils.d.ts",
+            "import": "./dist/utils/helpers/ObjectUtils.js"
         }
     },
     "scripts": {
