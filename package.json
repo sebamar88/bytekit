@@ -113,6 +113,10 @@
         "./error-boundary": {
             "types": "./dist/utils/core/ErrorBoundary.d.ts",
             "import": "./dist/utils/core/ErrorBoundary.js"
+        },
+        "./collection-utils": {
+            "types": "./dist/utils/helpers/CollectionUtils.d.ts",
+            "import": "./dist/utils/helpers/CollectionUtils.js"
         }
     },
     "scripts": {
