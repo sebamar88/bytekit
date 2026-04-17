@@ -125,6 +125,10 @@
         "./string-utils": {
             "types": "./dist/utils/helpers/StringUtils.d.ts",
             "import": "./dist/utils/helpers/StringUtils.js"
+        },
+        "./fn-utils": {
+            "types": "./dist/utils/helpers/FnUtils.d.ts",
+            "import": "./dist/utils/helpers/FnUtils.js"
         }
     },
     "scripts": {

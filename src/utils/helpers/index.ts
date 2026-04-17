@@ -14,3 +14,4 @@ export * from "#helpers/pipe.js";
 export * from "#helpers/CollectionUtils.js";
 export * from "#helpers/StringUtils.js";
 export * from "#helpers/ObjectUtils.js";
+export * from "#helpers/FnUtils.js";
