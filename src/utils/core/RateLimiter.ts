@@ -119,10 +119,14 @@ export class RateLimiter {
 
             await new Promise<void>((resolve, reject) => {
                 const timeout = setTimeout(resolve, waitTime);
-                signal?.addEventListener("abort", () => {
-                    clearTimeout(timeout);
-                    reject(signal.reason);
-                }, { once: true });
+                signal?.addEventListener(
+                    "abort",
+                    () => {
+                        clearTimeout(timeout);
+                        reject(signal.reason);
+                    },
+                    { once: true }
+                );
             });
         }
     }
@@ -225,10 +229,14 @@ export class SlidingWindowRateLimiter {
 
             await new Promise<void>((resolve, reject) => {
                 const timeout = setTimeout(resolve, waitTime);
-                signal?.addEventListener("abort", () => {
-                    clearTimeout(timeout);
-                    reject(signal.reason);
-                }, { once: true });
+                signal?.addEventListener(
+                    "abort",
+                    () => {
+                        clearTimeout(timeout);
+                        reject(signal.reason);
+                    },
+                    { once: true }
+                );
             });
         }
     }

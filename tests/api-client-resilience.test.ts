@@ -7,36 +7,39 @@ test("ApiClient - integrated rate limiting", async () => {
         callCount++;
         return new Response(JSON.stringify({ ok: true }), {
             status: 200,
-            headers: { "content-type": "application/json" }
+            headers: { "content-type": "application/json" },
         });
     };
 
     // Limit to 2 requests per 100ms
     const limiter = new RateLimiter({
         maxRequests: 2,
-        windowMs: 100
+        windowMs: 100,
     });
 
     const api = new ApiClient({
         baseUrl: "https://api.example.com",
         fetchImpl,
-        rateLimiter: limiter
+        rateLimiter: limiter,
     });
 
     const start = Date.now();
-    
+
     // First 2 should be immediate
     await api.get("/1");
     await api.get("/2");
-    
+
     assert.equal(callCount, 2);
-    
+
     // Third one should wait
     await api.get("/3");
     const end = Date.now();
-    
+
     assert.equal(callCount, 3);
-    assert.ok(end - start >= 100, `Should have waited at least 100ms, but took ${end - start}ms`);
+    assert.ok(
+        end - start >= 100,
+        `Should have waited at least 100ms, but took ${end - start}ms`
+    );
 });
 
 test("ApiClient - supports rateLimiter config object in constructor", async () => {
@@ -45,7 +48,7 @@ test("ApiClient - supports rateLimiter config object in constructor", async () =
         callCount++;
         return new Response(JSON.stringify({ ok: true }), {
             status: 200,
-            headers: { "content-type": "application/json" }
+            headers: { "content-type": "application/json" },
         });
     };
 
@@ -54,8 +57,8 @@ test("ApiClient - supports rateLimiter config object in constructor", async () =
         fetchImpl,
         rateLimiter: {
             maxRequests: 1,
-            windowMs: 50
-        }
+            windowMs: 50,
+        },
     });
 
     const start = Date.now();
@@ -64,7 +67,10 @@ test("ApiClient - supports rateLimiter config object in constructor", async () =
     const end = Date.now();
 
     assert.equal(callCount, 2);
-    assert.ok(end - start >= 50, "Should have respected rate limit config object");
+    assert.ok(
+        end - start >= 50,
+        "Should have respected rate limit config object"
+    );
 });
 
 test("ApiClient - rate limiting wait can be aborted", async () => {
@@ -75,8 +81,8 @@ test("ApiClient - rate limiting wait can be aborted", async () => {
         fetchImpl,
         rateLimiter: {
             maxRequests: 1,
-            windowMs: 1000 // Long wait
-        }
+            windowMs: 1000, // Long wait
+        },
     });
 
     // First request consumes the token
@@ -100,5 +106,8 @@ test("ApiClient - rate limiting wait can be aborted", async () => {
     }
 
     const end = Date.now();
-    assert.ok(end - start < 500, "Should have aborted quickly, not waited full window");
+    assert.ok(
+        end - start < 500,
+        "Should have aborted quickly, not waited full window"
+    );
 });
