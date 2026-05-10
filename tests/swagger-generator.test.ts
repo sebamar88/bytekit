@@ -301,13 +301,11 @@ describe("swagger-generator", () => {
     });
 
     it("should handle fetch errors", async () => {
-        globalThis.fetch = vi
-            .fn()
-            .mockResolvedValue({
-                ok: false,
-                status: 500,
-                url: "https://api.com/fail",
-            });
+        globalThis.fetch = vi.fn().mockResolvedValue({
+            ok: false,
+            status: 500,
+            url: "https://api.com/fail",
+        });
         const spy = vi.spyOn(console, "error").mockImplementation(() => {});
         const exitSpy = vi.spyOn(process, "exit").mockImplementation(() => {
             throw new Error("exit");
