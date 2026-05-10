@@ -1,6 +1,6 @@
 # API Reference
 
-Welcome to the **bytekit** API reference. This document provides an overview of all available modules in the current version (**v2.0.1+**).
+Welcome to the **bytekit** API reference. This document provides an overview of all available modules in the current version (**v3.2.0+**).
 
 ## 🌐 Networking & Resilience
 

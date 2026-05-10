@@ -11,6 +11,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - No changes yet.
 
+## [3.2.1] - 2026-05-10
+
+### Fixed
+
+- **ApiClient Rate Limiting**: Resolved API inconsistency by integrating `RateLimiter` directly into the `ApiClient` constructor and configuration.
+- **AbortSignal Support**: Improved `RateLimiter.waitForAllowance()` to support `AbortSignal`, ensuring rate limit waits can be cancelled.
+- **Documentation**: Corrected conflicting implementation guidance for resilience patterns across guides and Context7 benchmark rules.
+
 ## [3.2.0] - 2026-05-10
 
 ### Added

@@ -20,12 +20,6 @@ Ensure you don't exceed the server's request limits by throttling outgoing reque
 ```typescript
 import { ApiClient, RateLimiter } from "bytekit";
 
-// 1. Configure the Rate Limiter (e.g., 50 requests per minute per hostname)
-const rateLimiter = new RateLimiter({
-    maxRequests: 50,
-    windowMs: 60 * 1000,
-});
-
 const api = new ApiClient({
     baseUrl: "https://api.example.com",
     
@@ -41,15 +35,12 @@ const api = new ApiClient({
     circuitBreaker: {
         failureThreshold: 5,     // Open circuit after 5 failures
         resetTimeoutMs: 30000,   // Wait 30s before trying again
-    }
-});
+    },
 
-// 4. Use Interceptors to apply Rate Limiting globally
-api.addInterceptor({
-    request: async (url, init) => {
-        // Wait until rate limiter allows the request
-        await rateLimiter.waitForAllowance(url);
-        return [url, init];
+    // 4. Configure Rate Limiter (e.g., 50 requests per minute per hostname)
+    rateLimiter: {
+        maxRequests: 50,
+        windowMs: 60 * 1000,
     }
 });
 ```

@@ -8,6 +8,7 @@ import {
     RetryConfig,
     CircuitBreakerConfig,
 } from "#core/RetryPolicy.js";
+import { RateLimiter, RateLimiterConfig } from "#core/RateLimiter.js";
 import {
     ResponseValidator,
     ValidationSchema,
@@ -49,6 +50,7 @@ export interface ApiClientConfig {
     logger?: Logger;
     retryPolicy?: RetryConfig;
     circuitBreaker?: CircuitBreakerConfig;
+    rateLimiter?: RateLimiterConfig | RateLimiter;
     /** Optional pool for limiting concurrent requests. */
     pool?: PromisePoolOptions;
     /** Optional request queue for concurrency-limited, priority-aware request execution. */
@@ -249,6 +251,7 @@ export class ApiClient {
     >;
     private readonly retryPolicy: RetryPolicy;
     private readonly circuitBreaker: CircuitBreaker;
+    private readonly rateLimiter?: RateLimiter;
     private readonly pool?: PromisePool;
     private readonly _queue?: RequestQueue;
     private readonly _batcher?: RequestBatcher;
@@ -283,6 +286,7 @@ export class ApiClient {
         logger,
         retryPolicy,
         circuitBreaker,
+        rateLimiter,
         pool,
         queue,
         batch,
@@ -319,6 +323,15 @@ export class ApiClient {
         this.logger = logger;
         this.retryPolicy = new RetryPolicy(retryPolicy);
         this.circuitBreaker = new CircuitBreaker(circuitBreaker);
+
+        // Initialize RateLimiter if configured
+        if (rateLimiter) {
+            this.rateLimiter =
+                rateLimiter instanceof RateLimiter
+                    ? rateLimiter
+                    : new RateLimiter(rateLimiter);
+        }
+
         this.pool = pool ? new PromisePool(pool) : undefined;
         this._queue = queue ? new RequestQueue(queue) : undefined;
         this._batcher = batch ? new RequestBatcher(batch) : undefined;
@@ -609,6 +622,11 @@ export class ApiClient {
             body: preparedBody,
             signal,
         };
+
+        // Apply Rate Limiting if configured
+        if (this.rateLimiter) {
+            await this.rateLimiter.waitForAllowance(url, signal);
+        }
 
         // Request interceptor
         const interceptorsEnabled =

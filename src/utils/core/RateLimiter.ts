@@ -109,12 +109,21 @@ export class RateLimiter {
     /**
      * Wait until request is allowed (blocking)
      */
-    async waitForAllowance(url: string): Promise<void> {
+    async waitForAllowance(url: string, signal?: AbortSignal): Promise<void> {
         while (!this.isAllowed(url)) {
+            if (signal?.aborted) return;
+
             const stats = this.getStats(url);
             /* v8 ignore next */
             const waitTime = Math.min(stats.retryAfter ?? 1, 1) * 1000;
-            await new Promise((resolve) => setTimeout(resolve, waitTime));
+
+            await new Promise<void>((resolve, reject) => {
+                const timeout = setTimeout(resolve, waitTime);
+                signal?.addEventListener("abort", () => {
+                    clearTimeout(timeout);
+                    reject(signal.reason);
+                }, { once: true });
+            });
         }
     }
 }
@@ -206,12 +215,21 @@ export class SlidingWindowRateLimiter {
     /**
      * Wait until request is allowed
      */
-    async waitForAllowance(url: string): Promise<void> {
+    async waitForAllowance(url: string, signal?: AbortSignal): Promise<void> {
         while (!this.isAllowed(url)) {
+            if (signal?.aborted) return;
+
             const stats = this.getStats(url);
             /* v8 ignore next */
             const waitTime = Math.min(stats.retryAfter ?? 1, 1) * 1000;
-            await new Promise((resolve) => setTimeout(resolve, waitTime));
+
+            await new Promise<void>((resolve, reject) => {
+                const timeout = setTimeout(resolve, waitTime);
+                signal?.addEventListener("abort", () => {
+                    clearTimeout(timeout);
+                    reject(signal.reason);
+                }, { once: true });
+            });
         }
     }
 }
