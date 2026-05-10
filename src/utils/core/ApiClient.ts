@@ -1,5 +1,6 @@
 import { Logger } from "#core/Logger.js";
 import { UrlHelper } from "#helpers/UrlHelper.js";
+import { StreamingHelper, SSEEvent } from "#helpers/StreamingHelper.js";
 import { retry as retryFn } from "../async/retry.js";
 import {
     RetryPolicy,
@@ -377,6 +378,101 @@ export class ApiClient {
     }
 
     /**
+     * Consume a Server-Sent Events (SSE) stream.
+     *
+     * This method combines the robustness of `StreamingHelper.fetchSSE` with the
+     * configuration of the `ApiClient` (baseUrl, authorization headers, interceptors).
+     *
+     * Supports normalized signature: `api.stream(path, body)` or `api.stream(path, options)`.
+     *
+     * @example
+     * // Consume a POST-based stream with filters
+     * for await (const ev of api.stream<MyData>("/events", { type: "urgent" })) {
+     *   console.log(ev.data);
+     * }
+     *
+     * @param path The relative path to the SSE endpoint
+     * @param bodyOrOptions Request body (for POST) or full request options
+     */
+    async *stream<T = unknown>(
+        path: string | URL,
+        bodyOrOptions?: RequestOptions | unknown
+    ): AsyncGenerator<SSEEvent<T>, void, undefined> {
+        const options = this.normalizeBodyOrOptions(bodyOrOptions);
+        // Default to POST if we have a body but no explicit method
+        if (options.body && !options.method) {
+            options.method = "POST";
+        }
+        const { url, init, controller } = await this.prepareRequestConfig(
+            path,
+            options
+        );
+
+        try {
+            const stream = StreamingHelper.fetchSSE<T>(url, {
+                method: init.method,
+                body: init.body,
+                headers: init.headers as Record<string, string>,
+                signal: init.signal,
+                fetchImpl: this.fetchImpl,
+            });
+
+            for await (const event of stream) {
+                yield event;
+            }
+        } finally {
+            controller.abort();
+        }
+    }
+
+    /**
+     * Consume a JSON Lines (NDJSON) stream.
+     *
+     * Similar to `stream()`, but for endpoints that return a sequence of JSON objects
+     * separated by newlines instead of SSE format.
+     *
+     * Supports normalized signature: `api.streamJsonLines(path, body)` or `api.streamJsonLines(path, options)`.
+     *
+     * @example
+     * for await (const user of api.streamJsonLines<User>("/users/export")) {
+     *   console.log(user.name);
+     * }
+     *
+     * @param path The relative path to the NDJSON endpoint
+     * @param bodyOrOptions Request body (for POST) or full request options
+     */
+    async *streamJsonLines<T = unknown>(
+        path: string | URL,
+        bodyOrOptions?: RequestOptions | unknown
+    ): AsyncGenerator<T, void, undefined> {
+        const options = this.normalizeBodyOrOptions(bodyOrOptions);
+        // Default to POST if we have a body but no explicit method
+        if (options.body && !options.method) {
+            options.method = "POST";
+        }
+        const { url, init, controller } = await this.prepareRequestConfig(
+            path,
+            options
+        );
+
+        try {
+            const stream = StreamingHelper.fetchNDJSON<T>(url, {
+                method: init.method,
+                body: init.body,
+                headers: init.headers as Record<string, string>,
+                signal: init.signal,
+                fetchImpl: this.fetchImpl,
+            });
+
+            for await (const item of stream) {
+                yield item;
+            }
+        } finally {
+            controller.abort();
+        }
+    }
+
+    /**
      * Fetch a paginated list of resources.
      *
      * Handles standard pagination (page/limit/offset), filtering, and sorting.
@@ -482,8 +578,21 @@ export class ApiClient {
         }
 
         const controller = new AbortController();
-        const signal = controller.signal;
         const timeout = timeoutMs ?? this.timeoutMs;
+
+        // Link user signal if provided
+        if (requestOptions.signal) {
+            const userSignal = requestOptions.signal;
+            if (userSignal.aborted) {
+                controller.abort(userSignal.reason);
+            } else {
+                userSignal.addEventListener("abort", () => {
+                    controller.abort(userSignal.reason);
+                });
+            }
+        }
+
+        const signal = controller.signal;
 
         // Convert Headers to plain object for compatibility with all fetch implementations
         const headersObject = Object.fromEntries(

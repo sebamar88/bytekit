@@ -11,6 +11,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - No changes yet.
 
+## [3.2.0] - 2026-05-10
+
+### Added
+
+- **ApiClient Streaming Enhancements**:
+    - Added `api.stream<T>()` for robust Server-Sent Events (SSE) support.
+    - Added `api.streamJsonLines<T>()` for NDJSON support.
+    - **Signature Normalization**: Both methods support direct body passing (e.g., `api.stream(path, { filter: 'urgent' })`), matching `api.post()` behavior.
+    - Full support for `POST`, request bodies, `Authorization` (via interceptors), and `AbortController` in all streaming methods.
+- **StreamingHelper Enhancements**:
+    - Added `fetchNDJSON<T>()`: A modern, generator-based NDJSON consumer with full feature parity (POST, bodies, custom fetch).
+    - Improved `fetchSSE<T>()` with proactive cancellation and better buffer handling.
+
+### Fixed
+
+- **ApiClient**: Resolved a bug where user-provided `AbortSignal` in `RequestOptions` was being ignored. Now properly links user signal to the internal timeout controller.
+
+### Deprecated
+
+- `StreamingHelper.streamSSE`: Deprecated in favor of `ApiClient.stream()` or `StreamingHelper.fetchSSE()`.
+
 ## [3.1.0] - 2026-04-02
 
 ### Security

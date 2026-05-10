@@ -59,6 +59,10 @@ export interface FetchSSEOptions {
      * If `false` (default), the helper tries `JSON.parse` first.
      */
     raw?: boolean;
+    /**
+     * Optional custom fetch implementation.
+     */
+    fetchImpl?: typeof fetch;
 }
 
 export class StreamingHelper {
@@ -199,6 +203,10 @@ export class StreamingHelper {
      * Establishes a persistent connection to receive real-time updates from the server.
      * Automatically parses incoming data as JSON.
      *
+     * @deprecated Use {@link StreamingHelper.fetchSSE} for a more robust, fetch-based implementation
+     * that supports POST, custom headers, and AbortController. If using {@link ApiClient},
+     * prefer `api.stream()` which includes automatic authorization and interceptors.
+     *
      * @example
      * const stream = StreamingHelper.streamSSE("http://localhost:3000/events");
      * const unsubscribe = stream.subscribe((data) => {
@@ -310,6 +318,7 @@ export class StreamingHelper {
             signal,
             eventTypes,
             raw = false,
+            fetchImpl = globalThis.fetch.bind(globalThis),
         } = options;
 
         // Build the request body
@@ -335,7 +344,7 @@ export class StreamingHelper {
             }
         }
 
-        const response = await fetch(endpoint, {
+        const response = await fetchImpl(endpoint, {
             method,
             headers: {
                 Accept: "text/event-stream",
@@ -367,45 +376,47 @@ export class StreamingHelper {
 
         try {
             while (true) {
-                const { done, value } = await reader.read();
+                if (signal?.aborted) return;
 
+                const { done, value } = await reader.read();
                 if (done) {
-                    // Flush any partial event left in the buffer
-                    const flushed = this.flushSSEEvent<T>(
+                    const evt = this.flushSSEEvent<T>(
                         currentEvent,
                         currentData,
                         currentId,
                         currentRetry,
                         eventTypes,
-                        raw
+                        raw,
+                        signal
                     );
-                    /* v8 ignore next */
-                    if (flushed) yield flushed;
+                    if (evt) yield evt;
                     break;
                 }
+                
+                if (signal?.aborted) return;
 
                 buffer += decoder.decode(value, { stream: true });
-
-                // SSE spec: events are separated by one or more blank lines (\n\n)
                 const segments = buffer.split("\n");
-                // Keep the last segment (may be incomplete)
-                /* v8 ignore next */
                 buffer = segments.pop()!;
 
                 for (const line of segments) {
+                    if (signal?.aborted) return;
+
                     if (line === "" || line === "\r") {
-                        // Blank line → dispatch current event
                         const evt = this.flushSSEEvent<T>(
                             currentEvent,
                             currentData,
                             currentId,
                             currentRetry,
                             eventTypes,
-                            raw
+                            raw,
+                            signal
                         );
-                        if (evt) yield evt;
+                        if (evt) {
+                            yield evt;
+                            if (signal?.aborted) return;
+                        }
 
-                        // Reset for next event
                         currentEvent = "";
                         currentData = [];
                         currentId = undefined;
@@ -416,8 +427,6 @@ export class StreamingHelper {
                     const cleaned = line.endsWith("\r")
                         ? line.slice(0, -1)
                         : line;
-
-                    // Lines starting with ':' are comments (keep-alive) — skip
                     if (cleaned.startsWith(":")) continue;
 
                     const colonIdx = cleaned.indexOf(":");
@@ -429,7 +438,6 @@ export class StreamingHelper {
                         val = "";
                     } else {
                         field = cleaned.slice(0, colonIdx);
-                        // The spec says: if the first character after ':' is a space, strip it
                         val =
                             cleaned[colonIdx + 1] === " "
                                 ? cleaned.slice(colonIdx + 2)
@@ -452,7 +460,6 @@ export class StreamingHelper {
                             if (!isNaN(n)) currentRetry = n;
                             break;
                         }
-                        // Unknown fields are ignored per spec
                     }
                 }
             }
@@ -472,9 +479,10 @@ export class StreamingHelper {
         id: string | undefined,
         retry: number | undefined,
         allowedTypes: string[] | undefined,
-        raw: boolean
+        raw: boolean,
+        signal?: AbortSignal
     ): SSEEvent<T> | null {
-        if (dataLines.length === 0) return null;
+        if (dataLines.length === 0 || signal?.aborted) return null;
 
         const type = eventType || "message";
 
@@ -505,6 +513,108 @@ export class StreamingHelper {
         if (id !== undefined) evt.id = id;
         if (retry !== undefined) evt.retry = retry;
         return evt;
+    }
+
+    /**
+     * Consume a JSON Lines (NDJSON) endpoint via `fetch` + `ReadableStream`.
+     *
+     * Returns an `AsyncGenerator` yielding each parsed JSON object.
+     * Supports POST, bodies, custom headers, and AbortController.
+     *
+     * @example
+     * for await (const item of StreamingHelper.fetchNDJSON<User>("/api/users")) {
+     *   console.log(item.name);
+     * }
+     */
+    static async *fetchNDJSON<T = unknown>(
+        endpoint: string,
+        options: FetchSSEOptions = {}
+    ): AsyncGenerator<T, void, undefined> {
+        const {
+            method = "GET",
+            body,
+            headers = {},
+            signal,
+            fetchImpl = globalThis.fetch.bind(globalThis),
+        } = options;
+
+        // Build the request body
+        let requestBody: BodyInit | undefined;
+        if (body !== undefined && body !== null) {
+            if (
+                typeof body === "string" ||
+                body instanceof ArrayBuffer ||
+                body instanceof FormData ||
+                body instanceof URLSearchParams ||
+                body instanceof Blob ||
+                (typeof ReadableStream !== "undefined" &&
+                    body instanceof ReadableStream)
+            ) {
+                requestBody = body as BodyInit;
+            } else {
+                requestBody = JSON.stringify(body);
+                if (!headers["Content-Type"] && !headers["content-type"]) {
+                    headers["Content-Type"] = "application/json";
+                }
+            }
+        }
+
+        const response = await fetchImpl(endpoint, {
+            method,
+            headers: {
+                Accept: "application/x-ndjson",
+                ...headers,
+            },
+            body: requestBody,
+            signal,
+        });
+
+        if (!response.ok) {
+            throw new Error(`NDJSON request failed with status ${response.status}`);
+        }
+
+        if (!response.body) {
+            throw new Error("Response body is empty");
+        }
+
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        let buffer = "";
+
+        try {
+            while (true) {
+                if (signal?.aborted) break;
+
+                const { done, value } = await reader.read();
+                if (done) {
+                    if (buffer.trim()) {
+                        try {
+                            yield JSON.parse(buffer) as T;
+                        } catch {
+                            console.warn("Failed to parse final NDJSON buffer:", buffer);
+                        }
+                    }
+                    break;
+                }
+
+                buffer += decoder.decode(value, { stream: true });
+                const lines = buffer.split("\n");
+                buffer = lines.pop() || "";
+
+                for (const line of lines) {
+                    const trimmed = line.trim();
+                    if (trimmed) {
+                        try {
+                            yield JSON.parse(trimmed) as T;
+                        } catch {
+                            console.warn("Failed to parse NDJSON line:", trimmed);
+                        }
+                    }
+                }
+            }
+        } finally {
+            reader.releaseLock();
+        }
     }
 
     /**
