@@ -136,7 +136,9 @@ describe("safe serialization helpers", () => {
 
     it("uses 'anonymous' fallback for functions with no inferred name", () => {
         // Constructing a truly nameless function via eval-like call so V8 can't infer a name
-        const fn = (new Function("return function(){return 0}"))() as () => number;
+        const fn = new Function(
+            "return function(){return 0}"
+        )() as () => number;
         expect(fn.name).toBe("");
         const result = safeSerialize({ fn }) as Record<string, unknown>;
         expect(result.fn).toBe("[Function anonymous]");
@@ -146,13 +148,16 @@ describe("safe serialization helpers", () => {
         // Object.create(null) has no constructor, so constructor?.name is undefined
         const noProto = Object.create(null) as Record<string, unknown>;
         noProto.x = Object.create(null);
-        const result = safeSerialize({ noProto }, { maxDepth: 1 }) as Record<string, unknown>;
+        const result = safeSerialize({ noProto }, { maxDepth: 1 }) as Record<
+            string,
+            unknown
+        >;
         // At depth 1, noProto is visited. Its child 'x' is at depth 2 >= maxDepth=1... wait
         // Actually we need depth >= maxDepth on an object. With maxDepth=1, depth 1 >= 1.
         // The outer object is at depth 0, noProto is iterated at depth 1.
         // At depth 1, visit(noProto, 1) → depth(1) is NOT >= maxDepth(1)... it enters the object path.
         // We need a deeper nest: maxDepth=0 would catch depth 0 for objects.
         // Use maxDepth=1: outer obj at depth 0 → visits noProto at depth 1 → depth(1) >= maxDepth(1) → "[Object/null]"
-        expect((result.noProto as string)).toMatch(/\[.*\]/);
+        expect(result.noProto as string).toMatch(/\[.*\]/);
     });
 });

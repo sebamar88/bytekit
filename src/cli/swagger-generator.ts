@@ -74,7 +74,10 @@ export async function generateFromSwagger(
                             "Swagger/OpenAPI type generation"
                         )
                     );
-                    assertResponseUrl(tryRes, "Swagger/OpenAPI type generation");
+                    assertResponseUrl(
+                        tryRes,
+                        "Swagger/OpenAPI type generation"
+                    );
                     if (
                         tryRes.ok &&
                         /* v8 ignore next */
@@ -186,7 +189,11 @@ function generateInterface(name: string, schema: any): string {
 
 const MAX_SCHEMA_DEPTH = 20;
 
-function mapOpenApiToTs(schema: any, depth = 0, visitedRefs = new Set<string>()): string {
+function mapOpenApiToTs(
+    schema: any,
+    depth = 0,
+    visitedRefs = new Set<string>()
+): string {
     if (!schema) return "any";
     if (depth > MAX_SCHEMA_DEPTH) return "any /* max depth exceeded */";
 
@@ -194,7 +201,9 @@ function mapOpenApiToTs(schema: any, depth = 0, visitedRefs = new Set<string>())
     if (schema.$ref) {
         if (visitedRefs.has(schema.$ref)) {
             const refName = schema.$ref.split("/").pop();
-            return refName ? sanitizeTypeName(refName, "ReferencedSchema") : "any";
+            return refName
+                ? sanitizeTypeName(refName, "ReferencedSchema")
+                : "any";
         }
         visitedRefs.add(schema.$ref);
         const refName = schema.$ref.split("/").pop();
@@ -214,7 +223,11 @@ function mapOpenApiToTs(schema: any, depth = 0, visitedRefs = new Set<string>())
         case "boolean":
             return "boolean";
         case "array": {
-            const itemType = mapOpenApiToTs(schema.items, depth + 1, visitedRefs);
+            const itemType = mapOpenApiToTs(
+                schema.items,
+                depth + 1,
+                visitedRefs
+            );
             return `${itemType}[]`;
         }
         case "object":
@@ -231,7 +244,9 @@ function mapOpenApiToTs(schema: any, depth = 0, visitedRefs = new Set<string>())
                 return `(${types.join(" | ")})`;
             }
             if (schema.allOf) {
-                const types = schema.allOf.map((s: any) => mapOpenApiToTs(s, depth + 1, visitedRefs));
+                const types = schema.allOf.map((s: any) =>
+                    mapOpenApiToTs(s, depth + 1, visitedRefs)
+                );
                 return `(${types.join(" & ")})`;
             }
             return "any";

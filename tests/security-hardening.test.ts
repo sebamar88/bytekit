@@ -48,9 +48,7 @@ describe("assertSafeOutputPath", () => {
 describe("assertResponseUrl", () => {
     it("accepts HTTPS final URLs", () => {
         const response = { url: "https://api.example.com/data" } as Response;
-        expect(() =>
-            assertResponseUrl(response, "test")
-        ).not.toThrow();
+        expect(() => assertResponseUrl(response, "test")).not.toThrow();
     });
 
     it("rejects HTTP final URLs on non-loopback hosts", () => {
@@ -62,9 +60,7 @@ describe("assertResponseUrl", () => {
 
     it("allows empty response.url (no redirect verification possible)", () => {
         const response = { url: "" } as Response;
-        expect(() =>
-            assertResponseUrl(response, "test")
-        ).not.toThrow();
+        expect(() => assertResponseUrl(response, "test")).not.toThrow();
     });
 });
 
@@ -89,9 +85,9 @@ describe("readResponseWithLimit", () => {
             body: null,
             text: async () => "",
         } as unknown as Response;
-        await expect(
-            readResponseWithLimit(response)
-        ).rejects.toThrow(/too large/);
+        await expect(readResponseWithLimit(response)).rejects.toThrow(
+            /too large/
+        );
     });
 
     it("reads streaming responses via body.getReader()", async () => {
@@ -128,9 +124,9 @@ describe("readResponseWithLimit", () => {
             body: { getReader: () => reader },
             text: async () => "",
         } as unknown as Response;
-        await expect(
-            readResponseWithLimit(response, 50)
-        ).rejects.toThrow(/too large/);
+        await expect(readResponseWithLimit(response, 50)).rejects.toThrow(
+            /too large/
+        );
         expect(reader.cancel).toHaveBeenCalled();
     });
 
@@ -208,9 +204,9 @@ describe("RequestBatcher – maxPending", () => {
         });
         void batcher.add("https://api.com/a", {});
         void batcher.add("https://api.com/b", {});
-        await expect(
-            batcher.add("https://api.com/c", {})
-        ).rejects.toThrow(/Batcher is full/);
+        await expect(batcher.add("https://api.com/c", {})).rejects.toThrow(
+            /Batcher is full/
+        );
         vi.useRealTimers();
     });
 });
@@ -220,9 +216,8 @@ describe("RequestBatcher – maxPending", () => {
 describe("RequestCache – patternToRegex safety", () => {
     it("invalidation with wildcards completes quickly (no ReDoS)", async () => {
         // Import dynamically to access the class
-        const { RequestCache } = await import(
-            "../src/utils/core/RequestCache.js"
-        );
+        const { RequestCache } =
+            await import("../src/utils/core/RequestCache.js");
         const cache = new RequestCache({ ttl: 60_000 });
 
         // Populate cache with keys that could trigger catastrophic backtracking

@@ -148,10 +148,7 @@ export const MAX_CLI_RESPONSE_BYTES = 50 * 1024 * 1024;
  * Call this after `fetch()` to ensure the redirect chain did not land on an
  * insecure or internal host.
  */
-export function assertResponseUrl(
-    response: Response,
-    purpose: string
-): void {
+export function assertResponseUrl(response: Response, purpose: string): void {
     const finalUrl = response.url;
     if (finalUrl) {
         assertSecureRemoteUrl(finalUrl, purpose);
@@ -181,7 +178,7 @@ export async function readResponseWithLimit(
     const decoder = new TextDecoder();
     let total = 0;
     let result = "";
-     
+
     while (true) {
         const { done, value } = await reader.read();
         if (done) break;

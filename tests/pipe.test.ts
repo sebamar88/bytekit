@@ -12,7 +12,7 @@ describe("pipe", () => {
         const result = pipe(
             "hello",
             (s: string) => s.toUpperCase(),
-            (s: string) => s + "!",
+            (s: string) => s + "!"
         );
         expect(result).toBe("HELLO!");
     });
@@ -22,7 +22,7 @@ describe("pipe", () => {
             1,
             (n: number) => n + 1,
             (n: number) => n * 3,
-            (n: number) => String(n),
+            (n: number) => String(n)
         );
         expect(result).toBe("6");
     });
@@ -39,7 +39,7 @@ describe("pipe", () => {
             (n: number) => n + 1,
             (n: number) => n + 1,
             (n: number) => n + 1,
-            (n: number) => n + 1,
+            (n: number) => n + 1
         );
         expect(result).toBe(10);
     });
@@ -48,7 +48,7 @@ describe("pipe", () => {
         const result = pipe(
             { x: 1 },
             (o: { x: number }) => ({ ...o, y: 2 }),
-            (o: { x: number; y: number }) => o.x + o.y,
+            (o: { x: number; y: number }) => o.x + o.y
         );
         expect(result).toBe(3);
     });
@@ -57,8 +57,14 @@ describe("pipe", () => {
         const calls: number[] = [];
         pipe(
             10,
-            (n: number) => { calls.push(n); return n * 2; },
-            (n: number) => { calls.push(n); return n + 5; },
+            (n: number) => {
+                calls.push(n);
+                return n * 2;
+            },
+            (n: number) => {
+                calls.push(n);
+                return n + 5;
+            }
         );
         expect(calls).toEqual([10, 20]);
     });
@@ -84,7 +90,7 @@ describe("compose", () => {
             (s: string) => s + "!",
             (s: string) => s.toUpperCase(),
             (s: string) => s.trim(),
-            "  hello  ",
+            "  hello  "
         );
         expect(result).toBe("HELLO!");
     });
@@ -108,10 +114,7 @@ describe("pipeAsync", () => {
     });
 
     test("2 fns — sync functions work", async () => {
-        const result = await pipeAsync(
-            5,
-            (n: number) => n * 2,
-        );
+        const result = await pipeAsync(5, (n: number) => n * 2);
         expect(result).toBe(10);
     });
 
@@ -120,7 +123,7 @@ describe("pipeAsync", () => {
             "a",
             async (s: string) => s + "b",
             (s: string) => s + "c",
-            async (s: string) => s + "d",
+            async (s: string) => s + "d"
         );
         expect(result).toBe("abcd");
     });
@@ -137,7 +140,7 @@ describe("pipeAsync", () => {
             async (n: number) => n + 1,
             async (n: number) => n + 1,
             async (n: number) => n + 1,
-            async (n: number) => n + 1,
+            async (n: number) => n + 1
         );
         expect(result).toBe(10);
     });
@@ -146,9 +149,18 @@ describe("pipeAsync", () => {
         const order: number[] = [];
         await pipeAsync(
             0,
-            async (n: number) => { order.push(1); return n + 1; },
-            async (n: number) => { order.push(2); return n + 1; },
-            async (n: number) => { order.push(3); return n + 1; },
+            async (n: number) => {
+                order.push(1);
+                return n + 1;
+            },
+            async (n: number) => {
+                order.push(2);
+                return n + 1;
+            },
+            async (n: number) => {
+                order.push(3);
+                return n + 1;
+            }
         );
         expect(order).toEqual([1, 2, 3]);
     });
@@ -158,18 +170,19 @@ describe("pipeAsync", () => {
             pipeAsync(
                 0,
                 async (n: number) => n + 1,
-                () => { throw new Error("step failed"); },
-                async (n: number) => n + 1,
-            ),
+                () => {
+                    throw new Error("step failed");
+                },
+                async (n: number) => n + 1
+            )
         ).rejects.toThrow("step failed");
     });
 
     test("rejects when async step rejects", async () => {
         await expect(
-            pipeAsync(
-                "x",
-                async (_: string) => { throw new Error("async error"); },
-            ),
+            pipeAsync("x", async (_: string) => {
+                throw new Error("async error");
+            })
         ).rejects.toThrow("async error");
     });
 });

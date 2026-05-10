@@ -392,7 +392,7 @@ export class StreamingHelper {
                     if (evt) yield evt;
                     break;
                 }
-                
+
                 if (signal?.aborted) return;
 
                 buffer += decoder.decode(value, { stream: true });
@@ -570,7 +570,9 @@ export class StreamingHelper {
         });
 
         if (!response.ok) {
-            throw new Error(`NDJSON request failed with status ${response.status}`);
+            throw new Error(
+                `NDJSON request failed with status ${response.status}`
+            );
         }
 
         if (!response.body) {
@@ -591,7 +593,10 @@ export class StreamingHelper {
                         try {
                             yield JSON.parse(buffer) as T;
                         } catch {
-                            console.warn("Failed to parse final NDJSON buffer:", buffer);
+                            console.warn(
+                                "Failed to parse final NDJSON buffer:",
+                                buffer
+                            );
                         }
                     }
                     break;
@@ -607,7 +612,10 @@ export class StreamingHelper {
                         try {
                             yield JSON.parse(trimmed) as T;
                         } catch {
-                            console.warn("Failed to parse NDJSON line:", trimmed);
+                            console.warn(
+                                "Failed to parse NDJSON line:",
+                                trimmed
+                            );
                         }
                     }
                 }

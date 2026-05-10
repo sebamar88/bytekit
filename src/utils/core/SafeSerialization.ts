@@ -100,7 +100,11 @@ export function safeSerialize(
             seen.add(input);
             const output: Record<string, unknown> = {};
             for (const key of Object.keys(input)) {
-                if (key === "__proto__" || key === "constructor" || key === "prototype") {
+                if (
+                    key === "__proto__" ||
+                    key === "constructor" ||
+                    key === "prototype"
+                ) {
                     continue;
                 }
                 output[key] = visit(

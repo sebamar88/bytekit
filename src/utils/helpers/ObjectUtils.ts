@@ -1,7 +1,10 @@
 type Picked<T, K extends keyof T> = { [P in K]: T[P] };
 type Omitted<T, K extends keyof T> = { [P in Exclude<keyof T, K>]: T[P] };
 
-export function pick<T extends object, K extends keyof T>(obj: T, keys: K[]): Picked<T, K> {
+export function pick<T extends object, K extends keyof T>(
+    obj: T,
+    keys: K[]
+): Picked<T, K> {
     const result = {} as Picked<T, K>;
     for (const k of keys) {
         if (k in obj) result[k] = obj[k];
@@ -9,7 +12,10 @@ export function pick<T extends object, K extends keyof T>(obj: T, keys: K[]): Pi
     return result;
 }
 
-export function omit<T extends object, K extends keyof T>(obj: T, keys: K[]): Omitted<T, K> {
+export function omit<T extends object, K extends keyof T>(
+    obj: T,
+    keys: K[]
+): Omitted<T, K> {
     const excluded = new Set<PropertyKey>(keys);
     const result = {} as Omitted<T, K>;
     for (const k in obj) {
@@ -29,7 +35,7 @@ function isPlainObject(v: unknown): v is Record<string, unknown> {
 export function deepMerge<T extends object>(
     target: T,
     source: Partial<T>,
-    strategy: DeepMergeStrategy = "replace",
+    strategy: DeepMergeStrategy = "replace"
 ): T {
     const result = Object.assign({}, target) as Record<string, unknown>;
     for (const key of Object.keys(source) as (keyof T)[]) {
@@ -38,7 +44,11 @@ export function deepMerge<T extends object>(
         if (Array.isArray(src) && Array.isArray(tgt) && strategy === "concat") {
             result[key as string] = [...tgt, ...src];
         } else if (isPlainObject(src) && isPlainObject(tgt)) {
-            result[key as string] = deepMerge(tgt, src as Partial<typeof tgt>, strategy);
+            result[key as string] = deepMerge(
+                tgt,
+                src as Partial<typeof tgt>,
+                strategy
+            );
         } else if (src !== undefined) {
             result[key as string] = src;
         }
@@ -50,7 +60,7 @@ export function flattenObject(
     obj: Record<string, unknown>,
     delimiter = ".",
     prefix = "",
-    depth = 0,
+    depth = 0
 ): Record<string, unknown> {
     if (depth > 100) throw new RangeError("flattenObject: max depth exceeded");
     const result: Record<string, unknown> = {};
@@ -72,7 +82,8 @@ export function deepClone<T>(obj: T, seen = new WeakMap<object, unknown>()): T {
     if (Array.isArray(obj)) {
         const arr: unknown[] = [];
         seen.set(obj as object, arr);
-        for (let i = 0; i < obj.length; i++) arr.push(deepClone(obj[i] as unknown, seen));
+        for (let i = 0; i < obj.length; i++)
+            arr.push(deepClone(obj[i] as unknown, seen));
         return arr as unknown as T;
     }
     const clone: Record<string, unknown> = {};

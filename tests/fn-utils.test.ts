@@ -1,5 +1,11 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { memoize, once, partial, noop, identity } from "../src/utils/helpers/FnUtils.js";
+import {
+    memoize,
+    once,
+    partial,
+    noop,
+    identity,
+} from "../src/utils/helpers/FnUtils.js";
 
 describe("identity", () => {
     it("returns the same value", () => {
@@ -15,7 +21,9 @@ describe("noop", () => {
         expect(noop()).toBeUndefined();
     });
     it("can be called with any arguments", () => {
-        expect(() => (noop as (...args: unknown[]) => void)(1, 2, 3)).not.toThrow();
+        expect(() =>
+            (noop as (...args: unknown[]) => void)(1, 2, 3)
+        ).not.toThrow();
     });
 });
 

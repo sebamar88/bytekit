@@ -7,7 +7,12 @@ import { generateFromSwagger } from "../src/cli/swagger-generator";
 /** Creates a mock Response with the minimum properties that readResponseWithLimit and assertResponseUrl need. */
 function jsonResponse(
     data: unknown,
-    opts: { ok?: boolean; status?: number; contentType?: string; url?: string } = {}
+    opts: {
+        ok?: boolean;
+        status?: number;
+        contentType?: string;
+        url?: string;
+    } = {}
 ) {
     const {
         ok = true,
@@ -261,7 +266,9 @@ describe("swagger-generator", () => {
     });
 
     it("should warn if no schemas are found", async () => {
-        globalThis.fetch = vi.fn().mockResolvedValue(jsonResponse({ components: {} }));
+        globalThis.fetch = vi
+            .fn()
+            .mockResolvedValue(jsonResponse({ components: {} }));
         const spy = vi.spyOn(console, "warn").mockImplementation(() => {});
         await generateFromSwagger({ url: "https://api.com/empty" });
         expect(spy).toHaveBeenCalledWith(expect.stringContaining("No schemas"));
@@ -296,7 +303,11 @@ describe("swagger-generator", () => {
     it("should handle fetch errors", async () => {
         globalThis.fetch = vi
             .fn()
-            .mockResolvedValue({ ok: false, status: 500, url: "https://api.com/fail" });
+            .mockResolvedValue({
+                ok: false,
+                status: 500,
+                url: "https://api.com/fail",
+            });
         const spy = vi.spyOn(console, "error").mockImplementation(() => {});
         const exitSpy = vi.spyOn(process, "exit").mockImplementation(() => {
             throw new Error("exit");

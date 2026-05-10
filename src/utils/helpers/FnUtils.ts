@@ -9,7 +9,7 @@ interface CacheEntry<V> {
 
 export function memoize<T extends (...args: unknown[]) => unknown>(
     fn: T,
-    options?: MemoizeOptions,
+    options?: MemoizeOptions
 ): T {
     const primitiveCache = new Map<string, CacheEntry<ReturnType<T>>>();
     const objectCache = new WeakMap<object, CacheEntry<ReturnType<T>>>();
@@ -18,14 +18,21 @@ export function memoize<T extends (...args: unknown[]) => unknown>(
     return function (...args: Parameters<T>): ReturnType<T> {
         const now = ttl !== undefined ? Date.now() : 0;
 
-        if (args.length === 1 && args[0] !== null && typeof args[0] === "object") {
+        if (
+            args.length === 1 &&
+            args[0] !== null &&
+            typeof args[0] === "object"
+        ) {
             const key = args[0] as object;
             const cached = objectCache.get(key);
             if (cached && (ttl === undefined || now < cached.expiresAt!)) {
                 return cached.value;
             }
             const value = fn(...args) as ReturnType<T>;
-            objectCache.set(key, ttl !== undefined ? { value, expiresAt: now + ttl } : { value });
+            objectCache.set(
+                key,
+                ttl !== undefined ? { value, expiresAt: now + ttl } : { value }
+            );
             return value;
         }
 
@@ -35,7 +42,10 @@ export function memoize<T extends (...args: unknown[]) => unknown>(
             return cached.value;
         }
         const value = fn(...args) as ReturnType<T>;
-        primitiveCache.set(cacheKey, ttl !== undefined ? { value, expiresAt: now + ttl } : { value });
+        primitiveCache.set(
+            cacheKey,
+            ttl !== undefined ? { value, expiresAt: now + ttl } : { value }
+        );
         return value;
     } as T;
 }
@@ -57,7 +67,10 @@ export function partial<T extends (...args: unknown[]) => unknown>(
     ...partialArgs: Partial<Parameters<T>>
 ): (...remainingArgs: unknown[]) => ReturnType<T> {
     return function (...remainingArgs: unknown[]): ReturnType<T> {
-        return fn(...(partialArgs as unknown[]), ...remainingArgs) as ReturnType<T>;
+        return fn(
+            ...(partialArgs as unknown[]),
+            ...remainingArgs
+        ) as ReturnType<T>;
     };
 }
 

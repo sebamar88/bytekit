@@ -12,14 +12,14 @@ export function pipe<A, B, C, D>(
     a: A,
     ab: (a: A) => B,
     bc: (b: B) => C,
-    cd: (c: C) => D,
+    cd: (c: C) => D
 ): D;
 export function pipe<A, B, C, D, E>(
     a: A,
     ab: (a: A) => B,
     bc: (b: B) => C,
     cd: (c: C) => D,
-    de: (d: D) => E,
+    de: (d: D) => E
 ): E;
 export function pipe<A, B, C, D, E, F>(
     a: A,
@@ -27,7 +27,7 @@ export function pipe<A, B, C, D, E, F>(
     bc: (b: B) => C,
     cd: (c: C) => D,
     de: (d: D) => E,
-    ef: (e: E) => F,
+    ef: (e: E) => F
 ): F;
 export function pipe<A, B, C, D, E, F, G>(
     a: A,
@@ -36,7 +36,7 @@ export function pipe<A, B, C, D, E, F, G>(
     cd: (c: C) => D,
     de: (d: D) => E,
     ef: (e: E) => F,
-    fg: (f: F) => G,
+    fg: (f: F) => G
 ): G;
 export function pipe<A, B, C, D, E, F, G, H>(
     a: A,
@@ -46,7 +46,7 @@ export function pipe<A, B, C, D, E, F, G, H>(
     de: (d: D) => E,
     ef: (e: E) => F,
     fg: (f: F) => G,
-    gh: (g: G) => H,
+    gh: (g: G) => H
 ): H;
 export function pipe<A, B, C, D, E, F, G, H, I>(
     a: A,
@@ -57,7 +57,7 @@ export function pipe<A, B, C, D, E, F, G, H, I>(
     ef: (e: E) => F,
     fg: (f: F) => G,
     gh: (g: G) => H,
-    hi: (h: H) => I,
+    hi: (h: H) => I
 ): I;
 export function pipe<A, B, C, D, E, F, G, H, I, J>(
     a: A,
@@ -69,9 +69,12 @@ export function pipe<A, B, C, D, E, F, G, H, I, J>(
     fg: (f: F) => G,
     gh: (g: G) => H,
     hi: (h: H) => I,
-    ij: (i: I) => J,
+    ij: (i: I) => J
 ): J;
-export function pipe(value: unknown, ...fns: Array<(x: unknown) => unknown>): unknown {
+export function pipe(
+    value: unknown,
+    ...fns: Array<(x: unknown) => unknown>
+): unknown {
     return fns.reduce((acc, fn) => fn(acc), value);
 }
 
@@ -84,14 +87,14 @@ export function compose<A, B, C, D>(
     ab: (a: A) => B,
     bc: (b: B) => C,
     cd: (c: C) => D,
-    d: D,
+    d: D
 ): A;
 export function compose<A, B, C, D, E>(
     ab: (a: A) => B,
     bc: (b: B) => C,
     cd: (c: C) => D,
     de: (d: D) => E,
-    e: E,
+    e: E
 ): A;
 export function compose<A, B, C, D, E, F>(
     ab: (a: A) => B,
@@ -99,7 +102,7 @@ export function compose<A, B, C, D, E, F>(
     cd: (c: C) => D,
     de: (d: D) => E,
     ef: (e: E) => F,
-    f: F,
+    f: F
 ): A;
 export function compose<A, B, C, D, E, F, G>(
     ab: (a: A) => B,
@@ -108,7 +111,7 @@ export function compose<A, B, C, D, E, F, G>(
     de: (d: D) => E,
     ef: (e: E) => F,
     fg: (f: F) => G,
-    g: G,
+    g: G
 ): A;
 export function compose<A, B, C, D, E, F, G, H>(
     ab: (a: A) => B,
@@ -118,7 +121,7 @@ export function compose<A, B, C, D, E, F, G, H>(
     ef: (e: E) => F,
     fg: (f: F) => G,
     gh: (g: G) => H,
-    h: H,
+    h: H
 ): A;
 export function compose<A, B, C, D, E, F, G, H, I>(
     ab: (a: A) => B,
@@ -129,7 +132,7 @@ export function compose<A, B, C, D, E, F, G, H, I>(
     fg: (f: F) => G,
     gh: (g: G) => H,
     hi: (h: H) => I,
-    i: I,
+    i: I
 ): A;
 export function compose<A, B, C, D, E, F, G, H, I, J>(
     ab: (a: A) => B,
@@ -141,7 +144,7 @@ export function compose<A, B, C, D, E, F, G, H, I, J>(
     gh: (g: G) => H,
     hi: (h: H) => I,
     ij: (i: I) => J,
-    j: J,
+    j: J
 ): A;
 export function compose(...args: unknown[]): unknown {
     const value = args[args.length - 1];
@@ -156,20 +159,20 @@ export function pipeAsync<A, B>(a: A, ab: (a: A) => B | Promise<B>): Promise<B>;
 export function pipeAsync<A, B, C>(
     a: A,
     ab: (a: A) => B | Promise<B>,
-    bc: (b: B) => C | Promise<C>,
+    bc: (b: B) => C | Promise<C>
 ): Promise<C>;
 export function pipeAsync<A, B, C, D>(
     a: A,
     ab: (a: A) => B | Promise<B>,
     bc: (b: B) => C | Promise<C>,
-    cd: (c: C) => D | Promise<D>,
+    cd: (c: C) => D | Promise<D>
 ): Promise<D>;
 export function pipeAsync<A, B, C, D, E>(
     a: A,
     ab: (a: A) => B | Promise<B>,
     bc: (b: B) => C | Promise<C>,
     cd: (c: C) => D | Promise<D>,
-    de: (d: D) => E | Promise<E>,
+    de: (d: D) => E | Promise<E>
 ): Promise<E>;
 export function pipeAsync<A, B, C, D, E, F>(
     a: A,
@@ -177,7 +180,7 @@ export function pipeAsync<A, B, C, D, E, F>(
     bc: (b: B) => C | Promise<C>,
     cd: (c: C) => D | Promise<D>,
     de: (d: D) => E | Promise<E>,
-    ef: (e: E) => F | Promise<F>,
+    ef: (e: E) => F | Promise<F>
 ): Promise<F>;
 export function pipeAsync<A, B, C, D, E, F, G>(
     a: A,
@@ -186,7 +189,7 @@ export function pipeAsync<A, B, C, D, E, F, G>(
     cd: (c: C) => D | Promise<D>,
     de: (d: D) => E | Promise<E>,
     ef: (e: E) => F | Promise<F>,
-    fg: (f: F) => G | Promise<G>,
+    fg: (f: F) => G | Promise<G>
 ): Promise<G>;
 export function pipeAsync<A, B, C, D, E, F, G, H>(
     a: A,
@@ -196,7 +199,7 @@ export function pipeAsync<A, B, C, D, E, F, G, H>(
     de: (d: D) => E | Promise<E>,
     ef: (e: E) => F | Promise<F>,
     fg: (f: F) => G | Promise<G>,
-    gh: (g: G) => H | Promise<H>,
+    gh: (g: G) => H | Promise<H>
 ): Promise<H>;
 export function pipeAsync<A, B, C, D, E, F, G, H, I>(
     a: A,
@@ -207,7 +210,7 @@ export function pipeAsync<A, B, C, D, E, F, G, H, I>(
     ef: (e: E) => F | Promise<F>,
     fg: (f: F) => G | Promise<G>,
     gh: (g: G) => H | Promise<H>,
-    hi: (h: H) => I | Promise<I>,
+    hi: (h: H) => I | Promise<I>
 ): Promise<I>;
 export function pipeAsync<A, B, C, D, E, F, G, H, I, J>(
     a: A,
@@ -219,7 +222,7 @@ export function pipeAsync<A, B, C, D, E, F, G, H, I, J>(
     fg: (f: F) => G | Promise<G>,
     gh: (g: G) => H | Promise<H>,
     hi: (h: H) => I | Promise<I>,
-    ij: (i: I) => J | Promise<J>,
+    ij: (i: I) => J | Promise<J>
 ): Promise<J>;
 export async function pipeAsync(
     value: unknown,

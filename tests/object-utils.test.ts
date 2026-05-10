@@ -1,5 +1,11 @@
 import { describe, it, expect } from "vitest";
-import { pick, omit, deepMerge, flattenObject, deepClone } from "../src/utils/helpers/ObjectUtils.js";
+import {
+    pick,
+    omit,
+    deepMerge,
+    flattenObject,
+    deepClone,
+} from "../src/utils/helpers/ObjectUtils.js";
 
 describe("pick", () => {
     it("returns only specified keys", () => {
@@ -46,7 +52,9 @@ describe("deepMerge", () => {
     it("deeply merges nested objects", () => {
         const target = { x: { a: 1, b: 2 } };
         const source = { x: { b: 99, c: 3 } };
-        expect(deepMerge(target, source as Partial<typeof target>)).toEqual({ x: { a: 1, b: 99, c: 3 } });
+        expect(deepMerge(target, source as Partial<typeof target>)).toEqual({
+            x: { a: 1, b: 99, c: 3 },
+        });
     });
 
     it("replaces arrays by default (replace strategy)", () => {

@@ -45,7 +45,7 @@ export function camelCase(str: string): string {
         .map((w, i) =>
             i === 0
                 ? w.toLowerCase()
-                : w.charAt(0).toUpperCase() + w.slice(1).toLowerCase(),
+                : w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()
         )
         .join("");
 }
@@ -65,7 +65,7 @@ export function pascalCase(str: string): string {
 export function truncate(
     str: string,
     maxLen: number,
-    ellipsis = "...",
+    ellipsis = "..."
 ): string {
     if (str.length <= maxLen) return str;
     const cutAt = maxLen - ellipsis.length;

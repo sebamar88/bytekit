@@ -8,7 +8,7 @@ const sseResponse = (events: string[], init = {}) => {
             for (const event of events) {
                 controller.enqueue(new TextEncoder().encode(event));
                 // Give a chance for the async loop to catch the event and abort
-                await new Promise(resolve => setTimeout(resolve, 10));
+                await new Promise((resolve) => setTimeout(resolve, 10));
             }
             controller.close();
         },
@@ -29,8 +29,8 @@ test("ApiClient.stream() - handles basic GET stream", async () => {
     const fetchImpl = async (url) => {
         capturedUrl = url;
         return sseResponse([
-            "data: {\"msg\": \"hello\"}\n\n",
-            "event: update\ndata: {\"val\": 42}\n\n"
+            'data: {"msg": "hello"}\n\n',
+            'event: update\ndata: {"val": 42}\n\n',
         ]);
     };
 
@@ -53,11 +53,11 @@ test("ApiClient.stream() - handles basic GET stream", async () => {
 test("ApiClient.stream() - handles POST with body and authorization", async () => {
     let capturedUrl = "";
     let capturedInit: RequestInit | undefined;
-    
+
     const fetchImpl = async (url, init) => {
         capturedUrl = url;
         capturedInit = init;
-        return sseResponse(["data: \"ok\"\n\n"]);
+        return sseResponse(['data: "ok"\n\n']);
     };
 
     const client = new ApiClient({
@@ -67,15 +67,18 @@ test("ApiClient.stream() - handles POST with body and authorization", async () =
             request: (url, init) => {
                 const headers = new Headers(init.headers);
                 headers.set("Authorization", "Bearer token123");
-                return [url, { ...init, headers: Object.fromEntries(headers.entries()) }];
-            }
-        }
+                return [
+                    url,
+                    { ...init, headers: Object.fromEntries(headers.entries()) },
+                ];
+            },
+        },
     });
 
     const body = { filter: "active" };
     const gen = client.stream("/search", {
         method: "POST",
-        body
+        body,
     });
 
     const event = (await gen.next()).value;
@@ -91,16 +94,23 @@ test("ApiClient.stream() - handles POST with body and authorization", async () =
 
 test("ApiClient.stream() - supports AbortController cancellation", async () => {
     const controller = new AbortController();
-    
+
     const fetchImpl = async (url, init) => {
         const stream = new ReadableStream({
             start(controller) {
-                controller.enqueue(new TextEncoder().encode("data: \"first\"\n\n"));
-                controller.enqueue(new TextEncoder().encode("data: \"second\"\n\n"));
+                controller.enqueue(
+                    new TextEncoder().encode('data: "first"\n\n')
+                );
+                controller.enqueue(
+                    new TextEncoder().encode('data: "second"\n\n')
+                );
                 controller.close();
             },
         });
-        return new Response(stream, { status: 200, headers: { "content-type": "text/event-stream" } });
+        return new Response(stream, {
+            status: 200,
+            headers: { "content-type": "text/event-stream" },
+        });
     };
 
     const client = new ApiClient({
@@ -127,11 +137,14 @@ test("ApiClient.stream() - signature normalization (direct body)", async () => {
     let capturedInit: RequestInit | undefined;
     const fetchImpl = async (_url, init) => {
         capturedInit = init;
-        return sseResponse(["data: \"ok\"\n\n"]);
+        return sseResponse(['data: "ok"\n\n']);
     };
 
-    const client = new ApiClient({ baseUrl: "https://api.example.com", fetchImpl });
-    
+    const client = new ApiClient({
+        baseUrl: "https://api.example.com",
+        fetchImpl,
+    });
+
     // Direct body instead of { body: ... }
     const body = { foo: "bar" };
     const gen = client.stream("/events", body);
@@ -148,17 +161,22 @@ test("ApiClient.streamJsonLines() - handles NDJSON stream with auth", async () =
         capturedInit = init;
         const stream = new ReadableStream({
             start(controller) {
-                controller.enqueue(new TextEncoder().encode("{\"id\": 1}\n{\"id\": 2}\n"));
+                controller.enqueue(
+                    new TextEncoder().encode('{"id": 1}\n{"id": 2}\n')
+                );
                 controller.close();
             },
         });
-        return new Response(stream, { status: 200, headers: { "content-type": "application/x-ndjson" } });
+        return new Response(stream, {
+            status: 200,
+            headers: { "content-type": "application/x-ndjson" },
+        });
     };
 
     const client = new ApiClient({
         baseUrl: "https://api.example.com",
         fetchImpl,
-        defaultHeaders: { Authorization: "Bearer secret" }
+        defaultHeaders: { Authorization: "Bearer secret" },
     });
 
     const items = [];
@@ -169,16 +187,22 @@ test("ApiClient.streamJsonLines() - handles NDJSON stream with auth", async () =
     assert.equal(items.length, 2);
     assert.deepEqual(items[0], { id: 1 });
     assert.deepEqual(items[1], { id: 2 });
-    assert.equal(new Headers(capturedInit?.headers).get("Authorization"), "Bearer secret");
-    assert.equal(new Headers(capturedInit?.headers).get("Accept"), "application/x-ndjson");
+    assert.equal(
+        new Headers(capturedInit?.headers).get("Authorization"),
+        "Bearer secret"
+    );
+    assert.equal(
+        new Headers(capturedInit?.headers).get("Accept"),
+        "application/x-ndjson"
+    );
 });
 
 test("ApiClient.stream() - cleanups timeout controller", async () => {
-    const fetchImpl = async () => sseResponse(["data: \"hi\"\n\n"]);
+    const fetchImpl = async () => sseResponse(['data: "hi"\n\n']);
     const client = new ApiClient({
         baseUrl: "https://api.example.com",
         fetchImpl,
-        timeoutMs: 100 // short timeout
+        timeoutMs: 100, // short timeout
     });
 
     const events = [];

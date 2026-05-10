@@ -169,7 +169,7 @@ export class ApiError extends Error {
                         ? String(safeSerialize(this.body))
                         : JSON.stringify(safeSerialize(this.body), null, 2);
                 parts.push(`Body: ${bodyStr}`);
-            /* v8 ignore start */
+                /* v8 ignore start */
             } catch {
                 parts.push(`Body: ${String(safeSerialize(this.body))}`);
             }
@@ -398,7 +398,9 @@ export class ApiClient {
         path: string | URL,
         bodyOrOptions?: RequestOptions | unknown
     ): AsyncGenerator<SSEEvent<T>, void, undefined> {
-        const options = this.normalizeBodyOrOptions(bodyOrOptions as RequestOptions);
+        const options = this.normalizeBodyOrOptions(
+            bodyOrOptions as RequestOptions
+        );
         // Default to POST if we have a body but no explicit method
         if (options.body && !options.method) {
             options.method = "POST";
@@ -445,7 +447,9 @@ export class ApiClient {
         path: string | URL,
         bodyOrOptions?: RequestOptions | unknown
     ): AsyncGenerator<T, void, undefined> {
-        const options = this.normalizeBodyOrOptions(bodyOrOptions as RequestOptions);
+        const options = this.normalizeBodyOrOptions(
+            bodyOrOptions as RequestOptions
+        );
         // Default to POST if we have a body but no explicit method
         if (options.body && !options.method) {
             options.method = "POST";
