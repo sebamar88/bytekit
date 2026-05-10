@@ -398,7 +398,7 @@ export class ApiClient {
         path: string | URL,
         bodyOrOptions?: RequestOptions | unknown
     ): AsyncGenerator<SSEEvent<T>, void, undefined> {
-        const options = this.normalizeBodyOrOptions(bodyOrOptions);
+        const options = this.normalizeBodyOrOptions(bodyOrOptions as RequestOptions);
         // Default to POST if we have a body but no explicit method
         if (options.body && !options.method) {
             options.method = "POST";
@@ -413,7 +413,7 @@ export class ApiClient {
                 method: init.method,
                 body: init.body,
                 headers: init.headers as Record<string, string>,
-                signal: init.signal,
+                signal: init.signal || undefined,
                 fetchImpl: this.fetchImpl,
             });
 
@@ -445,7 +445,7 @@ export class ApiClient {
         path: string | URL,
         bodyOrOptions?: RequestOptions | unknown
     ): AsyncGenerator<T, void, undefined> {
-        const options = this.normalizeBodyOrOptions(bodyOrOptions);
+        const options = this.normalizeBodyOrOptions(bodyOrOptions as RequestOptions);
         // Default to POST if we have a body but no explicit method
         if (options.body && !options.method) {
             options.method = "POST";
@@ -460,7 +460,7 @@ export class ApiClient {
                 method: init.method,
                 body: init.body,
                 headers: init.headers as Record<string, string>,
-                signal: init.signal,
+                signal: init.signal || undefined,
                 fetchImpl: this.fetchImpl,
             });
 

@@ -31,7 +31,7 @@ export function deepMerge<T extends object>(
     source: Partial<T>,
     strategy: DeepMergeStrategy = "replace",
 ): T {
-    const result: Record<string, unknown> = Object.assign({}, target);
+    const result = Object.assign({}, target) as Record<string, unknown>;
     for (const key of Object.keys(source) as (keyof T)[]) {
         const src = source[key];
         const tgt = result[key as string];

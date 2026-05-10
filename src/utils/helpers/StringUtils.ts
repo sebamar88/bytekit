@@ -76,7 +76,7 @@ export function truncate(
 export function slugify(str: string): string {
     return normalizeUnicode(str)
         .toLowerCase()
-        .replace(/[^a-z0-9\s\-]/g, "")
+        .replace(/[^a-z0-9\s-]/g, "")
         .trim()
         .replace(/[\s]+/g, "-")
         .replace(/-+/g, "-");
