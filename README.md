@@ -1,9 +1,7 @@
 # Bytekit
 
-> **Previously known as:** `@sebamar88/utils` (v0.1.9 and earlier)
-
-**EN:** A lean, high-performance TypeScript toolkit focused on **Isomorphic HTTP Networking** and **Advanced Async Utilities**. Deep-zero dependencies.  
-**ES:** Un toolkit TypeScript ligero y de alto rendimiento enfocado en **Networking HTTP Isomórfico** y **Utilidades Asíncronas Avanzadas**. Cero dependencias.
+ **EN:** A lean, high-performance TypeScript toolkit focused on **Isomorphic HTTP Networking** and **Advanced Async Utilities** . Deep-zero dependencies.  
+ **ES:** Un toolkit TypeScript ligero y de alto rendimiento enfocado en **Networking HTTP Isomórfico** y **Utilidades Asíncronas Avanzadas** . Cero dependencias.
 
 ## 📊 Status / Estado
 
@@ -19,13 +17,13 @@
 
 ## ✨ Highlights / Características
 
-- 🌐 **Isomorphic ApiClient:** Works on Node.js 18+ and modern browsers (native fetch).
-- 🛡️ **Schema Validation:** Built-in adapters for Zod and Valibot. Fully typed responses.
-- 🔁 **HTTP Resilience:** Retries, Circuit Breaker, Rate Limiting, Request Cache, and Deduplication out of the box.
-- ⚡ **Async Toolkit:** A powerful set of tools for concurrency (`parallel`, `race`), timing (`sleep`, `timeout`), and execution control (`retry`, `debounce`, `throttle`).
-- 📦 **Deep-Zero Dependencies:** No external runtime packages added to your bundle.
-- 🪵 **Observability:** Structured logging and performance profiling modules.
-- 🎯 **95%+ Test Coverage:** Rigorously tested core.
+* 🌐 **Isomorphic ApiClient:** Works on Node.js 18+ and modern browsers (native fetch).
+* 🛡️ **Schema Validation:** Built-in adapters for Zod and Valibot. Fully typed responses.
+* 🔁 **HTTP Resilience:** Retries, Circuit Breaker, Rate Limiting, Request Cache, and Deduplication out of the box.
+* ⚡ **Async Toolkit:** A powerful set of tools for concurrency (`parallel`,  `race`), timing (`sleep`,  `timeout`), and execution control (`retry`,  `debounce`,  `throttle`).
+* 📦 **Deep-Zero Dependencies:** No external runtime packages added to your bundle.
+* 🪵 **Observability:** Structured logging and performance profiling modules.
+* 🎯 **95%+ Test Coverage:** Rigorously tested core.
 
 ## 🚀 Quick Start / Inicio Rápido
 
@@ -99,11 +97,11 @@ Bytekit includes a command-line tool for rapid scaffolding directly from your te
 
 ### Security Notes for v3
 
-- Remote CLI fetches now require `https://` unless you are targeting `localhost` or another loopback address.
-- Generated type names and property keys are sanitized before being written to disk.
-- `ApiClient` and `ApiError` are now safe-by-default for logging and serialization; sensitive payload fields are redacted unless you explicitly opt into risky logging.
-- `StorageManager` is not appropriate for secrets such as session tokens or API keys.
-- Migration details: see [docs/guides/MIGRATION_v3_SECURITY.md](docs/guides/MIGRATION_v3_SECURITY.md).
+* Remote CLI fetches now require `https://` unless you are targeting `localhost` or another loopback address.
+* Generated type names and property keys are sanitized before being written to disk.
+* `ApiClient` and `ApiError` are now safe-by-default for logging and serialization; sensitive payload fields are redacted unless you explicitly opt into risky logging.
+* `StorageManager` is not appropriate for secrets such as session tokens or API keys.
+* Migration details: see [docs/guides/MIGRATION_v3_SECURITY.md](docs/guides/MIGRATION_v3_SECURITY.md).
 
 ### Type Generation from an API Endpoint
 
@@ -119,11 +117,11 @@ bytekit --type https://api.example.com/users
 bytekit --swagger https://api.example.com/swagger.json
 ```
 
-Plain `http://` is now reserved for local development only, for example `http://localhost:3000/swagger.json`.
+Plain `http://` is now reserved for local development only, for example `http://localhost:3000/swagger.json` .
 
 ### DDD Bounded-Context Scaffolding
 
-Generate a full **Domain-Driven Design** folder structure with hexagonal ports, entity, repository interface, use cases, and an HTTP adapter that uses `ApiClient`:
+Generate a full **Domain-Driven Design** folder structure with hexagonal ports, entity, repository interface, use cases, and an HTTP adapter that uses `ApiClient` :
 
 ```bash
 # Minimal: creates the DDD directory tree + hexagonal port stubs
@@ -133,7 +131,7 @@ bytekit --ddd --domain=Product --port=ProductRepository
 bytekit --ddd --domain=Product --port=ProductRepository --actions=create,findById,update,delete
 ```
 
-The generated HTTP infrastructure repository always imports `ApiClient` from `bytekit/api-client`, keeping your data layer consistent with the rest of the toolkit.
+The generated HTTP infrastructure repository always imports `ApiClient` from `bytekit/api-client` , keeping your data layer consistent with the rest of the toolkit.
 
 <details>
 <summary>Generated file tree (with <code>--actions</code>)</summary>
@@ -168,30 +166,30 @@ product/
 
 ### 🔧 Networking & Resilience
 
-- **`ApiClient`** - Typed HTTP client with interceptors, retries, and schema validation support.
-- **`SchemaAdapter`** - Generic adapter to plug your favorite validation library (Zod, Valibot).
-- **`RetryPolicy` & `CircuitBreaker`** - Prevent failures and handle flaky endpoints.
-- **`RequestCache` & `RequestDeduplicator`** - Optimize your network bandwidth.
-- **`RateLimiter`** - Throttle your outbound requests.
+* **`ApiClient`** - Typed HTTP client with interceptors, retries, and schema validation support.
+* **`SchemaAdapter`** - Generic adapter to plug your favorite validation library (Zod, Valibot).
+* **`RetryPolicy` & `CircuitBreaker`** - Prevent failures and handle flaky endpoints.
+* **`RequestCache` & `RequestDeduplicator`** - Optimize your network bandwidth.
+* **`RateLimiter`** - Throttle your outbound requests.
 
 ### ⚡ Async Toolkit
 
-- Concurrency: **`parallel`**, **`race`**, **`allSettled`**, **`sequential`**.
-- Execution: **`retry`**, **`debounceAsync`**, **`throttleAsync`**.
-- Timing: **`sleep`**, **`timeout`**.
+* Concurrency: **`parallel`**, **`race`**, **`allSettled`**, **`sequential`** .
+* Execution: **`retry`**, **`debounceAsync`**, **`throttleAsync`** .
+* Timing: **`sleep`**, **`timeout`** .
 
 ### 🛠️ Key Helpers
 
-- **`Logger` & `Profiler`** - Structured logs and performance monitoring.
-- **`UrlSlugHelper`** - Generate SEO-friendly URL slugs.
-- **`QueryStringHelper`** - Powerful object-to-query-string serialization.
-- **`FileUploadHelper`**, **`StreamingHelper`**, **`WebSocketHelper`** - Specialized network tasks.
-- **`EventEmitter`**, **`DiffUtils`**, **`CacheManager`**, **`CryptoUtils`**.
+* **`Logger` & `Profiler`** - Structured logs and performance monitoring.
+* **`UrlSlugHelper`** - Generate SEO-friendly URL slugs.
+* **`QueryStringHelper`** - Powerful object-to-query-string serialization.
+* **`FileUploadHelper`**, **`StreamingHelper`**, **`WebSocketHelper`** - Specialized network tasks.
+* **`EventEmitter`**, **`DiffUtils`**, **`CacheManager`**, **`CryptoUtils`** .
 
 ## 🤝 Contributing / Contribuir
 
-**EN:** Contributions are welcome! Please read our contributing guidelines and feel free to submit issues and pull requests.  
-**ES:** ¡Las contribuciones son bienvenidas! Lee nuestras guías de contribución y no dudes en enviar issues y pull requests.
+ **EN:** Contributions are welcome! Please read our [contributing guidelines](CONTRIBUTING.md) and our [Code of Conduct](CODE_OF_CONDUCT.md), and feel free to submit issues and pull requests.  
+ **ES:** ¡Las contribuciones son bienvenidas! Lee nuestras [guías de contribución](CONTRIBUTING.md) y nuestro [Código de Conducta](CODE_OF_CONDUCT.md), y no dudes en enviar issues y pull requests.
 
 ## 📄 License / Licencia
 

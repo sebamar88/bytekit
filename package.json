@@ -3,6 +3,10 @@
     "description": "Lightning-fast TypeScript utilities: Isomorphic API client, Async toolkit (retry, debounce, parallel), QueryClient for state management, and CLI for Swagger/OpenAPI type generation.",
     "version": "3.0.1",
     "type": "module",
+    "funding": {
+        "type": "individual",
+        "url": "https://buymeacoffee.com/sebamar88"
+    },
     "imports": {
         "#core/*": "./dist/utils/core/*",
         "#utils/*": "./dist/utils/*",

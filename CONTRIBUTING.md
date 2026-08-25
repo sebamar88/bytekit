@@ -23,7 +23,7 @@ We love your input! We want to make contributing to Bytekit as easy and transpar
 
 ## 📜 Code of Conduct
 
-This project and everyone participating in it is governed by our Code of Conduct. By participating, you are expected to uphold this code. Please report unacceptable behavior to [sebamar88@gmail.com](mailto:sebamar88@gmail.com).
+This project and everyone participating in it is governed by our [Code of Conduct](CODE_OF_CONDUCT.md). By participating, you are expected to uphold this code. Please report unacceptable behavior to [sebamar88@gmail.com](mailto:sebamar88@gmail.com).
 
 ## 🤝 How Can I Contribute?
 
