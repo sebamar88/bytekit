@@ -1,7 +1,7 @@
 {
 	"name": "bytekit",
 	"description": "Lightning-fast TypeScript utilities: Isomorphic API client, Async toolkit (retry, debounce, parallel), functional helpers (string, object, collection), and CLI for Swagger/OpenAPI type generation.",
-	"version": "3.2.1",
+	"version": "3.2.2",
 	"type": "module",
 	"funding": {
 		"type": "individual",
