@@ -24,3 +24,5 @@ coverage
 
 # Test reports
 test-report.junit.xml
+
+AGENTS.md
