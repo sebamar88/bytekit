@@ -1,7 +1,7 @@
 {
 	"name": "bytekit",
-	"description": "Lightning-fast TypeScript utilities: Isomorphic API client, Async toolkit (retry, debounce, parallel), QueryClient for state management, and CLI for Swagger/OpenAPI type generation.",
-	"version": "3.0.1",
+	"description": "Lightning-fast TypeScript utilities: Isomorphic API client, Async toolkit (retry, debounce, parallel), functional helpers (string, object, collection), and CLI for Swagger/OpenAPI type generation.",
+	"version": "3.2.1",
 	"type": "module",
 	"funding": {
 		"type": "individual",
@@ -117,6 +117,22 @@
 		"./error-boundary": {
 			"types": "./dist/utils/core/ErrorBoundary.d.ts",
 			"import": "./dist/utils/core/ErrorBoundary.js"
+		},
+		"./collection-utils": {
+			"types": "./dist/utils/helpers/CollectionUtils.d.ts",
+			"import": "./dist/utils/helpers/CollectionUtils.js"
+		},
+		"./object-utils": {
+			"types": "./dist/utils/helpers/ObjectUtils.d.ts",
+			"import": "./dist/utils/helpers/ObjectUtils.js"
+		},
+		"./string-utils": {
+			"types": "./dist/utils/helpers/StringUtils.d.ts",
+			"import": "./dist/utils/helpers/StringUtils.js"
+		},
+		"./fn-utils": {
+			"types": "./dist/utils/helpers/FnUtils.d.ts",
+			"import": "./dist/utils/helpers/FnUtils.js"
 		}
 	},
 	"scripts": {

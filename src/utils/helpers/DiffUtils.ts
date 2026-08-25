@@ -185,13 +185,14 @@ export class DiffUtils {
 
         for (const key of keys) {
             if (current == null) return undefined;
-            /* v8 ignore next */
+            /* v8 ignore start */
             if (
                 key === "__proto__" ||
                 key === "constructor" ||
                 key === "prototype"
             )
                 return undefined;
+            /* v8 ignore end */
             current = (current as Record<string, unknown>)[key];
         }
 
@@ -211,10 +212,11 @@ export class DiffUtils {
         const lastKey = keys[keys.length - 1];
 
         // Reject empty paths or any segment that could lead to prototype pollution
-        /* v8 ignore next */
+        /* v8 ignore start */
         if (!lastKey || keys.some((k) => BLOCKED_KEYS.has(k))) {
             return;
         }
+        /* v8 ignore end */
 
         let current = obj;
 

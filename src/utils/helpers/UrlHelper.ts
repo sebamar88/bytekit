@@ -19,13 +19,15 @@ export interface QueryStringOptions {
 
 type InterpolableValue = string | number | boolean | null | undefined;
 
-/* v8 ignore next */
+/* v8 ignore start */
 const safeString = (value: InterpolableValue) =>
     value === null || value === undefined ? "" : String(value);
+/* v8 ignore end */
 
-/* v8 ignore next */
+/* v8 ignore start */
 const isPlainObject = (value: unknown): value is Record<string, unknown> =>
     typeof value === "object" && value !== null && !Array.isArray(value);
+/* v8 ignore end */
 
 const serializeValue = (value: unknown) => {
     if (value instanceof Date) return value.toISOString();

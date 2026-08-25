@@ -6,35 +6,27 @@ import { ApiClient, RateLimiter, createLogger } from "bytekit";
 export async function configureBulletproofClient() {
     const logger = createLogger({ namespace: "API" });
 
-    // 1. Setup global rate limiter (e.g. max 10 requests per second)
-    const rateLimiter = new RateLimiter({
-        maxRequests: 10,
-        windowMs: 1000
-    });
-
     const api = new ApiClient({
         baseUrl: "https://api.example.com",
         logger, // Attach logger for structured logging of retries
 
-        // 2. Setup Retry Policy (Transient failures)
+        // 1. Setup Retry Policy (Transient failures)
         retryPolicy: {
             maxAttempts: 3,
             initialDelayMs: 200,
             backoffMultiplier: 2
         },
 
-        // 3. Setup Circuit Breaker (Cascading failures)
+        // 2. Setup Circuit Breaker (Cascading failures)
         circuitBreaker: {
             failureThreshold: 5,
             resetTimeoutMs: 30000
-        }
-    });
+        },
 
-    // 4. Connect Rate Limiter via Interceptor
-    api.addInterceptor({
-        request: async (url, init) => {
-            await rateLimiter.waitForAllowance(url);
-            return [url, init];
+        // 3. Setup global rate limiter (e.g. max 10 requests per second)
+        rateLimiter: {
+            maxRequests: 10,
+            windowMs: 1000
         }
     });
 

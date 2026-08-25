@@ -20,7 +20,7 @@
 * 🌐 **Isomorphic ApiClient:** Works on Node.js 18+ and modern browsers (native fetch).
 * 🛡️ **Schema Validation:** Built-in adapters for Zod and Valibot. Fully typed responses.
 * 🔁 **HTTP Resilience:** Retries, Circuit Breaker, Rate Limiting, Request Cache, and Deduplication out of the box.
-* ⚡ **Async Toolkit:** A powerful set of tools for concurrency (`parallel`,   `race`), timing (`sleep`,   `timeout`), and execution control (`retry`,   `debounce`,   `throttle`).
+* ⚡ **Async Toolkit:** A powerful set of tools for concurrency (`parallel`,    `race`), timing (`sleep`,    `timeout`), and execution control (`retry`,    `debounce`,    `throttle`).
 * 📦 **Deep-Zero Dependencies:** No external runtime packages added to your bundle.
 * 🪵 **Observability:** Structured logging and performance profiling modules.
 * 🎯 **95%+ Test Coverage:** Rigorously tested core.
@@ -88,10 +88,10 @@ Bytekit is fully tree-shakeable. You can import exactly what you need:
 import { ApiClient } from "bytekit/api-client";
 import { Logger } from "bytekit/logger";
 import { retry, timeout } from "bytekit/async";
-import { UrlSlugHelper } from "bytekit/url-slug-helper";
+import { StringUtils } from "bytekit/string-utils";
 ```
 
-## �️ CLI
+## 🛠️ CLI
 
 Bytekit includes a command-line tool for rapid scaffolding directly from your terminal.
 
@@ -162,7 +162,7 @@ product/
 
 </details>
 
-## �📚 Core Modules
+## 📚 Core Modules
 
 ### 🔧 Networking & Resilience
 
@@ -181,10 +181,17 @@ product/
 ### 🛠️ Key Helpers
 
 * **`Logger` & `Profiler`** - Structured logs and performance monitoring.
-* **`UrlSlugHelper`** - Generate SEO-friendly URL slugs.
-* **`QueryStringHelper`** - Powerful object-to-query-string serialization.
+* **`UrlHelper`** - SEO-friendly `slugify()` and object-to-query-string `stringify()` serialization.
 * **`FileUploadHelper`**, **`StreamingHelper`**, **`WebSocketHelper`** - Specialized network tasks.
 * **`EventEmitter`**, **`DiffUtils`**, **`CacheManager`**, **`CryptoUtils`** .
+
+### 🧩 Functional & Data Utilities
+
+* **`StringUtils`** - `camelCase`,  `pascalCase`,  `snakeCase`,  `truncate`,  `slugify`.
+* **`ObjectUtils`** - `pick`,  `omit`,  `deepMerge`,  `deepClone`,  `flattenObject`.
+* **`CollectionUtils`** - `chunk`,  `groupBy`,  `uniqueBy`,  `flatten`,  `zip`.
+* **`FnUtils`** - `memoize`,  `once`,  `partial`,  `noop`,  `identity`.
+* **`pipe` / `compose`** - Type-safe functional composition of up to 10 functions.
 
 ## 🤝 Contributing / Contribuir
 

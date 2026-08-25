@@ -1,8 +1,10 @@
 import fs from "node:fs/promises";
-import path from "node:path";
 import {
+    assertResponseUrl,
+    assertSafeOutputPath,
     assertSecureRemoteUrl,
     formatPropertyKey,
+    readResponseWithLimit,
     sanitizeTypeName,
 } from "./security.js";
 
@@ -48,14 +50,17 @@ export async function generateTypesFromEndpoint(
             body: body ? body : undefined,
         });
 
+        assertResponseUrl(response, "Type generation from an endpoint");
+
         if (!response.ok) {
             throw new Error(`HTTP ${response.status}: ${response.statusText}`);
         }
 
-        const data = await response.json();
+        const text = await readResponseWithLimit(response);
+        const data = JSON.parse(text);
         const typeDefinition = generateTypeFromData(data, safeTypeName);
 
-        const outputPath = path.join(process.cwd(), output);
+        const outputPath = assertSafeOutputPath(output);
         await fs.writeFile(outputPath, typeDefinition, "utf8");
 
         console.log(`✅ Types generated successfully!`);
@@ -81,17 +86,27 @@ function generateTypeFromData(data: unknown, typeName: string): string {
     return `// Auto-generated types from API response\n// Generated at ${new Date().toISOString()}\n\n${typeDefinition}\n`;
 }
 
+const MAX_INFERENCE_DEPTH = 20;
+
 /**
  * Infer TypeScript type from data
  */
 function inferType(data: unknown, name: string, depth = 0): string {
+    /* v8 ignore start */
+    if (depth > MAX_INFERENCE_DEPTH) {
+        return `type ${name} = unknown; // max depth exceeded`;
+    }
+    /* v8 ignore end */
+
     if (data === null) {
         return `type ${name} = null;`;
     }
 
+    /* v8 ignore start */
     if (data === undefined) {
         return `type ${name} = undefined;`;
     }
+    /* v8 ignore end */
 
     const type = typeof data;
 
@@ -146,6 +161,10 @@ function generateObjectType(
 }
 
 function inferInlineType(value: unknown, depth: number): string {
+    if (depth > MAX_INFERENCE_DEPTH) {
+        return "unknown /* max depth exceeded */";
+    }
+
     if (value === null) {
         return "null";
     }

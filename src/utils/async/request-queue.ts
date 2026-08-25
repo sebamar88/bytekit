@@ -14,6 +14,11 @@ export interface RequestQueueOptions {
      */
     concurrency: number;
     /**
+     * Max tasks waiting in queue (across all priority lanes). Default: `Infinity`.
+     * When reached, `add()` rejects immediately with a `TypeError`.
+     */
+    maxQueueSize?: number;
+    /**
      * Called when a task rejects. Queue continues executing remaining tasks.
      * @param error  The rejection reason (cast to Error).
      * @param id     The task's unique identifier.
@@ -81,6 +86,7 @@ interface QueueItem {
  */
 export class RequestQueue {
     private readonly _concurrency: number;
+    private readonly _maxQueueSize: number;
     private readonly _onError?: (error: Error, id: string) => void;
     private readonly _high: QueueItem[] = [];
     private readonly _normal: QueueItem[] = [];
@@ -99,6 +105,7 @@ export class RequestQueue {
             throw new TypeError("concurrency must be >= 1");
         }
         this._concurrency = options.concurrency;
+        this._maxQueueSize = options.maxQueueSize ?? Infinity;
         this._onError = options.onError;
     }
 
@@ -119,6 +126,14 @@ export class RequestQueue {
 
         if (externalSignal?.aborted) {
             return Promise.reject(new QueueAbortError());
+        }
+
+        if (this.size >= this._maxQueueSize) {
+            return Promise.reject(
+                new TypeError(
+                    `Queue is full (maxQueueSize=${this._maxQueueSize})`
+                )
+            );
         }
 
         const controller = new AbortController();

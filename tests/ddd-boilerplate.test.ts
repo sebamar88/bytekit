@@ -31,8 +31,13 @@ describe("pascalFromKebabSlug", () => {
 
 describe("generateDddBoilerplate", () => {
     let tmp = "";
+    let originalCwd = "";
 
     afterEach(async () => {
+        if (originalCwd) {
+            process.chdir(originalCwd);
+            originalCwd = "";
+        }
         if (tmp) {
             await fs.rm(tmp, { recursive: true, force: true });
             tmp = "";
@@ -41,10 +46,12 @@ describe("generateDddBoilerplate", () => {
 
     it("crea la jerarquía y archivos de puertos inbound/outbound", async () => {
         tmp = await fs.mkdtemp(path.join(os.tmpdir(), "bytekit-ddd-"));
+        originalCwd = process.cwd();
+        process.chdir(tmp);
         const { rootDir, slug } = await generateDddBoilerplate({
             domain: "Billing",
             port: "InvoicePersistence",
-            outDir: tmp,
+            outDir: ".",
         });
 
         expect(rootDir).toBe(path.resolve(tmp));
@@ -80,32 +87,38 @@ describe("generateDddBoilerplate", () => {
 
     it("rechaza dominio vacío", async () => {
         tmp = await fs.mkdtemp(path.join(os.tmpdir(), "bytekit-ddd-"));
+        originalCwd = process.cwd();
+        process.chdir(tmp);
         await expect(
             generateDddBoilerplate({
                 domain: "   ",
                 port: "X",
-                outDir: tmp,
+                outDir: ".",
             })
         ).rejects.toThrow(/dominio/i);
     });
 
     it("rechaza nombre de puerto vacío", async () => {
         tmp = await fs.mkdtemp(path.join(os.tmpdir(), "bytekit-ddd-"));
+        originalCwd = process.cwd();
+        process.chdir(tmp);
         await expect(
             generateDddBoilerplate({
                 domain: "a",
                 port: "  ",
-                outDir: tmp,
+                outDir: ".",
             })
         ).rejects.toThrow(/puerto/i);
     });
 
     it("genera entidad, repositorio, casos de uso e impl HTTP cubriendo todas las ramas de verbo (POST/PUT/PATCH/DELETE/GET)", async () => {
         tmp = await fs.mkdtemp(path.join(os.tmpdir(), "bytekit-ddd-actions-"));
+        originalCwd = process.cwd();
+        process.chdir(tmp);
         const { rootDir, slug } = await generateDddBoilerplate({
             domain: "Order",
             port: "OrderRepository",
-            outDir: tmp,
+            outDir: ".",
             actions: [
                 "create",
                 "findById",
@@ -217,23 +230,27 @@ describe("generateDddBoilerplate", () => {
 
     it("silencia EEXIST al generar dos veces en el mismo directorio", async () => {
         tmp = await fs.mkdtemp(path.join(os.tmpdir(), "bytekit-ddd-twice-"));
+        originalCwd = process.cwd();
+        process.chdir(tmp);
         // Primera pasada — crea directorios y .gitkeep
         await generateDddBoilerplate({
             domain: "Invoice",
             port: "InvoiceRepo",
-            outDir: tmp,
+            outDir: ".",
         });
         // Segunda pasada — los .gitkeep ya existen → EEXIST debe silenciarse sin lanzar
         const { slug } = await generateDddBoilerplate({
             domain: "Invoice",
             port: "InvoiceRepo",
-            outDir: tmp,
+            outDir: ".",
         });
         expect(slug).toBe("invoice");
     });
 
     it("relanza errores no-EEXIST que ocurren al escribir .gitkeep (rama throw e, línea 371)", async () => {
         tmp = await fs.mkdtemp(path.join(os.tmpdir(), "bytekit-ddd-rethrow-"));
+        originalCwd = process.cwd();
+        process.chdir(tmp);
         const permError = Object.assign(new Error("Permission denied"), {
             code: "EACCES",
         });
@@ -245,7 +262,7 @@ describe("generateDddBoilerplate", () => {
                 generateDddBoilerplate({
                     domain: "Fail",
                     port: "FailRepo",
-                    outDir: tmp,
+                    outDir: ".",
                 })
             ).rejects.toThrow("Permission denied");
         } finally {
@@ -257,10 +274,12 @@ describe("generateDddBoilerplate", () => {
         tmp = await fs.mkdtemp(
             path.join(os.tmpdir(), "bytekit-ddd-nopartial-")
         );
+        originalCwd = process.cwd();
+        process.chdir(tmp);
         await generateDddBoilerplate({
             domain: "Product",
             port: "ProductStore",
-            outDir: tmp,
+            outDir: ".",
             // Solo POST y DELETE — ninguno requiere Partial<EntityProps>
             actions: ["create", "delete"],
         });
@@ -276,20 +295,16 @@ describe("generateDddBoilerplate", () => {
 
     it("usa el slug como directorio raíz cuando outDir no se proporciona (rama `|| slug`)", async () => {
         tmp = await fs.mkdtemp(path.join(os.tmpdir(), "bytekit-ddd-cwd-"));
-        const originalCwd = process.cwd();
+        originalCwd = process.cwd();
         process.chdir(tmp);
-        try {
-            const { rootDir, slug } = await generateDddBoilerplate({
-                domain: "Widget",
-                port: "WidgetRepo",
-                // sin outDir → usa el slug como directorio de salida
-            });
-            expect(slug).toBe("widget");
-            expect(realpathSync(rootDir)).toBe(
-                realpathSync(path.resolve(tmp, "widget"))
-            );
-        } finally {
-            process.chdir(originalCwd);
-        }
+        const { rootDir, slug } = await generateDddBoilerplate({
+            domain: "Widget",
+            port: "WidgetRepo",
+            // sin outDir → usa el slug como directorio de salida
+        });
+        expect(slug).toBe("widget");
+        expect(realpathSync(rootDir)).toBe(
+            realpathSync(path.resolve(tmp, "widget"))
+        );
     });
 });

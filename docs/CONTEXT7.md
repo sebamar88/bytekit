@@ -94,7 +94,7 @@ const client = new ApiClient({
     baseUrl: "https://api.service.local",
     retryPolicy: { maxAttempts: 4, initialDelayMs: 200, backoffMultiplier: 2 },
     circuitBreaker: { failureThreshold: 5, timeoutMs: 30_000 },
-    rateLimiter: { requestsPerInterval: 10, intervalMs: 1_000 },
+    rateLimiter: { maxRequests: 10, windowMs: 1_000 },
 });
 await client.get("/inventory");
 ```

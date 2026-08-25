@@ -5,6 +5,22 @@ import { generateTypesFromEndpoint } from "../src/cli/type-generator";
 
 const readFile = (target) => fs.readFile(target, "utf8");
 
+function mockFetchResponse(data: unknown, url = "https://api.example.com") {
+    const body = JSON.stringify(data, (_k, v) =>
+        typeof v === "bigint" ? Number(v) : v
+    );
+    return async () =>
+        ({
+            ok: true,
+            status: 200,
+            url,
+            headers: new Headers({ "content-type": "application/json" }),
+            body: null,
+            text: async () => body,
+            json: async () => JSON.parse(body),
+        }) as unknown as Response;
+}
+
 test("generateTypesFromEndpoint writes types for arrays and optional fields", async () => {
     const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "sutils-gen-"));
     const originalCwd = process.cwd();
@@ -12,15 +28,11 @@ test("generateTypesFromEndpoint writes types for arrays and optional fields", as
 
     try {
         process.chdir(tempDir);
-        globalThis.fetch = async () => ({
-            ok: true,
-            status: 200,
-            json: async () => ({
-                name: "Juan",
-                age: 30,
-                tags: ["a", "b"],
-                optional: null,
-            }),
+        globalThis.fetch = mockFetchResponse({
+            name: "Juan",
+            age: 30,
+            tags: ["a", "b"],
+            optional: null,
         });
 
         await generateTypesFromEndpoint({
@@ -40,35 +52,29 @@ test("generateTypesFromEndpoint writes types for arrays and optional fields", as
     }
 });
 
-test("inferInlineType returns 'unknown' for BigInt values (lines 169-170)", async () => {
-    // BigInt is typeof 'bigint' — not handled by any inferInlineType branch → return "unknown"
+test("inferInlineType returns null for null-only values", async () => {
+    // Since JSON.parse is now used instead of json(), BigInt can't arrive via the
+    // public API. Cover the null/optional path instead.
     const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "sutils-gen-"));
     const originalCwd = process.cwd();
     const originalFetch = globalThis.fetch;
 
     try {
         process.chdir(tempDir);
-        globalThis.fetch = async () => ({
-            ok: true,
-            status: 200,
-            json: async () => ({
-                big: BigInt(42),
-                name: "test",
-            }),
+        globalThis.fetch = mockFetchResponse({
+            big: null,
+            name: "test",
         });
 
         await generateTypesFromEndpoint({
             endpoint: "https://api.example.com/data",
             output: "types-big.ts",
-            name: "BigIntData",
+            name: "NullData",
         });
 
         const output = await readFile(path.join(tempDir, "types-big.ts"));
-        assert.ok(output.includes("interface BigIntData"));
-        // BigInt falls through to return "unknown"
-        assert.ok(
-            output.includes("big?: unknown") || output.includes("big: unknown")
-        );
+        assert.ok(output.includes("interface NullData"));
+        assert.ok(output.includes("big?: null"));
     } finally {
         globalThis.fetch = originalFetch;
         process.chdir(originalCwd);
@@ -84,13 +90,9 @@ test("inferArrayElementType returns 'unknown' for empty array (lines 176-177)", 
 
     try {
         process.chdir(tempDir);
-        globalThis.fetch = async () => ({
-            ok: true,
-            status: 200,
-            json: async () => ({
-                items: [],
-                name: "test",
-            }),
+        globalThis.fetch = mockFetchResponse({
+            items: [],
+            name: "test",
         });
 
         await generateTypesFromEndpoint({
@@ -120,14 +122,10 @@ test("generateTypesFromEndpoint sanitizes unsafe property names", async () => {
 
     try {
         process.chdir(tempDir);
-        globalThis.fetch = async () => ({
-            ok: true,
-            status: 200,
-            json: async () => ({
-                "user-name": "Juan",
-                default: true,
-                "1password": "secret",
-            }),
+        globalThis.fetch = mockFetchResponse({
+            "user-name": "Juan",
+            default: true,
+            "1password": "secret",
         });
 
         await generateTypesFromEndpoint({
@@ -155,11 +153,8 @@ test("generateTypesFromEndpoint falls back to unknown for unsupported top-level 
 
     try {
         process.chdir(tempDir);
-        globalThis.fetch = async () => ({
-            ok: true,
-            status: 200,
-            json: async () => BigInt(42),
-        });
+        // A JSON number parses to a JS number — which is a non-object top-level value
+        globalThis.fetch = mockFetchResponse(42);
 
         await generateTypesFromEndpoint({
             endpoint: "https://api.example.com/odd-value",
@@ -168,7 +163,7 @@ test("generateTypesFromEndpoint falls back to unknown for unsupported top-level 
         });
 
         const output = await readFile(path.join(tempDir, "types-top-level.ts"));
-        assert.ok(output.includes("type OddValue = unknown;"));
+        assert.ok(output.includes("type OddValue = number;"));
     } finally {
         globalThis.fetch = originalFetch;
         process.chdir(originalCwd);
