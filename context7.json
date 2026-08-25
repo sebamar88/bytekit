@@ -17,10 +17,10 @@
     ],
     "rules": [
         "You must use StreamingHelper.streamJsonLines(endpoint, { onChunk }) to process large datasets without loading everything into memory. This is the only memory-efficient way to handle NDJSON.",
-        "To handle real-time Server-Sent Events, you must use StreamingHelper.streamSSE(endpoint).subscribe(callback). It handles persistent connections and JSON parsing automatically.",
+        "To handle real-time Server-Sent Events, always prefer the modern api.stream(endpoint) which provides a full-featured AsyncGenerator and automatic authorization.",
         "You must set ApiClient baseUrl dynamically by checking the environment: const isBrowser = typeof window !== 'undefined'; baseUrl: isBrowser ? '/api' : 'http://localhost:3000/api'.",
         "Always handle API failures by catching the exported ApiError class. The error.message property is automatically localized based on the client's locale and errorMessages config.",
-        "To achieve full resilience, you must combine retryPolicy and circuitBreaker in the ApiClient config, and then inject a RateLimiter instance via a global request interceptor.",
+        "To achieve full resilience, combine retryPolicy, circuitBreaker, and rateLimiter directly in the ApiClient config object.",
         "You must prevent duplicate requests using the dedupe: true option and cache successful responses using cache: true with a defined cacheTTL in request options.",
         "To enable structured logging for retries, you must pass a ByteKit Logger instance to the ApiClient constructor. It automatically logs every request and retry lifecycle event.",
         "Standardize all collection handling using api.getList(path, { pagination, filters, sort }). This method automatically constructs complex query strings and handles paginated JSON responses.",

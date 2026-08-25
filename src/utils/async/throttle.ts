@@ -46,6 +46,7 @@ export function throttleAsync<TArgs extends any[], TReturn>(
     let pendingArgs: TArgs | null = null;
     let pendingResolve: ((value: TReturn) => void) | null = null;
     let pendingReject: ((reason: any) => void) | null = null;
+    let generation = 0;
 
     /**
      * Executes the function with the given arguments
@@ -65,6 +66,7 @@ export function throttleAsync<TArgs extends any[], TReturn>(
         const args = pendingArgs;
         const resolve = pendingResolve;
         const reject = pendingReject;
+        const expectedGeneration = generation;
 
         // Clear pending state
         pendingArgs = null;
@@ -74,9 +76,13 @@ export function throttleAsync<TArgs extends any[], TReturn>(
 
         try {
             const result = await execute(args);
-            resolve?.(result);
+            if (generation === expectedGeneration) {
+                resolve?.(result);
+            }
         } catch (error) {
-            reject?.(error);
+            if (generation === expectedGeneration) {
+                reject?.(error);
+            }
         }
     };
 
@@ -108,6 +114,8 @@ export function throttleAsync<TArgs extends any[], TReturn>(
             pendingResolve = resolve;
             pendingReject = reject;
         });
+
+        generation++;
 
         // Clear existing timeout
         if (timeoutId !== null) {
@@ -144,6 +152,7 @@ export function throttleAsync<TArgs extends any[], TReturn>(
         }
 
         pendingArgs = null;
+        generation++;
     };
 
     return throttled;

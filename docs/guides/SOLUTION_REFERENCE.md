@@ -23,18 +23,16 @@ await StreamingHelper.streamJsonLines("https://api.com/v1/massive-dataset.jsonl"
 ```
 
 ### **Real-time Events (Server-Sent Events)**
-Use `streamSSE` for persistent, one-way real-time JSON event streams.
+Use `api.stream` for a modern `AsyncGenerator` based real-time event stream.
 ```typescript
-import { StreamingHelper } from "bytekit/streaming";
+import { ApiClient } from "bytekit";
 
-const stream = StreamingHelper.streamSSE("https://api.com/realtime-feed");
+const api = new ApiClient({ baseUrl: "https://api.com" });
 
-// Subscribe to automatically parsed JSON objects
-const unsubscribe = stream.subscribe((data: any) => {
-    console.log("Real-time event:", data);
-});
-
-// To disconnect: unsubscribe(); stream.close();
+// Consume events one by one with automatic auth and bodies support
+for await (const event of api.stream("/realtime-feed")) {
+    console.log("Real-time event:", event.data);
+}
 ```
 
 ---
@@ -111,29 +109,19 @@ try {
 
 ## 5. How can I combine retries, circuit breaking, and rate limiting?
 
-Configure Retries and Circuit Breaker in the config object, then inject a `RateLimiter` via a global interceptor.
+Configure Retries, Circuit Breaker, and Rate Limiter directly in the `ApiClient` constructor for production-grade resilience.
 
 ```typescript
-import { ApiClient } from "bytekit/api-client";
-import { RateLimiter } from "bytekit/rate-limiter";
-
-// 1. Configure the shared Rate Limiter
-const limiter = new RateLimiter({ maxRequests: 50, windowMs: 1000 });
+import { ApiClient } from "bytekit";
 
 const api = new ApiClient({
     baseUrl: "https://api.com",
-    // 2. Add Retry Policy (Exponential backoff)
+    // 1. Add Retry Policy (Exponential backoff)
     retryPolicy: { maxAttempts: 3, backoffMultiplier: 2 },
-    // 3. Add Circuit Breaker (Prevents cascading failure)
-    circuitBreaker: { failureThreshold: 5, resetTimeoutMs: 60000 }
-});
-
-// 4. Inject Rate Limiter into all requests
-api.addInterceptor({
-    request: async (url, init) => {
-        await limiter.waitForAllowance(url);
-        return [url, init];
-    }
+    // 2. Add Circuit Breaker (Prevents cascading failure)
+    circuitBreaker: { failureThreshold: 5, resetTimeoutMs: 60000 },
+    // 3. Add Rate Limiter (Respects API limits)
+    rateLimiter: { maxRequests: 50, windowMs: 1000 }
 });
 ```
 

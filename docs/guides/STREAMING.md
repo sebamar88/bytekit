@@ -56,34 +56,34 @@ const result = await StreamingHelper.streamJsonLines<User>(
 
 ## 📡 Server-Sent Events (SSE)
 
-Real-time updates are best handled with SSE. `StreamingHelper.streamSSE` provides a simple subscription model.
+Real-time updates are best handled with SSE. ByteKit provides two ways to handle them: the modern `api.stream()` for full feature support, and the legacy `streamSSE`.
 
-### Basic Subscription
+### Modern Usage (`ApiClient.stream`)
+
+This is the recommended way to handle SSE. It supports `Authorization` headers, `POST` requests with bodies, and custom interceptors.
+
+```typescript
+import { ApiClient } from "bytekit";
+
+const api = new ApiClient({ baseUrl: "https://api.example.com" });
+
+// Supports POST, Body, and Authorization automatically
+for await (const event of api.stream<PriceUpdate>("/prices", {
+    method: "POST",
+    body: { symbols: ["BTC", "ETH"] }
+})) {
+    console.log(`Event: ${event.event}`, event.data);
+}
+```
+
+### Legacy Subscription (`streamSSE`)
+
+> [!WARNING]
+> `StreamingHelper.streamSSE` is deprecated. It uses the native `EventSource` API which is limited to `GET` requests and doesn't support custom headers or request bodies.
 
 ```typescript
 import { StreamingHelper } from "bytekit";
-
-interface PriceUpdate {
-    symbol: string;
-    price: number;
-}
-
-const stream = StreamingHelper.streamSSE<PriceUpdate>(
-    "https://api.example.com/prices",
-    {
-        onError: (error) => console.error("SSE error:", error),
-        onComplete: () => console.log("SSE connection closed"),
-    }
-);
-
-// Subscribe to events
-const unsubscribe = stream.subscribe((data) => {
-    console.log(`${data.symbol}: $${data.price}`);
-});
-
-// When you're done, close the connection
-// unsubscribe(); // Stop receiving updates but keep connection
-// stream.close(); // Close the connection entirely
+// ... (rest of legacy example)
 ```
 
 ### Custom Event Types

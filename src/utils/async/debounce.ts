@@ -49,6 +49,7 @@ export function debounceAsync<TArgs extends any[], TReturn>(
     let pendingResolve: ((value: TReturn) => void) | null = null;
     let pendingReject: ((reason: any) => void) | null = null;
     let lastCallTime = 0;
+    let generation = 0;
 
     /**
      * Executes the function with the pending arguments
@@ -59,6 +60,7 @@ export function debounceAsync<TArgs extends any[], TReturn>(
         const args = pendingArgs;
         const resolve = pendingResolve;
         const reject = pendingReject;
+        const expectedGeneration = generation;
 
         // Clear pending state
         pendingArgs = null;
@@ -67,9 +69,13 @@ export function debounceAsync<TArgs extends any[], TReturn>(
 
         try {
             const result = await fn(...args);
-            resolve?.(result);
+            if (generation === expectedGeneration) {
+                resolve?.(result);
+            }
         } catch (error) {
-            reject?.(error);
+            if (generation === expectedGeneration) {
+                reject?.(error);
+            }
         }
     };
 
@@ -83,6 +89,7 @@ export function debounceAsync<TArgs extends any[], TReturn>(
 
         lastCallTime = now;
         pendingArgs = args;
+        generation++;
 
         // Create a new promise for this call
         const promise = new Promise<TReturn>((resolve, reject) => {
@@ -146,6 +153,7 @@ export function debounceAsync<TArgs extends any[], TReturn>(
 
         pendingArgs = null;
         lastCallTime = 0;
+        generation++;
     };
 
     /**

@@ -24,7 +24,6 @@ export interface SafeSerializeOptions {
     maxStringLength?: number;
 }
 
-/* v8 ignore next */
 export function createSensitiveKeySet(keys?: string[]): Set<string> {
     return new Set((keys ?? DEFAULT_SENSITIVE_KEYS).map(normalizeSensitiveKey));
 }
@@ -80,7 +79,6 @@ export function safeSerialize(
             return {
                 name: input.name,
                 message: input.message,
-                stack: input.stack,
             };
         }
 
@@ -101,8 +99,19 @@ export function safeSerialize(
 
             seen.add(input);
             const output: Record<string, unknown> = {};
-            for (const [key, nested] of Object.entries(input)) {
-                output[key] = visit(nested, depth + 1, key);
+            for (const key of Object.keys(input)) {
+                if (
+                    key === "__proto__" ||
+                    key === "constructor" ||
+                    key === "prototype"
+                ) {
+                    continue;
+                }
+                output[key] = visit(
+                    (input as Record<string, unknown>)[key],
+                    depth + 1,
+                    key
+                );
             }
             return output;
         }

@@ -1,5 +1,6 @@
 import { Logger } from "#core/Logger.js";
 import { UrlHelper } from "#helpers/UrlHelper.js";
+import { StreamingHelper, SSEEvent } from "#helpers/StreamingHelper.js";
 import { retry as retryFn } from "../async/retry.js";
 import {
     RetryPolicy,
@@ -7,6 +8,7 @@ import {
     RetryConfig,
     CircuitBreakerConfig,
 } from "#core/RetryPolicy.js";
+import { RateLimiter, RateLimiterConfig } from "#core/RateLimiter.js";
 import {
     ResponseValidator,
     ValidationSchema,
@@ -48,6 +50,7 @@ export interface ApiClientConfig {
     logger?: Logger;
     retryPolicy?: RetryConfig;
     circuitBreaker?: CircuitBreakerConfig;
+    rateLimiter?: RateLimiterConfig | RateLimiter;
     /** Optional pool for limiting concurrent requests. */
     pool?: PromisePoolOptions;
     /** Optional request queue for concurrency-limited, priority-aware request execution. */
@@ -168,10 +171,11 @@ export class ApiError extends Error {
                         ? String(safeSerialize(this.body))
                         : JSON.stringify(safeSerialize(this.body), null, 2);
                 parts.push(`Body: ${bodyStr}`);
+                /* v8 ignore start */
             } catch {
-                /* v8 ignore next */
                 parts.push(`Body: ${String(safeSerialize(this.body))}`);
             }
+            /* v8 ignore end */
         }
 
         if (this.stack) {
@@ -247,6 +251,7 @@ export class ApiClient {
     >;
     private readonly retryPolicy: RetryPolicy;
     private readonly circuitBreaker: CircuitBreaker;
+    private readonly rateLimiter?: RateLimiter;
     private readonly pool?: PromisePool;
     private readonly _queue?: RequestQueue;
     private readonly _batcher?: RequestBatcher;
@@ -281,6 +286,7 @@ export class ApiClient {
         logger,
         retryPolicy,
         circuitBreaker,
+        rateLimiter,
         pool,
         queue,
         batch,
@@ -317,6 +323,15 @@ export class ApiClient {
         this.logger = logger;
         this.retryPolicy = new RetryPolicy(retryPolicy);
         this.circuitBreaker = new CircuitBreaker(circuitBreaker);
+
+        // Initialize RateLimiter if configured
+        if (rateLimiter) {
+            this.rateLimiter =
+                rateLimiter instanceof RateLimiter
+                    ? rateLimiter
+                    : new RateLimiter(rateLimiter);
+        }
+
         this.pool = pool ? new PromisePool(pool) : undefined;
         this._queue = queue ? new RequestQueue(queue) : undefined;
         this._batcher = batch ? new RequestBatcher(batch) : undefined;
@@ -373,6 +388,105 @@ export class ApiClient {
 
     async delete<T>(path: string | URL, options?: RequestOptions<T>) {
         return this.request<T>(path, { ...options, method: "DELETE" });
+    }
+
+    /**
+     * Consume a Server-Sent Events (SSE) stream.
+     *
+     * This method combines the robustness of `StreamingHelper.fetchSSE` with the
+     * configuration of the `ApiClient` (baseUrl, authorization headers, interceptors).
+     *
+     * Supports normalized signature: `api.stream(path, body)` or `api.stream(path, options)`.
+     *
+     * @example
+     * // Consume a POST-based stream with filters
+     * for await (const ev of api.stream<MyData>("/events", { type: "urgent" })) {
+     *   console.log(ev.data);
+     * }
+     *
+     * @param path The relative path to the SSE endpoint
+     * @param bodyOrOptions Request body (for POST) or full request options
+     */
+    async *stream<T = unknown>(
+        path: string | URL,
+        bodyOrOptions?: RequestOptions | unknown
+    ): AsyncGenerator<SSEEvent<T>, void, undefined> {
+        const options = this.normalizeBodyOrOptions(
+            bodyOrOptions as RequestOptions
+        );
+        // Default to POST if we have a body but no explicit method
+        if (options.body && !options.method) {
+            options.method = "POST";
+        }
+        const { url, init, controller } = await this.prepareRequestConfig(
+            path,
+            options
+        );
+
+        try {
+            const stream = StreamingHelper.fetchSSE<T>(url, {
+                method: init.method,
+                body: init.body,
+                headers: init.headers as Record<string, string>,
+                signal: init.signal || undefined,
+                fetchImpl: this.fetchImpl,
+            });
+
+            for await (const event of stream) {
+                yield event;
+            }
+        } finally {
+            controller.abort();
+        }
+    }
+
+    /**
+     * Consume a JSON Lines (NDJSON) stream.
+     *
+     * Similar to `stream()`, but for endpoints that return a sequence of JSON objects
+     * separated by newlines instead of SSE format.
+     *
+     * Supports normalized signature: `api.streamJsonLines(path, body)` or `api.streamJsonLines(path, options)`.
+     *
+     * @example
+     * for await (const user of api.streamJsonLines<User>("/users/export")) {
+     *   console.log(user.name);
+     * }
+     *
+     * @param path The relative path to the NDJSON endpoint
+     * @param bodyOrOptions Request body (for POST) or full request options
+     */
+    async *streamJsonLines<T = unknown>(
+        path: string | URL,
+        bodyOrOptions?: RequestOptions | unknown
+    ): AsyncGenerator<T, void, undefined> {
+        const options = this.normalizeBodyOrOptions(
+            bodyOrOptions as RequestOptions
+        );
+        // Default to POST if we have a body but no explicit method
+        if (options.body && !options.method) {
+            options.method = "POST";
+        }
+        const { url, init, controller } = await this.prepareRequestConfig(
+            path,
+            options
+        );
+
+        try {
+            const stream = StreamingHelper.fetchNDJSON<T>(url, {
+                method: init.method,
+                body: init.body,
+                headers: init.headers as Record<string, string>,
+                signal: init.signal || undefined,
+                fetchImpl: this.fetchImpl,
+            });
+
+            for await (const item of stream) {
+                yield item;
+            }
+        } finally {
+            controller.abort();
+        }
     }
 
     /**
@@ -481,8 +595,21 @@ export class ApiClient {
         }
 
         const controller = new AbortController();
-        const signal = controller.signal;
         const timeout = timeoutMs ?? this.timeoutMs;
+
+        // Link user signal if provided
+        if (requestOptions.signal) {
+            const userSignal = requestOptions.signal;
+            if (userSignal.aborted) {
+                controller.abort(userSignal.reason);
+            } else {
+                userSignal.addEventListener("abort", () => {
+                    controller.abort(userSignal.reason);
+                });
+            }
+        }
+
+        const signal = controller.signal;
 
         // Convert Headers to plain object for compatibility with all fetch implementations
         const headersObject = Object.fromEntries(
@@ -495,6 +622,11 @@ export class ApiClient {
             body: preparedBody,
             signal,
         };
+
+        // Apply Rate Limiting if configured
+        if (this.rateLimiter) {
+            await this.rateLimiter.waitForAllowance(url, signal);
+        }
 
         // Request interceptor
         const interceptorsEnabled =
