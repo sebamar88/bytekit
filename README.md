@@ -20,7 +20,7 @@
 * 🌐 **Isomorphic ApiClient:** Works on Node.js 18+ and modern browsers (native fetch).
 * 🛡️ **Schema Validation:** Built-in adapters for Zod and Valibot. Fully typed responses.
 * 🔁 **HTTP Resilience:** Retries, Circuit Breaker, Rate Limiting, Request Cache, and Deduplication out of the box.
-* ⚡ **Async Toolkit:** A powerful set of tools for concurrency (`parallel`,  `race`), timing (`sleep`,  `timeout`), and execution control (`retry`,  `debounce`,  `throttle`).
+* ⚡ **Async Toolkit:** A powerful set of tools for concurrency (`parallel`,   `race`), timing (`sleep`,   `timeout`), and execution control (`retry`,   `debounce`,   `throttle`).
 * 📦 **Deep-Zero Dependencies:** No external runtime packages added to your bundle.
 * 🪵 **Observability:** Structured logging and performance profiling modules.
 * 🎯 **95%+ Test Coverage:** Rigorously tested core.

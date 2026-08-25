@@ -4,22 +4,22 @@ First off, thanks for taking the time to contribute! 🎉
 
 We love your input! We want to make contributing to Bytekit as easy and transparent as possible, whether it's:
 
-- Reporting a bug
-- Discussing the current state of the code
-- Submitting a fix
-- Proposing new features
-- Becoming a maintainer
+* Reporting a bug
+* Discussing the current state of the code
+* Submitting a fix
+* Proposing new features
+* Becoming a maintainer
 
 ## 📋 Table of Contents
 
-- [Code of Conduct](#code-of-conduct)
-- [How Can I Contribute?](#how-can-i-contribute)
-- [Development Setup](#development-setup)
-- [Pull Request Process](#pull-request-process)
-- [Code Style Guidelines](#code-style-guidelines)
-- [Testing Guidelines](#testing-guidelines)
-- [Documentation Guidelines](#documentation-guidelines)
-- [Community](#community)
+* [Code of Conduct](#code-of-conduct)
+* [How Can I Contribute?](#how-can-i-contribute)
+* [Development Setup](#development-setup)
+* [Pull Request Process](#pull-request-process)
+* [Code Style Guidelines](#code-style-guidelines)
+* [Testing Guidelines](#testing-guidelines)
+* [Documentation Guidelines](#documentation-guidelines)
+* [Community](#community)
 
 ## 📜 Code of Conduct
 
@@ -31,11 +31,11 @@ This project and everyone participating in it is governed by our [Code of Conduc
 
 Before creating bug reports, please check the existing issues to avoid duplicates. When you create a bug report, include as many details as possible:
 
-- **Use a clear and descriptive title**
-- **Describe the exact steps to reproduce the problem**
-- **Provide specific examples** (code snippets, screenshots)
-- **Describe the behavior you observed** and what you expected
-- **Include environment details** (Node.js version, OS, browser)
+* **Use a clear and descriptive title** 
+* **Describe the exact steps to reproduce the problem** 
+* **Provide specific examples** (code snippets, screenshots)
+* **Describe the behavior you observed** and what you expected
+* **Include environment details** (Node.js version, OS, browser)
 
 Use our [Bug Report Template](.github/ISSUE_TEMPLATE/bug_report.md)
 
@@ -43,10 +43,10 @@ Use our [Bug Report Template](.github/ISSUE_TEMPLATE/bug_report.md)
 
 Feature suggestions are tracked as GitHub issues. When creating a feature request:
 
-- **Use a clear and descriptive title**
-- **Provide a detailed description** of the proposed feature
-- **Explain why this feature would be useful** to most users
-- **Include code examples** showing how the feature would be used
+* **Use a clear and descriptive title** 
+* **Provide a detailed description** of the proposed feature
+* **Explain why this feature would be useful** to most users
+* **Include code examples** showing how the feature would be used
 
 Use our [Feature Request Template](.github/ISSUE_TEMPLATE/feature_request.md)
 
@@ -54,18 +54,18 @@ Use our [Feature Request Template](.github/ISSUE_TEMPLATE/feature_request.md)
 
 Unsure where to begin? You can start by looking through `good-first-issue` and `help-wanted` issues:
 
-- **Good first issues** - issues which should only require a few lines of code
-- **Help wanted issues** - issues which should be a bit more involved
+* **Good first issues** - issues which should only require a few lines of code
+* **Help wanted issues** - issues which should be a bit more involved
 
 ### Pull Requests
 
 1. **Fork the repository** and create your branch from `main`
-2. **Install dependencies**: `pnpm install`
+2. **Install dependencies** : `pnpm install`
 3. **Make your changes** following our code style guidelines
 4. **Add tests** for your changes
-5. **Ensure all tests pass**: `pnpm run test:coverage`
-6. **Lint your code**: `pnpm run lint`
-7. **Format your code**: `pnpm run format`
+5. **Ensure all tests pass** : `pnpm run test:coverage`
+6. **Lint your code** : `pnpm run lint`
+7. **Format your code** : `pnpm run format`
 8. **Update documentation** if needed
 9. **Submit your PR** using our template
 
@@ -73,8 +73,8 @@ Unsure where to begin? You can start by looking through `good-first-issue` and `
 
 ### Prerequisites
 
-- Node.js >= 18
-- pnpm >= 9
+* Node.js >= 18
+* pnpm >= 9
 
 ### Installation
 
@@ -141,19 +141,19 @@ We follow [Conventional Commits](https://www.conventionalcommits.org/):
 <footer>
 ```
 
-**Types:**
+ **Types:** 
 
-- `feat`: New feature
-- `fix`: Bug fix
-- `docs`: Documentation changes
-- `style`: Code style changes (formatting, no logic change)
-- `refactor`: Code refactoring
-- `perf`: Performance improvements
-- `test`: Adding or updating tests
-- `chore`: Maintenance tasks
-- `ci`: CI/CD changes
+* `feat`: New feature
+* `fix`: Bug fix
+* `docs`: Documentation changes
+* `style`: Code style changes (formatting, no logic change)
+* `refactor`: Code refactoring
+* `perf`: Performance improvements
+* `test`: Adding or updating tests
+* `chore`: Maintenance tasks
+* `ci`: CI/CD changes
 
-**Examples:**
+ **Examples:** 
 
 ```
 feat(api-client): add retry mechanism with exponential backoff
@@ -169,19 +169,19 @@ test(array-utils): add edge case tests for chunk function
 
 ### TypeScript
 
-- Use TypeScript strict mode
-- Prefer interfaces over types for object shapes
-- Use explicit return types for public functions
-- Avoid `any` - use `unknown` if type is truly unknown
-- Use optional chaining (`?.`) and nullish coalescing (`??`)
+* Use TypeScript strict mode
+* Prefer interfaces over types for object shapes
+* Use explicit return types for public functions
+* Avoid `any` - use `unknown` if type is truly unknown
+* Use optional chaining (`?.`) and nullish coalescing (`??`)
 
 ### Naming Conventions
 
-- **Files**: kebab-case (`array-utils.ts`)
-- **Classes**: PascalCase (`ApiClient`)
-- **Functions**: camelCase (`formatDate`)
-- **Constants**: UPPER_SNAKE_CASE (`MAX_RETRIES`)
-- **Interfaces**: PascalCase with 'I' prefix optional (`IRequestOptions` or `RequestOptions`)
+* **Files** : kebab-case (`array-utils.ts`)
+* **Classes** : PascalCase (`ApiClient`)
+* **Functions** : camelCase (`formatDate`)
+* **Constants** : UPPER_SNAKE_CASE (`MAX_RETRIES`)
+* **Interfaces** : PascalCase with 'I' prefix optional (`IRequestOptions` or `RequestOptions`)
 
 ### Code Organization
 
@@ -211,21 +211,21 @@ function helperFunction() {
 
 ### Best Practices
 
-- **DRY (Don't Repeat Yourself)**: Extract common logic into utilities
-- **SOLID Principles**: Follow single responsibility, open/closed, etc.
-- **Error Handling**: Always handle errors gracefully with descriptive messages
-- **Documentation**: Add JSDoc comments for all public APIs
-- **Performance**: Consider performance implications, especially for utilities
-- **Type Safety**: Leverage TypeScript's type system fully
+* **DRY (Don't Repeat Yourself)** : Extract common logic into utilities
+* **SOLID Principles** : Follow single responsibility, open/closed, etc.
+* **Error Handling** : Always handle errors gracefully with descriptive messages
+* **Documentation** : Add JSDoc comments for all public APIs
+* **Performance** : Consider performance implications, especially for utilities
+* **Type Safety** : Leverage TypeScript's type system fully
 
 ## ✅ Testing Guidelines
 
 ### Test Coverage Requirements
 
-- **Overall coverage**: >= 90%
-- **Branch coverage**: >= 85%
-- **Function coverage**: >= 90%
-- **Line coverage**: >= 90%
+* **Overall coverage** : >= 90%
+* **Branch coverage** : >= 85%
+* **Function coverage** : >= 90%
+* **Line coverage** : >= 90%
 
 ### Writing Tests
 
@@ -251,18 +251,18 @@ describe("myFunction", () => {
 
 ### Test Structure
 
-- **Arrange**: Set up test data and conditions
-- **Act**: Execute the function/method being tested
-- **Assert**: Verify the results
+* **Arrange** : Set up test data and conditions
+* **Act** : Execute the function/method being tested
+* **Assert** : Verify the results
 
 ### What to Test
 
-- ✅ Happy path scenarios
-- ✅ Edge cases (empty arrays, null/undefined, boundary values)
-- ✅ Error conditions
-- ✅ Type safety (if using TypeScript)
-- ✅ Performance (for critical utilities)
-- ✅ Integration between modules
+* ✅ Happy path scenarios
+* ✅ Edge cases (empty arrays, null/undefined, boundary values)
+* ✅ Error conditions
+* ✅ Type safety (if using TypeScript)
+* ✅ Performance (for critical utilities)
+* ✅ Integration between modules
 
 ## 📚 Documentation Guidelines
 
@@ -270,7 +270,9 @@ describe("myFunction", () => {
 
 Add JSDoc comments for all public APIs:
 
-````typescript
+`
+
+```typescript
 /**
  * Formats a date according to the specified format string.
  *
@@ -285,13 +287,18 @@ Add JSDoc comments for all public APIs:
  * formatDate(new Date(), 'YYYY-MM-DD')
  * // => '2024-03-15'
  * ```
+
  */
 export function formatDate(
+
     date: Date,
     format: string,
     options?: FormatOptions
+
 ): string {
+
     // ...
+
 }
 ````
 
@@ -317,17 +324,17 @@ For major features:
 
 ### Getting Help
 
-- 💬 [GitHub Discussions](https://github.com/sebamar88/bytekit/discussions) - Ask questions and share ideas
-- 🐛 [GitHub Issues](https://github.com/sebamar88/bytekit/issues) - Report bugs and request features
-- 📧 Email: sebamar88@gmail.com
+* 💬 [GitHub Discussions](https://github.com/sebamar88/bytekit/discussions) - Ask questions and share ideas
+* 🐛 [GitHub Issues](https://github.com/sebamar88/bytekit/issues) - Report bugs and request features
+* 📧 Email: sebamar88@gmail.com
 
 ### Recognition
 
 Contributors will be:
 
-- Listed in our README
-- Mentioned in release notes
-- Credited in the CHANGELOG
+* Listed in our README
+* Mentioned in release notes
+* Credited in the CHANGELOG
 
 ## 📄 License
 
